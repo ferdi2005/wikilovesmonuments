@@ -1,0 +1,2 @@
+class Monument < ApplicationRecord
+end

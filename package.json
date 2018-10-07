@@ -1,5 +1,8 @@
 {
   "name": "wikilovesmonuments",
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+    "bulma": "^0.7.1",
+    "jquery": "^3.3.1"
+  }
 }

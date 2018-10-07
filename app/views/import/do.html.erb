@@ -1,0 +1,7 @@
+<%= form_for(:import, url: import_path, method: :post) do |f| %>
+  <div class="control">
+  <%= f.label :password, class: 'label'%>
+  <%= f.password_field :password, class: 'input' %>
+</div>
+<%= f.submit 'Esegui import', class: 'button is-danger is-medium' %>
+<% end %>

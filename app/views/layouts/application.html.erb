@@ -1,15 +1,27 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Wikilovesmonuments</title>
+    <title>Ricerca - Wiki Loves Monuments</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
 
   <body>
-    <%= yield %>
+    <% flash.each do |tipo_messaggio, messaggio| %>
+      <div class="notification is-<%= tipo_messaggio %>"><%= messaggio %></div>
+    <% end %>
+    <div class="section">
+      <%= yield %>
+    </div>
   </body>
+    <footer class="footer">
+    <p>
+    </p>
+    <%= link_to 'About', about_path %>
+</footer>
+
 </html>
