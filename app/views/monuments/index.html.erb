@@ -6,7 +6,7 @@
     <th>Link</th>
   </thead>
   <tbody>
-      <%= @monument.each do |monument| %>
+      <% @monument.each do |monument| %>
       <tr>
         <td>
         <% if !monument.image.nil? %>
@@ -19,7 +19,7 @@
         <%= monument.itemLabel %>
         </td>
         <td>
-          <%= link_to monument, class: 'button is-small is-link' %>
+          <i class="fas fa-search"></i> <%= link_to 'Maggiori informazioni', monuments_path + '/' + monument.id.to_s, class: 'button is-small is-link' %>
         </td>
       <% end %>
     </tbody>

@@ -61,7 +61,7 @@ if (navigator.geolocation) {
   </div>
 </br>
 </form>
-<% maps_api_key = "AIzaSyCgY0RtlxWQh4OPKXLqLZKWT3RJGOg15Cc" %>
+<% maps_api_key = ENV['google_maps_api_key'] %>
 <script src='https://maps.googleapis.com/maps/api/js?key=<%= maps_api_key %>&libraries=places'></script>
 <script>
   function initialize() {

@@ -3,7 +3,6 @@ class ImportController < ApplicationController
   def do
   end
   def import
-    #DEBUG: Cambiare to env password
       endpoint = "https://query.wikidata.org/sparql"
       sparql = '
       #defaultView:Map
