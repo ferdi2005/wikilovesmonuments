@@ -2,9 +2,9 @@ class MonumentsController < ApplicationController
 
   def index
     if params[:latitude] && params[:longitude]
-      @monument = Monument.near([params[:latitude].to_decimal, params[:longitude].to_decimal],30, units: :km)
+      @monument = Monument.near([params[:latitude].to_decimal, params[:longitude].to_decimal])
     elsif params[:city]
-      @monument = Monument.near("#{params[:city]}", 30, units: :km)
+      @monument = Monument.near("#{params[:city]}")
     end
   end
 

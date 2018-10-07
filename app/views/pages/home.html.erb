@@ -1,7 +1,8 @@
 <h1 class="is-danger is-2 title is-centered">Wiki Loves Monuments Italia</h1>
 <h2 style="position:center;" class="is-link is-4 title is-centered">Ricerca monumenti</h1>
-
-<div class="is-centered" id="button-loc-position"></div>
+<div class="buttons is-centered">
+<%= link_to "Utilizza la mia posizione", monuments_path, id: 'autoposition-button', class: "button is-primary is-large is-centered" %>
+</div>
 
 <input type="hidden" id="latitude" name="latitude"/>
 <input type="hidden" id="longitude" name="longitude"/>
