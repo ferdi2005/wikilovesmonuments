@@ -5,7 +5,7 @@
   <input type="hidden" id="latitude" name="latitude"/>
   <input type="hidden" id="longitude" name="longitude"/>
 </form>
-<button id="click-submit-position" value="Utilizza la mia posizione" class="button is-primary is-large is-centered"/>
+<button id="click-submit-position" class="button is-primary is-large is-centered">Utilizza la mia posizione</button>
 </div>
 <script>
 if (navigator.geolocation) {
@@ -17,13 +17,13 @@ if (navigator.geolocation) {
         var lat = position.coords.latitude;
         var lng = position.coords.longitude;
 
-        $("#autoposition-button").click(function(){
+        $("#click-submit-position").click(function(){
           $("#latitude").val(lat);
           $("#longitude").val(lng);
+          $("#form-position").submit();
         });
 
-
-    }, function(error) {
+      }, function(error) {
         clearTimeout(location_timeout);
         console.log('Geolocation Error!');
     });
@@ -31,12 +31,6 @@ if (navigator.geolocation) {
     // Fallback for no geolocation
     console.log('Geolocation Error!');
 }
-
-        $("#click-submit-position").click(function(){
-          $("#latitude").val(lat);
-          $("#longitude").val(lng);
-          $("#form-position").submit();
-        });
 
 </script>
 <!--
