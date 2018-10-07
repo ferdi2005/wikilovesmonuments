@@ -1,2 +1,26 @@
-<h1>Monuments#list</h1>
-<p>Find me in app/views/monuments/list.html.erb</p>
+<h1 class="title is-2 is-danger">Lista monumenti nelle vicinanze</h1>
+<table class="table">
+  <thead>
+    <th>Immagine</th>
+    <th>Nome</th>
+    <th>Link</th>
+  </thead>
+  <tbody>
+      <%= @monument.each do |monument| %>
+      <tr>
+        <td>
+        <% if !monument.image.nil? %>
+          <%= image_tag monument.image, width: 200  %>
+        <% else %>
+          Scattane una tu!
+        <% end %>
+        </td>
+        <td>
+        <%= monument.itemLabel %>
+        </td>
+        <td>
+          <%= link_to monument, class: 'button is-small is-link' %>
+        </td>
+      <% end %>
+    </tbody>
+</table>

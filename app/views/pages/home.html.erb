@@ -1,2 +1,80 @@
-<h1>Pages#home</h1>
-<p>Find me in app/views/pages/home.html.erb</p>
+<h1 class="is-danger is-2 title is-centered">Wiki Loves Monuments Italia</h1>
+<h2 style="position:center;" class="is-link is-4 title is-centered">Ricerca monumenti</h1>
+
+<div class="is-centered" id="button-loc-position"></div>
+
+<input type="hidden" id="latitude" name="latitude"/>
+<input type="hidden" id="longitude" name="longitude"/>
+<!--
+<label class="label is-vertical">Distanza massima</b>
+<form id="distance-form">
+  <div class="select is-small">
+    <select name="distance">
+      <option value="10">10 km</option>
+      <option value="20">20 km</option>
+      <option value="50">50 km</option>
+      <option value="100">100 km</option>
+    </select>
+  </div>
+</form>
+-->
+<script>
+if (navigator.geolocation) {
+    var location_timeout = setTimeout(10000);
+
+    navigator.geolocation.getCurrentPosition(function(position) {
+        clearTimeout(location_timeout);
+
+        var lat = position.coords.latitude;
+        var lng = position.coords.longitude;
+        geocodeLatLng(lat, lng);
+
+        $('#button-loc-position').append('<%= link_to "Utilizza la mia posizione", monuments_path, id: 'autoposition-button', class: "button is-primary is-large" %>')
+
+        $("#autoposition-button").click(function(){
+          $("#latitude").val(lat);
+          $("#longitude").val(lng);
+        });
+
+
+    }, function(error) {
+        clearTimeout(location_timeout);
+        console.log('Geolocation Error!');
+    });
+} else {
+    // Fallback for no geolocation
+    console.log('Geolocation Error!');
+}
+</script>
+<div class="strike">
+   <span>O</span>
+</div>
+<br />
+<form method="get" action="/monuments" >
+  <div class="field has-addons is-centered">
+      <div class="control">
+        <input type="text" class="input" id="searchTextField" placeholder="Città" name="city"></input>
+      </div>
+      <div class="control">
+        <button type="submit" class="button is-primary" placeholder="Cerca" id="click-form"/>
+      </div>
+  </div>
+</br>
+</form>
+<% maps_api_key = "AIzaSyCgY0RtlxWQh4OPKXLqLZKWT3RJGOg15Cc" %>
+<script src='https://maps.googleapis.com/maps/api/js?key=<%= maps_api_key %>&libraries=places'></script>
+<script>
+  function initialize() {
+    var options = {
+      types: ['(cities)'],
+      componentRestrictions: {
+        country: "it"
+      }
+    };
+
+    var input = document.getElementById('searchTextField');
+    var autocomplete = new google.maps.places.Autocomplete(input, options);
+  }
+
+  google.maps.event.addDomListener(window, 'load', initialize);
+</script>
