@@ -17,12 +17,8 @@ if (navigator.geolocation) {
         var lat = position.coords.latitude;
         var lng = position.coords.longitude;
 
-        $("#autoposition-button").click(function(){
-          $("#latitude").val(lat);
-          $("#longitude").val(lng);
-        });
-
-
+        alert(lat);
+        alert(lng);
     }, function(error) {
         clearTimeout(location_timeout);
         console.log('Geolocation Error!');
