@@ -15,8 +15,8 @@ ActiveRecord::Schema.define(version: 2018_10_07_132551) do
   create_table "monuments", force: :cascade do |t|
     t.string "item"
     t.string "wlmid"
-    t.decimal "latitude", precision: 2, scale: 15
-    t.decimal "longitude", precision: 2, scale: 15
+    t.decimal "latitude"
+    t.decimal "longitude"
     t.string "itemLabel"
     t.string "image"
     t.datetime "created_at", null: false
