@@ -1,24 +1,12 @@
 <h1 class="is-danger is-2 title is-centered">Wiki Loves Monuments Italia</h1>
 <h2 style="position:center;" class="is-link is-4 title is-centered">Ricerca monumenti</h1>
 <div class="buttons is-centered">
-<%= link_to "Utilizza la mia posizione", monuments_path, id: 'autoposition-button', class: "button is-primary is-large is-centered" %>
-</div>
-
-<input type="hidden" id="latitude" name="latitude"/>
-<input type="hidden" id="longitude" name="longitude"/>
-<!--
-<label class="label is-vertical">Distanza massima</b>
-<form id="distance-form">
-  <div class="select is-small">
-    <select name="distance">
-      <option value="10">10 km</option>
-      <option value="20">20 km</option>
-      <option value="50">50 km</option>
-      <option value="100">100 km</option>
-    </select>
-  </div>
+<form method="get" action="/monuments" id="form-position">
+  <input type="hidden" id="latitude" name="latitude"/>
+  <input type="hidden" id="longitude" name="longitude"/>
 </form>
--->
+<button id="click-submit-position" value="Utilizza la mia posizione" class="button is-primary is-large is-centered"/>
+</div>
 <script>
 if (navigator.geolocation) {
     var location_timeout = setTimeout(10000);
@@ -43,7 +31,27 @@ if (navigator.geolocation) {
     // Fallback for no geolocation
     console.log('Geolocation Error!');
 }
+
+        $("#click-submit-position").click(function(){
+          $("#latitude").val(lat);
+          $("#longitude").val(lng);
+          $("#form-position").submit();
+        });
+
 </script>
+<!--
+<label class="label is-vertical">Distanza massima</b>
+<form id="distance-form">
+  <div class="select is-small">
+    <select name="distance">
+      <option value="10">10 km</option>
+      <option value="20">20 km</option>
+      <option value="50">50 km</option>
+      <option value="100">100 km</option>
+    </select>
+  </div>
+</form>
+-->
 <div class="strike">
    <span>O</span>
 </div>
@@ -54,7 +62,7 @@ if (navigator.geolocation) {
         <input type="text" class="input" id="searchTextField" placeholder="Città" name="city"></input>
       </div>
       <div class="control">
-        <button type="submit" class="button is-primary" placeholder="Cerca" id="click-form"/>
+        <button type="submit" class="button is-primary" placeholder="Cerca" id="click-form">Cerca</button>
       </div>
   </div>
 </br>
