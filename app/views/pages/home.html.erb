@@ -27,9 +27,6 @@ if (navigator.geolocation) {
 
         var lat = position.coords.latitude;
         var lng = position.coords.longitude;
-        geocodeLatLng(lat, lng);
-
-        $('#button-loc-position').append('<%= link_to "Utilizza la mia posizione", monuments_path, id: 'autoposition-button', class: "button is-primary is-large" %>')
 
         $("#autoposition-button").click(function(){
           $("#latitude").val(lat);
