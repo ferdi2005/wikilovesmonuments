@@ -1,7 +1,7 @@
 <h1 class="title is-2 is-primary"><%= @monument.itemLabel %></h1>
 
    <% result = Geocoder.search([@monument.latitude, @monument.longitude]) %>
-    <a href="https://www.openstreetmap.org/?mlat=<%= @monument.latitude %>&mlon=<%= @monument.longitude %>">Indirizzo: <%= result.first.address %> </p>
+    <a href="https://www.openstreetmap.org/?mlat=<%= @monument.latitude %>&mlon=<%= @monument.longitude %>">Indirizzo: <%= result.first.address %> </a>
     <hr />
     <br />
     <%= link_to 'Item su Wikidata', "https://wikidata.org/wiki/#{@monument.item}", class: 'button is-danger is-medium' %>
