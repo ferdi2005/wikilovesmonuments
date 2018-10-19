@@ -8,17 +8,21 @@ class ImportController < ApplicationController
     else
       endpoint = "https://query.wikidata.org/sparql"
       sparql = '
-      #defaultView:Map
-      SELECT DISTINCT ?item ?itemLabel ?coords ?wlmid ?image
+      SELECT DISTINCT ?item ?itemLabel (AVG(?lat) AS ?lat) (AVG(?lon) AS ?lon) ?image
       WHERE {
-      ?item wdt:P2186 ?wlmid ;
+        ?item wdt:P2186 ?wlmid ;
                 wdt:P17 wd:Q38 ;
-                wdt:P625 ?coords
-      OPTIONAL { ?item wdt:P18 ?image }
+                wdt:P625 ?coords.
+                ?item                 p:P625         ?statementnode.
+                ?statementnode      psv:P625         ?valuenode.
+                ?valuenode     wikibase:geoLatitude  ?lat.
+                ?valuenode     wikibase:geoLongitude ?lon.
+          OPTIONAL { ?item wdt:P18 ?image } 
           MINUS { ?item p:P2186 [ pq:P582 ?end ] .
           FILTER ( ?end <= "2018-09-01T00:00:00+00:00"^^xsd:dateTime ) }
-      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],it"  }
-      }'
+        SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],it"  } 
+      }
+      GROUP BY ?item ?itemLabel ?image'
 
       client = SPARQL::Client.new(endpoint, :method => :get)
       monuments = client.query(sparql)
@@ -34,14 +38,11 @@ class ImportController < ApplicationController
           if key.to_s == 'wlmid'
             @mon.wlmid = val.to_s
           end
-          if key.to_s == 'coords'
-            totalarray = val.to_s.split('(')
-            onlylatlong = totalarray[1].split(')')
-            latlongarray = onlylatlong[0].split(' ')
-            lat = latlongarray[1]
-            long = latlongarray[0]
-            @mon.latitude = lat
-            @mon.longitude = long
+          if key.to_s == 'lat'
+            @mon.latitude = BigDecimal.new(val.to_s)
+          end
+          if key.to_s == 'lon'
+            @mon.longitude = BigDecimal.new(val.to_s)
           end
           if key.to_s == 'itemLabel'
             @mon.itemLabel = val.to_s
