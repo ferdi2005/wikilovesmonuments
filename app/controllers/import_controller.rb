@@ -6,6 +6,7 @@ class ImportController < ApplicationController
       render 'do'
       flash[:danger] = 'La password inserita non è corretta'
     else
+      Monument.delete_all
       endpoint = "https://query.wikidata.org/sparql"
       sparql = '
       SELECT DISTINCT ?item ?itemLabel (AVG(?lat) AS ?lat) (AVG(?lon) AS ?lon) ?image
@@ -17,10 +18,10 @@ class ImportController < ApplicationController
                 ?statementnode      psv:P625         ?valuenode.
                 ?valuenode     wikibase:geoLatitude  ?lat.
                 ?valuenode     wikibase:geoLongitude ?lon.
-          OPTIONAL { ?item wdt:P18 ?image } 
+          OPTIONAL { ?item wdt:P18 ?image }
           MINUS { ?item p:P2186 [ pq:P582 ?end ] .
           FILTER ( ?end <= "2018-09-01T00:00:00+00:00"^^xsd:dateTime ) }
-        SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],it"  } 
+        SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],it"  }
       }
       GROUP BY ?item ?itemLabel ?image'
 
