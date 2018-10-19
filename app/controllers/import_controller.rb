@@ -39,10 +39,10 @@ class ImportController < ApplicationController
             @mon.wlmid = val.to_s
           end
           if key.to_s == 'lat'
-            @mon.latitude = val.to_s
+            @mon.latitude = BigDecimal.new(val.to_s)
           end
           if key.to_s == 'lon'
-            @mon.longitude = val.to_s
+            @mon.longitude = BigDecimal.new(val.to_s)
           end
           if key.to_s == 'itemLabel'
             @mon.itemLabel = val.to_s
