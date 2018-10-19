@@ -1,6 +1,6 @@
 <% provide(:title, 'Monumenti nelle vicinanze') %>
 <h1 class="title is-2 is-danger">Lista monumenti nelle vicinanze</h1>
-<% if @monument.any? %>
+<% if @monument.any? || !@monument.nil? %>
 <table class="table">
   <thead>
     <th>Immagine</th>
@@ -21,11 +21,12 @@
         <%= monument.itemLabel %>
         </td>
         <td>
-          <i class="fas fa-search"></i> <%= link_to 'Maggiori informazioni', monuments_path + '/' + monument.id.to_s, class: 'button is-small is-link' %>
+          <i class="fas fa-search"></i> <%= link_to 'Maggiori informazioni', monuments_path + '/' + monument.id.to_s, class: 'button is-small is-link'%>
         </td>
       <% end %>
     </tbody>
 </table>
+  <%== pagy_nav_responsive_bulma(@pagy) %>
 <% else %>
 <h1 class="is-centered title is-3 is-red">Nessun monumento trovato nella località indicata</h1>
 <% end %>

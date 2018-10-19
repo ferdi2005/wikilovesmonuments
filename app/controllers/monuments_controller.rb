@@ -1,10 +1,11 @@
 class MonumentsController < ApplicationController
+  include Pagy::Backend
 
   def index
     if params[:latitude] && params[:longitude]
-      @monument = Monument.near([BigDecimal.new(params[:latitude]), BigDecimal.new(params[:longitude])])
+      @pagy, @monument = pagy(Monument.near([BigDecimal.new(params[:latitude]), BigDecimal.new(params[:longitude])]))
     elsif params[:city]
-      @monument = Monument.near("#{params[:city]}")
+      @pagy, @monument = pagy(Monument.near("#{params[:city]}"))
     end
   end
 
