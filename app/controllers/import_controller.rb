@@ -1,12 +1,11 @@
 class ImportController < ApplicationController
-  attr_accessor :password
   def do
   end
   def import
-    unless params[:import][:password] == ENV['PASSWORD']
-      redirect_to root_path
+    if params[:import][:password] != ENV['PASSWORD']
+      render 'do'
       flash[:danger] = 'La password inserita non è corretta'
-    end
+    else
       endpoint = "https://query.wikidata.org/sparql"
       sparql = '
       #defaultView:Map
@@ -56,4 +55,5 @@ class ImportController < ApplicationController
       redirect_to root_path
       flash[:success] = "Import fatto con successo"
   end
+end
 end
