@@ -7,10 +7,11 @@
   <input type="hidden" id="longitude" name="longitude"/>
 </form>
 <button id="click-submit-position" class="button is-primary is-large is-centered">Utilizza la mia posizione</button>
+<p id="geoerror" class="is-centered"></p>
 </div>
 <script>
 if (navigator.geolocation) {
-    var location_timeout = setTimeout(10000);
+    var location_timeout = setTimeout(1000);
 
     navigator.geolocation.getCurrentPosition(function(position) {
         clearTimeout(location_timeout);
@@ -26,11 +27,13 @@ if (navigator.geolocation) {
 
       }, function(error) {
         clearTimeout(location_timeout);
-        console.log('Geolocation Error!');
+        $("#geoerror").append('Errore di geolocalizzazione! Molto probabilmente non avrai autorizzato la localizzazione dal tuo browser o il tuo browser non ha i permessi necessari. Scrivi il nome della città nel campo sotto.');
+        $("#click-submit-position").addClass('is-hidden');
     });
 } else {
     // Fallback for no geolocation
-    console.log('Geolocation Error!');
+    $("#geoerror").append('Errore di geolocalizzazione! Molto probabilmente non avrai autorizzato la localizzazione dal tuo browser o il tuo browser non ha i permessi necessari. Scrivi il nome della città nel campo sotto.');
+    $("#click-submit-position").addClass('is-hidden');
 }
 
 </script>
@@ -38,13 +41,23 @@ if (navigator.geolocation) {
    <span>O</span>
 </div>
 <br />
+<script>
+function empty() {
+    var x;
+    x = document.getElementById("searchTextField").value;
+    if (x == "") {
+        alert("Inserisci il nome di una città prima di cercare.");
+        return false;
+    };
+}
+</script>
 <form method="get" action="/monuments" >
   <div class="field has-addons is-centered">
       <div class="control">
         <input type="text" class="input" id="searchTextField" placeholder="Città" name="city"></input>
       </div>
       <div class="control">
-        <button type="submit" class="button is-primary" placeholder="Cerca" id="click-form">Cerca</button>
+        <button type="submit" class="button is-primary" placeholder="Cerca" id="click-form" onClick="return empty()">Cerca</button>
       </div>
   </div>
 </br>

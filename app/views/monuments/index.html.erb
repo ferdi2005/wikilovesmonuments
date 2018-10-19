@@ -1,6 +1,6 @@
 <% provide(:title, 'Monumenti nelle vicinanze') %>
 <h1 class="title is-2 is-danger">Lista monumenti nelle vicinanze</h1>
-<% if @monument.any? || !@monument.nil? %>
+<% if @monument.any? %>
 <table class="table">
   <thead>
     <th>Immagine</th>
@@ -29,4 +29,7 @@
   <%== pagy_nav_responsive_bulma(@pagy) %>
 <% else %>
 <h1 class="is-centered title is-3 is-red">Nessun monumento trovato nella località indicata</h1>
+<% end %>
+<% if @monument.nil? %>
+<h1 class="is-centered title is-3 is-red">Nessun monumento trovato nella località indicata o errore</h1>
 <% end %>
