@@ -1,7 +1,30 @@
-<h1 class="title is-2 is-primary"><%= @monument.itemLabel %></h1>
+<% provide(:title, @monument.itemLabel.capitalize) %>
+<h1 class="title is-2 is-primary"><%= @monument.itemLabel.capitalize %></h1>
+<!-- leaflet stuff -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
+  integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+  crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+  integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+  crossorigin=""></script>
+<!-- end leaflet stuff -->
+<!-- map -->
+<div id="mapid" class="is-centered" style="height: 360px;"></div>
+<script>
+var mymap = L.map('mapid').setView([<%= @monument.latitude %>, <%= @monument.longitude %>], 18);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(mymap);
 
-   <% result = Geocoder.search([@monument.latitude, @monument.longitude]) %>
-    <a href="https://www.openstreetmap.org/?mlat=<%= @monument.latitude %>&mlon=<%= @monument.longitude %>">Indirizzo: <%= result.first.address %> </a>
+L.marker([<%= @monument.latitude %>, <%= @monument.longitude %>]).addTo(mymap)
+    .bindPopup('<%= @monument.itemLabel.capitalize %>')
+    .openPopup();
+</script>
+<!-- end map stuff -->
+
+<br />
+   <b>Indirizzo:</b><% result = Geocoder.search([@monument.latitude, @monument.longitude]) %>
+    <a href="https://www.openstreetmap.org/?mlat=<%= @monument.latitude %>&mlon=<%= @monument.longitude %>"><%= result.first.address %> </a>
     <hr />
     <br />
     <%= link_to 'Item su Wikidata', "https://wikidata.org/wiki/#{@monument.item}", class: 'button is-danger is-medium' %>

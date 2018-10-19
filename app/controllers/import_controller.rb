@@ -3,6 +3,10 @@ class ImportController < ApplicationController
   def do
   end
   def import
+    unless params[:import][:password] == ENV['PASSWORD']
+      redirect_to root_path
+      flash[:danger] = 'La password inserita non è corretta'
+    end
       endpoint = "https://query.wikidata.org/sparql"
       sparql = '
       #defaultView:Map
