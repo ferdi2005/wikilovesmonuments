@@ -12,7 +12,7 @@
       <tr>
         <td>
         <% if !monument.image.nil? %>
-          <%= image_tag monument.image, width: 200  %>
+          <%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=200" , width: 200  %>
         <% else %>
           Scattane una tu!
         <% end %>

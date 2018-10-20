@@ -19,8 +19,9 @@ L.marker([<%= @monument.latitude %>, <%= @monument.longitude %>]).addTo(mymap)
     <a href="https://www.openstreetmap.org/?mlat=<%= @monument.latitude %>&mlon=<%= @monument.longitude %>"><%= result.first.address %> </a>
     <hr />
     <br />
-    <%= link_to 'Item su Wikidata', "https://wikidata.org/wiki/#{@monument.item}", class: 'button is-danger is-medium' %>
-    <br />
-    <br />
-     <%= link_to ' Carica una foto ', "https://commons.wikimedia.org/w/index.php?title=Special:UploadWizard&campaign=wlm-it&id=#{@monument.wlmid}&uselang=it&descriptionlang=it&lat=#{@monument.latitude}&lon=#{@monument.longitude}&categories=Images+from+Wiki+Loves+Monuments+2018+in+Italy", class: 'button is-primary is-medium' %>
-</level>
+    <div class="buttons is-vertical">
+      <%= link_to 'Item su Wikidata', "https://wikidata.org/wiki/#{@monument.item}", class: 'button is-danger is-medium' %>
+      <br />
+      <br />
+       <%= link_to ' Carica una foto ', "https://commons.wikimedia.org/w/index.php?title=Special:UploadWizard&campaign=wlm-it&id=#{@monument.wlmid}&uselang=it&descriptionlang=it&lat=#{@monument.latitude}&lon=#{@monument.longitude}&categories=Images+from+Wiki+Loves+Monuments+2018+in+Italy", class: 'button is-primary is-medium' %>
+      </div>
