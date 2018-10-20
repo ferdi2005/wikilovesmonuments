@@ -2,14 +2,14 @@ class ImportController < ApplicationController
   def do
   end
   def import
-    if params[:import][:password] != ENV['PASSWORD']
+    if params[:import][:password] != 'd'
       render 'do'
       flash[:danger] = 'La password inserita non è corretta'
     else
       Monument.delete_all
       endpoint = "https://query.wikidata.org/sparql"
       sparql = '
-      SELECT DISTINCT ?item ?itemLabel (AVG(?lat) AS ?lat) (AVG(?lon) AS ?lon) ?image
+      SELECT DISTINCT ?item ?itemLabel (AVG(?lat) AS ?lat) (AVG(?lon) AS ?lon) ?image ?wlmid
       WHERE {
         ?item wdt:P2186 ?wlmid ;
                 wdt:P17 wd:Q38 ;
@@ -23,7 +23,7 @@ class ImportController < ApplicationController
           FILTER ( ?end <= "2018-09-01T00:00:00+00:00"^^xsd:dateTime ) }
         SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],it"  }
       }
-      GROUP BY ?item ?itemLabel ?image'
+      GROUP BY ?item ?itemLabel ?image ?wlmid'
 
       client = SPARQL::Client.new(endpoint, :method => :get)
       monuments = client.query(sparql)
