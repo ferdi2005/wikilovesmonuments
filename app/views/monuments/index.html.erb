@@ -14,14 +14,14 @@
         <% if !monument.image.nil? %>
           <%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=200" , width: 200  %>
         <% else %>
-          Scattane una tu!
+          <%= link_to 'Scattane una tu!',"https://commons.wikimedia.org/w/index.php?title=Special:UploadWizard&campaign=wlm-it&id=#{monument.wlmid}&uselang=it&descriptionlang=it&lat=#{monument.latitude}&lon=#{monument.longitude}&categories=Images+from+Wiki+Loves+Monuments+#{DateTime.now.strftime('%y')}+in+Italy" %>
         <% end %>
         </td>
         <td>
         <%= monument.itemLabel %>
         </td>
         <td>
-          <i class="fas fa-search"></i> <%= link_to 'Maggiori informazioni', monuments_path + '/' + monument.id.to_s, class: 'button is-small is-link'%>
+          <i class="fas fa-search"></i> <%= link_to 'Maggiori informazioni', monuments_path + '/' + monument.id.to_s, class: 'button is-medium is-link'%>
         </td>
       <% end %>
     </tbody>
