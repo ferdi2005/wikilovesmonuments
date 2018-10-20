@@ -1,8 +1,10 @@
 class ImportController < ApplicationController
   def do
+
   end
+
   def import
-    if params[:import][:password] != 'd'
+    if params[:import][:password] != ENV['password']
       render 'do'
       flash[:danger] = 'La password inserita non è corretta'
     else
@@ -40,10 +42,10 @@ class ImportController < ApplicationController
             @mon.wlmid = val.to_s
           end
           if key.to_s == 'lat'
-            @mon.latitude = BigDecimal.new(val.to_s)
+            @mon.latitude = BigDecimal(val.to_s)
           end
           if key.to_s == 'lon'
-            @mon.longitude = BigDecimal.new(val.to_s)
+            @mon.longitude = BigDecimal(val.to_s)
           end
           if key.to_s == 'itemLabel'
             @mon.itemLabel = val.to_s
@@ -57,6 +59,6 @@ class ImportController < ApplicationController
       end
       redirect_to root_path
       flash[:success] = "Import fatto con successo"
+    end
   end
-end
 end
