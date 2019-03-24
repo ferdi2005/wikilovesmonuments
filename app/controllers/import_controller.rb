@@ -4,7 +4,7 @@ class ImportController < ApplicationController
   end
 
   def import
-    if params[:import][:password] != ENV['PASSWORD']
+    if Rails.env.production? && params[:import][:password] != ENV['PASSWORD']
       render 'do'
       flash[:danger] = 'La password inserita non è corretta'
     else

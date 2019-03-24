@@ -21,7 +21,7 @@
         <%= monument.itemLabel %>
         </td>
         <td>
-          <i class="fas fa-search"></i> <%= link_to 'Maggiori informazioni', monuments_path + '/' + monument.id.to_s, class: 'button is-medium is-link'%>
+          <i class="fas fa-search"></i> <%= link_to 'Maggiori informazioni', monument, class: 'button is-medium is-link'%>
         </td>
       <% end %>
     </tbody>

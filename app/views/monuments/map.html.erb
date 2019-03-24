@@ -1,0 +1,14 @@
+<div id="mapid" class="is-centered" style="height: 100vh;width:100vh;"></div>
+<script>
+var mymap = L.map('mapid').setView([42.504154, 12.646361], 6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(mymap);
+
+<% @monuments.each do |monument| %>
+L.marker([<%= monument.latitude %>, <%= monument.longitude %>]).addTo(mymap)
+    .bindPopup('<%= link_to monument.itemLabel.capitalize, monument %>');
+<% end %>
+</script>
+
+

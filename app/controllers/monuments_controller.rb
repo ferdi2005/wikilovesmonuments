@@ -10,6 +10,10 @@ class MonumentsController < ApplicationController
   end
 
   def show
-    @monument = Monument.find(params[:id])
+    @monument = Monument.find(params[:format])
   end
+
+  def map
+   @monuments = Monument.all
+  end 
 end
