@@ -27,7 +27,7 @@ class ImportController < ApplicationController
       }
       GROUP BY ?item ?itemLabel ?image ?wlmid'
 
-      client = SPARQL::Client.new(endpoint, :method => :get)
+      client =  SPARQL::Client.new(endpoint, :method => :get, :headers => { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.3 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1'})
       monuments = client.query(sparql)
 
       for row in monuments do
