@@ -20,6 +20,7 @@ class MonumentsController < ApplicationController
   end
 
   def map
+    flash[:warning] = "L'utilizzo di questa pagina richiede numerose risorse per il server e per il tuo computer, molto probabilmente si bloccherà facilmente"
    @monuments = Monument.all
   end 
 end

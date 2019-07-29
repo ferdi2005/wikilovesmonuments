@@ -45,7 +45,7 @@ L.marker(<%= @geocenter.to_s %>, {icon: redIcon}).bindPopup('Tu sei qui').addTo(
         <%= monument.itemLabel %>
         </td>
         <td>
-          <i class="fas fa-search"></i> <%= link_to 'Maggiori informazioni', monument, class: 'button is-medium is-link'%>
+          <i class="fas fa-search"></i> <%= link_to 'Maggiori informazioni', monument, class: 'button is-link'%>
         </td>
       <% end %>
     </tbody>
