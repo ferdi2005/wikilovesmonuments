@@ -52,7 +52,7 @@ class ImportController < ApplicationController
           end
           if key.to_s == 'image'
             filename = val.to_s.split('Special:FilePath/')[1]
-            @mon.image = 'File:' + filename.to_s
+            @mon.image = filename.to_s
           end
         end
         @mon.save
