@@ -62,7 +62,7 @@ function empty() {
   </div>
 </br>
 </form>
-<% maps_api_key = ENV['GOOGLE_MAPS_API_KEY'] %>
+<!-- <% maps_api_key = ENV['GOOGLE_MAPS_API_KEY'] %>
 <script src='https://maps.googleapis.com/maps/api/js?key=<%= maps_api_key %>&libraries=places'></script>
 <script>
   function initialize() {
@@ -79,6 +79,7 @@ function empty() {
 
   google.maps.event.addDomListener(window, 'load', initialize);
 </script>
+-->
 <!--
 <%= link_to 'Mappa generale', map_path, class: 'button is-primary is-large' %>
 -->

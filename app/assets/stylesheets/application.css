@@ -12,6 +12,8 @@
  *
  *= require_tree .
  *= require_self
+ *= require all
+ *= require leaflet
  */
 @import 'bulma.css';
 .is-centered > div {

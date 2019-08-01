@@ -14,6 +14,9 @@
 //= require activestorage
 //= require turbolinks
 //= require pagy
+//= require all
+//= require jquery
+//= require leaflet
 //= require_tree .
 
 window.addEventListener("turbolinks:load", Pagy.init);
