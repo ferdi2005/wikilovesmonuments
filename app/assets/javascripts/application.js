@@ -16,7 +16,7 @@
 //= require pagy
 //= require all
 //= require jquery
-//= require leaflet
+//= require leaflet/dist/leaflet.js
 //= require_tree .
 
 window.addEventListener("turbolinks:load", Pagy.init);

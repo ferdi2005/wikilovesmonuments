@@ -50,7 +50,7 @@ L.marker(<%= @geocenter.to_s %>, {icon: redIcon}).bindPopup('Tu sei qui').addTo(
       <% end %>
     </tbody>
 </table>
-  <%== pagy_nav_responsive_bulma(@pagy) %>
+  <%== pagy_bulma_nav_js(@pagy) %>
 <% else %>
 <h1 class="is-centered title is-3 is-red">Nessun monumento trovato nella località indicata</h1>
 <% end %>
