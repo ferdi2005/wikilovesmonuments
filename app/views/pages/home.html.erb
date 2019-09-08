@@ -10,19 +10,8 @@
 <p id="geoerror" class="is-centered"></p>
 </div>
 <script>
-if (!document.cookie.split(';').includes('consenso=yes')) {
-Swal.fire({
-  title: 'Trova i monumenti partecipanti a Wiki Loves Monunemtns vicino a te!',
-  text: "Alla richiesta di utilizzo della geolocalizzazione che ti verrà presentata dopo, clicca su Ok o su Consenti per assicurarti di poter trovare con facilità i monumenti partecipanti vicino a te. Questo sito NON conserva la tua posizione, né la utilizza per altri scopi che non siano trovare i monumenti di Wiki Loves Monuments. Se accetti, ricorderemo la tua scelta.",
-  type: 'info',
-  showCancelButton: true,
-  confirmButtonColor: '#3085d6',
-  cancelButtonColor: '#d33',
-  confirmButtonText: 'Certo, voglio trovare i monumenti vicino a me.',
-  cancelButtonText: 'No, grazie.'
-}).then((result) => {
-  if (result.value) {
-    if (navigator.geolocation) {
+function geoloc() {
+      if (navigator.geolocation) {
         var location_timeout = setTimeout(1000);
 
         navigator.geolocation.getCurrentPosition(function(position) {
@@ -48,12 +37,37 @@ Swal.fire({
         $("#geoerror").append('Errore di geolocalizzazione! Molto probabilmente non avrai autorizzato la localizzazione dal tuo browser o il tuo browser non ha i permessi necessari (su iOS, vai in Impostazioni->Privacy e dai a Safari/il tuo broweser il permesso di utilizzare la posizione). Scrivi il nome della città nel campo sotto.');
         $("#click-submit-position").addClass('is-hidden');
     }
+
+}
+
+if (!document.cookie.split(';').includes('consenso=yes')) {
+  var asd = false;
+} else if (!document.cookie.split(';').includes(' consenso=yes')){
+  var asd = false;
+} else {
+  var asd = true;
+}
+if (asd) {
+Swal.fire({
+  title: 'Trova i monumenti partecipanti a Wiki Loves Monunemtns vicino a te!',
+  text: "Alla richiesta di utilizzo della geolocalizzazione che ti verrà presentata dopo, clicca su Ok o su Consenti per assicurarti di poter trovare con facilità i monumenti partecipanti vicino a te. Questo sito NON conserva la tua posizione, né la utilizza per altri scopi che non siano trovare i monumenti di Wiki Loves Monuments. Se accetti, ricorderemo la tua scelta.",
+  type: 'info',
+  showCancelButton: true,
+  confirmButtonColor: '#3085d6',
+  cancelButtonColor: '#d33',
+  confirmButtonText: 'Certo, voglio trovare i monumenti vicino a me.',
+  cancelButtonText: 'No, grazie.'
+}).then((result) => {
+  if (result.value) {
+    geoloc();
   } else {
         $("#geoerror").append('Non hai acconsentito alla geolocalizzazione.');
         $("#click-submit-position").addClass('is-hidden');
 
   }
 })
+} else {
+  geoloc();
 }
 </script>
 <div class="strike">
