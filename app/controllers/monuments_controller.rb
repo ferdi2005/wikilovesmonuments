@@ -13,6 +13,10 @@ class MonumentsController < ApplicationController
       result = Geocoder.search(params[:city])
       @geocenter = result.first.coordinates
     end
+    respond_to do |format|
+      format.html
+      format.json { render json: [@monument_nopagy, @geocenter] }
+    end
   end
 
   def show
