@@ -11,23 +11,19 @@ class ImportController < ApplicationController
       Monument.delete_all
       endpoint = "https://query.wikidata.org/sparql"
       sparql = '
-      SELECT DISTINCT ?item ?itemLabel (AVG(?lat) AS ?lat) (AVG(?lon) AS ?lon) ?image ?wlmid
+      SELECT DISTINCT ?item ?itemLabel ?coords ?wlmid ?image
       WHERE {
-        ?item wdt:P2186 ?wlmid ;
+      ?item wdt:P2186 ?wlmid ;
                 wdt:P17 wd:Q38 ;
-                wdt:P625 ?coords.
-                ?item                 p:P625         ?statementnode.
-                ?statementnode      psv:P625         ?valuenode.
-                ?valuenode     wikibase:geoLatitude  ?lat.
-                ?valuenode     wikibase:geoLongitude ?lon.
-          OPTIONAL { ?item wdt:P18 ?image }
+                wdt:P625 ?coords
+      OPTIONAL { ?item wdt:P18 ?image }
           MINUS { ?item p:P2186 [ pq:P582 ?end ] .
-          FILTER ( ?end <= "2018-09-01T00:00:00+00:00"^^xsd:dateTime ) }
-        SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],it"  }
-      }
-      GROUP BY ?item ?itemLabel ?image ?wlmid'
+          FILTER ( ?end <= "2020-09-01T00:00:00+00:00"^^xsd:dateTime )
+                }
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],it" }
+        }'
 
-      client =  SPARQL::Client.new(endpoint, :method => :get, :headers => { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.3 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1'})
+      client =  SPARQL::Client.new(endpoint, :method => :get, :headers => { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1'})
       monuments = client.query(sparql)
 
       for row in monuments do
@@ -41,11 +37,14 @@ class ImportController < ApplicationController
           if key.to_s == 'wlmid'
             @mon.wlmid = val.to_s
           end
-          if key.to_s == 'lat'
-            @mon.latitude = BigDecimal(val.to_s)
-          end
-          if key.to_s == 'lon'
-            @mon.longitude = BigDecimal(val.to_s)
+          if key.to_s == 'coords'
+            totalarray = val.to_s.split('(')
+            onlylatlong = totalarray[1].split(')')
+            latlongarray = onlylatlong[0].split(' ')
+            lat = latlongarray[1]
+            long = latlongarray[0]
+            @mon.latitude = BigDecimal.new(lat)
+            @mon.longitude = BigDecimal.new(long)
           end
           if key.to_s == 'itemLabel'
             @mon.itemLabel = val.to_s
