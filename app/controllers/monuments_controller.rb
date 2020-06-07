@@ -20,7 +20,7 @@ class MonumentsController < ApplicationController
   end
 
   def show
-    @monument = Monument.find(params[:format])
+    @monument = Monument.find(params[:id])
     respond_to do |format|
       format.html
       format.json { render json: @monument }
