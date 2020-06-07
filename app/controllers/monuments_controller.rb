@@ -11,7 +11,7 @@ class MonumentsController < ApplicationController
       @pagy, @monument = pagy(Monument.near("#{params[:city]}"))
       @monument_nopagy = Monument.near(params[:city])
       result = Geocoder.search(params[:city])
-      @geocenter = result.first.coordinates
+      @geocenter = result.try(:first).try(:coordinates)
     end
     respond_to do |format|
       format.html
