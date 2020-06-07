@@ -21,6 +21,10 @@ class MonumentsController < ApplicationController
 
   def show
     @monument = Monument.find(params[:format])
+    respond_to do |format|
+      format.html
+      format.json { render json: @monument }
+    end
   end
 
   def map
