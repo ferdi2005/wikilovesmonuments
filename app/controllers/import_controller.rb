@@ -11,7 +11,7 @@ class ImportController < ApplicationController
       Monument.delete_all
       endpoint = "https://query.wikidata.org/sparql"
       sparql = '
-      SELECT DISTINCT ?item ?itemLabel ?coords ?wlmid ?image
+      SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image
       WHERE {
       ?item wdt:P2186 ?wlmid ;
                 wdt:P17 wd:Q38 ;
@@ -52,6 +52,9 @@ class ImportController < ApplicationController
           if key.to_s == 'image'
             filename = val.to_s.split('Special:FilePath/')[1]
             @mon.image = filename.to_s
+          end
+          if key.to_s == "itemDescription"
+            @mon.itemDescription = val.to_s
           end
         end
         @mon.save
