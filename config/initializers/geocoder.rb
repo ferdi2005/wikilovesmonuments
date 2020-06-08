@@ -1,1 +1,1 @@
-Geocoder.configure(cache: Redis.new)
+Geocoder.configure(cache: Redis.new, lookup: :mapbox, api_key: ENV['MAPBOX_SECRET'])

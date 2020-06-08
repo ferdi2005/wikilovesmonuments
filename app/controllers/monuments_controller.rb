@@ -8,9 +8,9 @@ class MonumentsController < ApplicationController
       @monument_nopagy = Monument.near([BigDecimal.new(params[:latitude]), BigDecimal.new(params[:longitude])])
       @geocenter = [params[:latitude].to_f, params[:longitude].to_f]
     elsif params[:city]
-      @pagy, @monument = pagy(Monument.near("#{params[:city]}"))
-      @monument_nopagy = Monument.near(params[:city])
-      result = Geocoder.search(params[:city])
+      @pagy, @monument = pagy(Monument.near("#{params[:city]}, IT"))
+      @monument_nopagy = Monument.near("#{params[:city]}, IT")
+      result = Geocoder.search("#{params[:city]}, IT")
       @geocenter = result.try(:first).try(:coordinates)
     end
     respond_to do |format|
