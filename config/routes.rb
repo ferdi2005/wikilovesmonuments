@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   get 'map', to: 'monuments#map'
   
   get 'monuments', to: 'monuments#index'
+  get 'address', to: 'monuments#address'
   get 'show', to: 'monuments#show'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
