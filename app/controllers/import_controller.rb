@@ -20,7 +20,7 @@ class ImportController < ApplicationController
           MINUS { ?item p:P2186 [ pq:P582 ?end ] .
           FILTER ( ?end <= "2020-09-01T00:00:00+00:00"^^xsd:dateTime )
                 }
-      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],it" }
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "it" }
         }'
 
       client =  SPARQL::Client.new(endpoint, :method => :get, :headers => { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1'})
