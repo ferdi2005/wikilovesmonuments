@@ -11,12 +11,13 @@ class ImportController < ApplicationController
       Monument.delete_all
       endpoint = "https://query.wikidata.org/sparql"
       sparql = '
-      SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image
+      SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink
       WHERE {
       ?item wdt:P2186 ?wlmid ;
                 wdt:P17 wd:Q38 ;
                 wdt:P625 ?coords
       OPTIONAL { ?item wdt:P18 ?image }
+      OPTIONAL {?sitelink schema:isPartOf <https://it.wikipedia.org/>;schema:about ?item. }
           MINUS { ?item p:P2186 [ pq:P582 ?end ] .
           FILTER ( ?end <= "2020-09-01T00:00:00+00:00"^^xsd:dateTime )
                 }
@@ -55,6 +56,9 @@ class ImportController < ApplicationController
           end
           if key.to_s == "itemDescription"
             @mon.itemDescription = val.to_s
+          end
+          if key.to_s == "sitelink"
+            @mon.wikipedia = val.to_s
           end
         end
         @mon.save
