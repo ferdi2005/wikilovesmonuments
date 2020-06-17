@@ -30,6 +30,8 @@ gem 'geocoder'
 gem 'sparql'
 
 gem 'pagy'
+
+gem 'whenever'
 # Use ActiveStorage variant
 # gem 'mini_magick', '~> 4.8'
 
