@@ -31,7 +31,9 @@ gem 'sparql'
 
 gem 'pagy'
 
-gem 'whenever'
+gem 'sidekiq'
+
+gem 'sidekiq-scheduler'
 # Use ActiveStorage variant
 # gem 'mini_magick', '~> 4.8'
 
