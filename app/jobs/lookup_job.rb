@@ -11,10 +11,11 @@ class LookupJob < ApplicationJob
       else
         totalhits = count[1][1]['searchinfo']['totalhits']
       end
+      puts totalhits
       if (totalhits > 0)
-        monument.update_attribute(:with_photos, true)
+        monument.update_attributes(with_photos: true, photos_count: totalhits)
       else
-        monument.update_attribute(:with_photos, false)
+        monument.update_attributes(with_photos: false, photos_count: totalhits)
       end
     end
   end
