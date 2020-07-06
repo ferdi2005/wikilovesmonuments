@@ -1,9 +1,16 @@
 <%= provide(:title, 'About e privacy policy') %>
-<h1>Tool per visualizzare i monumenti partecipanti a <%= link_to 'Wiki Loves Monuments Italia', 'http://wikilovesmonuments.it' %></h1>
+<h1 class="title h2">Tool per visualizzare i monumenti partecipanti a <%= link_to 'Wiki Loves Monuments Italia', 'http://wikilovesmonuments.it' %></h1>
 <ul>
 <li><%= link_to 'Codice sorgente', 'https://github.com/ferdi2005/wikilovesmonuments' %></li>
 <li>Dati importati da Wikidata - Licenza CC0 </li></ul>
-<li> <%= link_to 'Google Maps privacy policy', 'https://policies.google.com/privacy?hl=it' %></li>
 <li>Query di Lorenzo Losa con miglioramenti di Stefano Sabatini</li>
 <li>Favicon del sito è il <a href="https://commons.wikimedia.org/wiki/File:Wiki_Loves_Monuments_Logo_notext.svg">Logo ufficiale di WLM</a></li>
 </ul>
+
+<h2 class="title h3">Statistiche</h2>
+<p>Ci sono <b><%= Monument.where(with_photos: false).count %></b> monumenti senza una fotografia su <%= Monument.count %> monumenti totali. Trovi altre statistiche sul sito dei <a href="https://statistiche.ferdinando.me">concorsi locali</a>.</p>
+
+<% if Date.today >= Date.parse('30 september') %>
+<p>Il 31 agosto ce ne erano <%= Nophoto.find_by(created_at: Date.parse('31 august')).try(:count) %> (su <%= Nophoto.find_by(created_at: Date.parse('31 august')).try(:monuments) %>), il 30 settembre ce ne erano <%= Nophoto.find_by(created_at: Date.parse('30 september')).try(:count) %> (su <%= Nophoto.find_by(created_at: Date.parse('30 september')).try(:monuments) %>). Nuovi monumenti con foto: <%= Nophoto.where(created_at: Date.parse('30 september')).try(:count) - Nophoto.find_by(created_at: Date.parse('31 august')).try(:count) if Nophoto.find_by(created_at: Date.parse('30 september')).try(:count) != nil %>  </p>
+<% end %>
+<%= line_chart Nophoto.where(created_at: Date.parse('30 august')...Date.parse('30 september')).pluck(:created_at, :count) %>

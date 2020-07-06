@@ -13,6 +13,9 @@ module Wikilovesmonuments
 
     config.active_job.queue_adapter = :sidekiq
     Redis.exists_returns_integer = true
+
+    Time.zone = "Europe/Rome"
+    Groupdate.week_start = :monday
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading

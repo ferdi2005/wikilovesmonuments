@@ -1,0 +1,2 @@
+class Nophoto < ApplicationRecord
+end

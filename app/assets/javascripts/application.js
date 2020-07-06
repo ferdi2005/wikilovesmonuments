@@ -17,6 +17,9 @@
 //= require all
 //= require jquery
 //= require leaflet/dist/leaflet.js
+//= require chartkick
+//= require Chart.bundle
 //= require_tree .
 
 window.addEventListener("turbolinks:load", Pagy.init);
+
