@@ -10,7 +10,7 @@
 <h2 class="title h3">Statistiche</h2>
 <p>Ci sono <b><%= Monument.where(with_photos: false).count %></b> monumenti senza una fotografia su <%= Monument.count %> monumenti totali. Trovi altre statistiche sul sito dei <a href="https://statistiche.ferdinando.me">concorsi locali</a>.</p>
 
-<% if Date.today >= Date.parse('30 september') %>
-<p>Il 31 agosto ce ne erano <%= Nophoto.find_by(created_at: Date.parse('31 august')).try(:count) %> (su <%= Nophoto.find_by(created_at: Date.parse('31 august')).try(:monuments) %>), il 30 settembre ce ne erano <%= Nophoto.find_by(created_at: Date.parse('30 september')).try(:count) %> (su <%= Nophoto.find_by(created_at: Date.parse('30 september')).try(:monuments) %>). Nuovi monumenti con foto: <%= Nophoto.where(created_at: Date.parse('30 september')).try(:count) - Nophoto.find_by(created_at: Date.parse('31 august')).try(:count) if Nophoto.find_by(created_at: Date.parse('30 september')).try(:count) != nil %>  </p>
+<% if Date.today >= Date.parse('1 october') %>
+<p>Il 31 agosto ce ne erano <%= Nophoto.find_by(created_at: Date.parse('31 august')).try(:count) %> (su <%= Nophoto.find_by(created_at: Date.parse('31 august')).try(:monuments) %>), il 30 settembre ce ne erano <%= Nophoto.find_by(created_at: Date.parse('1 october')).try(:count) %> (su <%= Nophoto.find_by(created_at: Date.parse('1 october')).try(:monuments) %>). Nuovi monumenti con foto: <%= Nophoto.where(created_at: Date.parse('1 october')).try(:count) - Nophoto.find_by(created_at: Date.parse('31 august')).try(:count) if Nophoto.find_by(created_at: Date.parse('1 october')).try(:count) != nil %>  </p>
 <% end %>
-<%= line_chart Nophoto.where(created_at: Date.parse('30 august')...Date.parse('30 september')).pluck(:created_at, :count) %>
+<%= line_chart Nophoto.where(created_at: Date.parse('30 august')...Date.parse('1 october')).pluck(:created_at, :count) %>
