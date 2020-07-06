@@ -10,7 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_17_213817) do
+ActiveRecord::Schema.define(version: 2020_07_06_122411) do
+
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
 
   create_table "monuments", force: :cascade do |t|
     t.string "item"
@@ -23,6 +26,7 @@ ActiveRecord::Schema.define(version: 2020_06_17_213817) do
     t.datetime "updated_at", null: false
     t.string "itemDescription"
     t.string "wikipedia"
+    t.boolean "with_photos"
   end
 
 end
