@@ -3,6 +3,8 @@ class ImportJob < ApplicationJob
 
   def perform()
     Monument.delete_all
+    # Resetta gli id in modo che partano da 1
+    ActiveRecord::Base.connection.reset_pk_sequence!(Monument.table_name)
     endpoint = "https://query.wikidata.org/sparql"
     sparql = '
     SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink
