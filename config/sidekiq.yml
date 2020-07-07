@@ -2,6 +2,3 @@
   import:
     cron: '0 3 * * *'
     class: ImportJob
-  lookup:
-    cron: '0 22 * * *'
-    class: LookupJob

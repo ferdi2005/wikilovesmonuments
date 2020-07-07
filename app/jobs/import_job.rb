@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 class ImportJob < ApplicationJob
   queue_as :default
 
-  def perform()
+  def perform
     Monument.delete_all
     # Resetta gli id in modo che partano da 1
     ActiveRecord::Base.connection.reset_pk_sequence!(Monument.table_name)
-    endpoint = "https://query.wikidata.org/sparql"
+    endpoint = 'https://query.wikidata.org/sparql'
     sparql = '
     SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink
     WHERE {
@@ -20,20 +22,18 @@ class ImportJob < ApplicationJob
     SERVICE wikibase:label { bd:serviceParam wikibase:language "it" }
       }'
 
-    client =  SPARQL::Client.new(endpoint, :method => :get, :headers => { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1'})
+    client =  SPARQL::Client.new(endpoint, method: :get, headers: { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1' })
     monuments = client.query(sparql)
 
-    for row in monuments do
+    monuments.each do |row|
       @mon = Monument.new
-      for key,val in row do
+      row.each do |key, val|
         if key.to_s == 'item'
           itemarray = val.to_s.split('/')
           itemcode = itemarray[4]
           @mon.item = itemcode.to_s
         end
-        if key.to_s == 'wlmid'
-          @mon.wlmid = val.to_s
-        end
+        @mon.wlmid = val.to_s if key.to_s == 'wlmid'
         if key.to_s == 'coords'
           totalarray = val.to_s.split('(')
           onlylatlong = totalarray[1].split(')')
@@ -43,21 +43,16 @@ class ImportJob < ApplicationJob
           @mon.latitude = BigDecimal(lat)
           @mon.longitude = BigDecimal(long)
         end
-        if key.to_s == 'itemLabel'
-          @mon.itemLabel = val.to_s
-        end
+        @mon.itemLabel = val.to_s if key.to_s == 'itemLabel'
         if key.to_s == 'image'
           filename = val.to_s.split('Special:FilePath/')[1]
           @mon.image = filename.to_s
         end
-        if key.to_s == "itemDescription"
-          @mon.itemDescription = val.to_s
-        end
-        if key.to_s == "sitelink"
-          @mon.wikipedia = val.to_s
-        end
+        @mon.itemDescription = val.to_s if key.to_s == 'itemDescription'
+        @mon.wikipedia = val.to_s if key.to_s == 'sitelink'
       end
       @mon.save
     end
+    LookupJob.perform_later
   end
 end
