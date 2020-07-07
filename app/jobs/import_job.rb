@@ -22,7 +22,23 @@ class ImportJob < ApplicationJob
     SERVICE wikibase:label { bd:serviceParam wikibase:language "it" }
       }'
 
-    client =  SPARQL::Client.new(endpoint, method: :get, headers: { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1' })
+    if ENV['REGIONE'] == 'PUGLIA'
+      sparql = '
+      SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink
+      WHERE {
+      ?item wdt:P2186 ?wlmid ;
+              wdt:P131* wd:Q1447;
+                wdt:P17 wd:Q38 ;
+                wdt:P625 ?coords 
+      OPTIONAL { ?item wdt:P18 ?image }
+      OPTIONAL {?sitelink schema:isPartOf <https://it.wikipedia.org/>;schema:about ?item. }
+          MINUS { ?item p:P2186 [ pq:P582 ?end ] .
+          FILTER ( ?end <= "2020-09-01T00:00:00+00:00"^^xsd:dateTime )
+                }
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "it" }
+        }'
+    end
+        client =  SPARQL::Client.new(endpoint, method: :get, headers: { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1' })
     monuments = client.query(sparql)
 
     monuments.each do |row|
