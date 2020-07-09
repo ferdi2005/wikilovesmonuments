@@ -9,11 +9,12 @@ class ImportJob < ApplicationJob
     ActiveRecord::Base.connection.reset_pk_sequence!(Monument.table_name)
     endpoint = 'https://query.wikidata.org/sparql'
     sparql = '
-    SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink
+    SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons
     WHERE {
     ?item wdt:P2186 ?wlmid ;
               wdt:P17 wd:Q38 ;
               wdt:P625 ?coords
+    OPTIONAL { ?item wdt:P373 ?commons }
     OPTIONAL { ?item wdt:P18 ?image }
     OPTIONAL {?sitelink schema:isPartOf <https://it.wikipedia.org/>;schema:about ?item. }
         MINUS { ?item p:P2186 [ pq:P582 ?end ] .
@@ -24,12 +25,13 @@ class ImportJob < ApplicationJob
 
     if ENV['REGIONE'] == 'PUGLIA'
       sparql = '
-      SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink
+      SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons
       WHERE {
       ?item wdt:P2186 ?wlmid ;
               wdt:P131* wd:Q1447;
                 wdt:P17 wd:Q38 ;
-                wdt:P625 ?coords 
+                wdt:P625 ?coords
+      OPTIONAL { ?item wdt:P373 ?commons }
       OPTIONAL { ?item wdt:P18 ?image }
       OPTIONAL {?sitelink schema:isPartOf <https://it.wikipedia.org/>;schema:about ?item. }
           MINUS { ?item p:P2186 [ pq:P582 ?end ] .
@@ -38,7 +40,7 @@ class ImportJob < ApplicationJob
       SERVICE wikibase:label { bd:serviceParam wikibase:language "it" }
         }'
     end
-        client =  SPARQL::Client.new(endpoint, method: :get, headers: { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1' })
+    client = SPARQL::Client.new(endpoint, method: :get, headers: { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1' })
     monuments = client.query(sparql)
 
     monuments.each do |row|
@@ -64,6 +66,7 @@ class ImportJob < ApplicationJob
           filename = val.to_s.split('Special:FilePath/')[1]
           @mon.image = filename.to_s
         end
+        @mon.commons = val.to_s if key.to_s == 'commons'
         @mon.itemDescription = val.to_s if key.to_s == 'itemDescription'
         @mon.wikipedia = val.to_s if key.to_s == 'sitelink'
       end

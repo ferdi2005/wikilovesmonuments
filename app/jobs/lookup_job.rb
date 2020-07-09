@@ -4,7 +4,7 @@ class LookupJob < ApplicationJob
   queue_as :default
 
   def perform(*_args)
-    Monument.where(image: nil).each do |monument|
+    Monument.where(image: nil, commons: nil).each do |monument|
       search = '"' + monument.wlmid + '"'
       retimes = 0
       begin
