@@ -4,7 +4,7 @@ class LookupJob < ApplicationJob
   queue_as :default
 
   def perform(*_args)
-    Monument.where(image: nil, commons: nil).each do |monument|
+    Monument.each do |monument|
       search = '"' + monument.wlmid + '"'
       retimes = 0
       begin
@@ -32,7 +32,6 @@ class LookupJob < ApplicationJob
         monument.update_attributes(with_photos: false, photos_count: totalhits)
       end
     end
-
     nophoto = Monument.where(with_photos: false).count
     Nophoto.create(count: nophoto, monuments: Monument.count)
   end

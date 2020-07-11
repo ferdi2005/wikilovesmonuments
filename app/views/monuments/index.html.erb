@@ -14,7 +14,7 @@ L.marker([<%= monument.latitude %>, <%= monument.longitude %>]).addTo(mymap)
     
 <% end %>
 var redIcon = new L.Icon({
-  iconUrl: '<%= image_url 'marker-icon-2x-red.png' %>',
+  iconUrl: '<%= image_url 'marker-icon-2x-green.png' if monument.with_photos %> <%= image_url 'marker-icon-2x-red.png' unless monument.with_photos%>',
   shadowUrl: '<%= image_url 'marker-shadow.png' %>',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
