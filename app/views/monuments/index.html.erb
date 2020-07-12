@@ -26,12 +26,8 @@ var greenIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 <% @monument_nopagy.each do |monument| %>
-<% if monument.with_photos>
-L.marker([<%= monument.latitude %>, <%= monument.longitude %>] , {icon: greenIcon}).addTo(mymap)
-    .bindPopup('<%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=400" unless monument.image.blank? %><br/> <%= link_to monument.itemLabel.capitalize, show_path(id: monument.id) %>');
-<% else %>
-L.marker([<%= monument.latitude %>, <%= monument.longitude %>] , {icon: redIcon}).addTo(mymap)
-    .bindPopup('<%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=400" unless monument.image.blank? %><br/> <%= link_to monument.itemLabel.capitalize, show_path(id: monument.id) %>');
+  L.marker([<%= monument.latitude %>, <%= monument.longitude %>] , {icon: <%= monument.with_photos? ? 'greenIcon' : 'redIcon' %>}).addTo(mymap)
+      .bindPopup('<%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=400" unless monument.image.blank? %><%== '<br/>' unless monument.image.blank? %> <%= link_to monument.itemLabel.capitalize, show_path(id: monument.id) %>');
 <% end %>
 
 
