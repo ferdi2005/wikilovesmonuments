@@ -27,7 +27,7 @@ var greenIcon = new L.Icon({
 });
 <% @monument_nopagy.each do |monument| %>
   L.marker([<%= monument.latitude %>, <%= monument.longitude %>] , {icon: <%= monument.with_photos? ? 'greenIcon' : 'redIcon' %>}).addTo(mymap)
-      .bindPopup('<%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=400" unless monument.image.blank? %><%== '<br/>' unless monument.image.blank? %> <%= link_to monument.itemLabel.capitalize, show_path(id: monument.id) %>');
+      .bindPopup('<%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=400" unless monument.image.blank? %><%== '<br/>' unless monument.image.blank? %> <%= link_to monument.itemlabel.capitalize, show_path(id: monument.id) %>');
 <% end %>
 
 
@@ -51,7 +51,7 @@ L.marker(<%= @geocenter.to_s %>).bindPopup('Tu sei qui').addTo(mymap);
         <% end %>
         </td>
         <td>
-        <%= monument.itemLabel %>
+        <%= monument.itemlabel %>
         </td>
         <td>
           <i class="fas fa-search"></i> <%= link_to 'Maggiori informazioni', show_path(id: monument.id), class: 'button is-link'%>

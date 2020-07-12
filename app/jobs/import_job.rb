@@ -9,7 +9,7 @@ class ImportJob < ApplicationJob
     ActiveRecord::Base.connection.reset_pk_sequence!(Monument.table_name)
     endpoint = 'https://query.wikidata.org/sparql'
     sparql = '
-    SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons
+    SELECT DISTINCT ?item ?itemlabel ?itemdescription ?coords ?wlmid ?image ?sitelink ?commons
     WHERE {
     ?item wdt:P2186 ?wlmid ;
               wdt:P17 wd:Q38 ;
@@ -25,7 +25,7 @@ class ImportJob < ApplicationJob
 
     if ENV['REGIONE'] == 'PUGLIA'
       sparql = '
-      SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons
+      SELECT DISTINCT ?item ?itemlabel ?itemdescription ?coords ?wlmid ?image ?sitelink ?commons
       WHERE {
       ?item wdt:P2186 ?wlmid ;
               wdt:P131* wd:Q1447;
@@ -61,13 +61,13 @@ class ImportJob < ApplicationJob
           @mon.latitude = BigDecimal(lat)
           @mon.longitude = BigDecimal(long)
         end
-        @mon.itemLabel = val.to_s if key.to_s == 'itemLabel'
+        @mon.itemlabel = val.to_s if key.to_s == 'itemlabel'
         if key.to_s == 'image'
           filename = val.to_s.split('Special:FilePath/')[1]
           @mon.image = filename.to_s
         end
         @mon.commons = val.to_s if key.to_s == 'commons'
-        @mon.itemDescription = val.to_s if key.to_s == 'itemDescription'
+        @mon.itemdescription = val.to_s if key.to_s == 'itemdescription'
         @mon.wikipedia = val.to_s if key.to_s == 'sitelink'
       end
       @mon.save

@@ -5,7 +5,7 @@ one:
   wlmid: MyString
   latitude: 9.99
   longitude: 9.99
-  itemLabel: MyString
+  itemlabel: MyString
   image: MyString
 
 two:
@@ -13,5 +13,5 @@ two:
   wlmid: MyString
   latitude: 9.99
   longitude: 9.99
-  itemLabel: MyString
+  itemlabel: MyString
   image: MyString

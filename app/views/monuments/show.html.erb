@@ -1,5 +1,5 @@
-<% provide(:title, @monument.itemLabel.capitalize) %>
-<h1 class="title is-2 is-primary"><%= @monument.itemLabel.capitalize %></h1>
+<% provide(:title, @monument.itemlabel.capitalize) %>
+<h1 class="title is-2 is-primary"><%= @monument.itemlabel.capitalize %></h1>
 <!-- map -->
 <div id="mapid" class="is-centered" style="height: 360px;"></div>
 <script>
@@ -9,7 +9,7 @@ L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y
 }).addTo(mymap);
 
 L.marker([<%= @monument.latitude %>, <%= @monument.longitude %>]).addTo(mymap)
-    .bindPopup('<%= @monument.itemLabel.capitalize %>')
+    .bindPopup('<%= @monument.itemlabel.capitalize %>')
     .openPopup();
 </script>
 <!-- end map stuff -->
