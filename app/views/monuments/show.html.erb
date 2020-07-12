@@ -24,4 +24,13 @@ L.marker([<%= @monument.latitude %>, <%= @monument.longitude %>]).addTo(mymap)
       <br />
       <br />
        <%= link_to ' Carica una foto ', "https://commons.wikimedia.org/w/index.php?title=Special:UploadWizard&campaign=wlm-it&id=#{@monument.wlmid}&uselang=it&descriptionlang=it&lat=#{@monument.latitude}&lon=#{@monument.longitude}&categories=Images+from+Wiki+Loves+Monuments+#{DateTime.now.strftime('%y')}+in+Italy", class: 'button is-primary is-medium' %>
+       <br />
+       <br />
+     <%= link_to 'Categoria su Commons', "https://commons.wikimedia.org/wiki/Category:#{@monument.commons}", class: 'button is-danger is-medium' unless @monument.commons.nil?%>
+
       </div>
+<% if @monument.with_photos %>
+    <p>Il monumento ha <%= @monument.photos_count unless @monument.photos_count.nil? %> foto.</p>
+<% else %>
+    <p>Il monumento non ha foto</p>
+<% end %>
