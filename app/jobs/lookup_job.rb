@@ -4,7 +4,7 @@ class LookupJob < ApplicationJob
   queue_as :default
 
   def perform(*_args)
-    Monument.each do |monument|
+    Monument.all.each do |monument|
       search = '"' + monument.wlmid + '"'
       retimes = 0
       begin
