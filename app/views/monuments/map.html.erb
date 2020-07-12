@@ -7,7 +7,7 @@ L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y
 
 <% @monuments.each do |monument| %>
 L.marker([<%= monument.latitude %>, <%= monument.longitude %>]).addTo(mymap)
-    .bindPopup('<%= link_to monument.itemLabel.capitalize, show_path(id: monument.id) %>');
+    .bindPopup('<%= link_to monument.itemlabel.capitalize, show_path(id: monument.id) %>');
 <% end %>
 </script>
 

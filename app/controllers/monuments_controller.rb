@@ -38,4 +38,11 @@ class MonumentsController < ApplicationController
     flash[:warning] = "L'utilizzo di questa pagina richiede numerose risorse per il server e per il tuo computer, molto probabilmente si bloccherà facilmente"
    @monuments = Monument.all
   end 
+
+  def namesearch
+    @monuments = Monument.search(params[:search].strip)
+    respond_to do |format|
+      format.json { render json: @monuments }
+    end
+  end
 end
