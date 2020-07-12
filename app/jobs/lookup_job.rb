@@ -30,6 +30,9 @@ class LookupJob < ApplicationJob
         monument.update_attributes(with_photos: true, photos_count: totalhits)
       else
         monument.update_attributes(with_photos: false, photos_count: totalhits)
+        unless monument.image.nil? || monument.commons.nil?
+          monument.update_attribute(:with_photos, true)
+        end  
       end
     end
     nophoto = Monument.where(with_photos: false).count
