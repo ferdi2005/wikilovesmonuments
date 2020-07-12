@@ -8,13 +8,8 @@ L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(mymap);
 <%= dummyfile = '' %>
-<% @monument_nopagy.each do |monument| %>
-L.marker([<%= monument.latitude %>, <%= monument.longitude %>]).addTo(mymap)
-    .bindPopup('<%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=400" unless monument.image.blank? %><br/> <%= link_to monument.itemLabel.capitalize, show_path(id: monument.id) %>');
-    
-<% end %>
 var redIcon = new L.Icon({
-  iconUrl: '<%= image_url 'marker-icon-2x-green.png' if monument.with_photos %> <%= image_url 'marker-icon-2x-red.png' unless monument.with_photos%>',
+  iconUrl: '<%= image_url 'marker-icon-2x-red.png' %>',
   shadowUrl: '<%= image_url 'marker-shadow.png' %>',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
@@ -22,7 +17,25 @@ var redIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-L.marker(<%= @geocenter.to_s %>, {icon: redIcon}).bindPopup('Tu sei qui').addTo(mymap);
+var greenIcon = new L.Icon({
+  iconUrl: '<%= image_url 'marker-icon-2x-green.png' %>',
+  shadowUrl: '<%= image_url 'marker-shadow.png' %>',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+<% @monument_nopagy.each do |monument| %>
+<% if monument.with_photos>
+L.marker([<%= monument.latitude %>, <%= monument.longitude %>] , {icon: greenIcon}).addTo(mymap)
+    .bindPopup('<%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=400" unless monument.image.blank? %><br/> <%= link_to monument.itemLabel.capitalize, show_path(id: monument.id) %>');
+<% else %>
+L.marker([<%= monument.latitude %>, <%= monument.longitude %>] , {icon: redIcon}).addTo(mymap)
+    .bindPopup('<%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=400" unless monument.image.blank? %><br/> <%= link_to monument.itemLabel.capitalize, show_path(id: monument.id) %>');
+<% end %>
+
+
+L.marker(<%= @geocenter.to_s %>).bindPopup('Tu sei qui').addTo(mymap);
 
 </script>
 <table class="table">
