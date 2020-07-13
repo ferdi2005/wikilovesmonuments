@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_12_204942) do
+ActiveRecord::Schema.define(version: 2020_07_13_114313) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -38,6 +38,7 @@ ActiveRecord::Schema.define(version: 2020_07_12_204942) do
     t.integer "monuments"
     t.integer "with_commons"
     t.integer "with_image"
+    t.integer "nowlm"
   end
 
 end

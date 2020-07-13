@@ -37,6 +37,6 @@ class LookupJob < ApplicationJob
     end
     nophoto = Monument.where(with_photos: false).count
 
-    Nophoto.create(count: nophoto, monuments: Monument.count, with_commons: Monument.where.not(commons:nil).count, with_image: Monument.where.not(image:nil).count )
+    Nophoto.create(count: nophoto, monuments: Monument.count, with_commons: Monument.where.not(commons:nil).count, with_image: Monument.where.not(image:nil).count, nowlm: Monument.where(with_photos: true, photos_count: 0).count)
   end
 end
