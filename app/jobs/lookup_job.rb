@@ -32,9 +32,9 @@ class LookupJob < ApplicationJob
         'Veneto' => ['Veneto', true]
     }
 
-    regarr = regioni[monument.regione.capitalize]
+    regarr = regioni[monument.regione]
 
-      newstring = regarr[0]
+      newstring = '+-+' + regarr[0]
       if regarr[1] == false && lakecomo == false
         newstring = newstring + '%7C' + basecat + '+-+' + 'without+local+award'
       end
@@ -42,7 +42,7 @@ class LookupJob < ApplicationJob
       if monument.item.in?(lakecomo)
         newstring = newstring + '%7C' + basecat + '+-+' + 'Lake+Como'
       end
-      monurl.gsub!('-+unknown+region', newstring)
+      monurl.gsub!('+-+unknown+region', newstring)
 
       monument.update_attribute(:uploadurl, monurl)
   end
