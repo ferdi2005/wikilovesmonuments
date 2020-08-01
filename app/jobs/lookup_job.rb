@@ -8,7 +8,7 @@ class LookupJob < ApplicationJob
     mon = HTTParty.get("https://it.wikipedia.org/w/api.php?action=parse&text={{%23invoke:WLM|upload_url|#{monument.item}}}&contentmodel=wikitext&format=json",
       headers: { 'User-Agent' => 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using HTTParty Ruby Gem' },
       uri_adapter: Addressable::URI).to_a
-      monurl = mon['parse']['externallinks'][0]
+      monurl = mon[0][1]['externallinks'][0]
       regioni = {
         'Abruzzo' => ['Abruzzo', true],
         'Basilicata' => ['Basilicata', true],
@@ -64,10 +64,11 @@ class LookupJob < ApplicationJob
     SERVICE wikibase:label { bd:serviceParam wikibase:language "it" }
       }
     '
+    endpoint = 'https://query.wikidata.org/sparql'
     client = SPARQL::Client.new(endpoint, method: :get, headers: { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1' })
     comoquery = client.query(sparql)  
 
-    comquery.each do |com|
+    comoquery.each do |key, val|
       if key.to_s == 'item'
         itemarray = val.to_s.split('/')
         itemcode = itemarray[4]
