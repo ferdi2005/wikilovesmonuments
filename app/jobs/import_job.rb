@@ -8,8 +8,9 @@ class ImportJob < ApplicationJob
     # Resetta gli id in modo che partano da 1
     ActiveRecord::Base.connection.reset_pk_sequence!(Monument.table_name)
     endpoint = 'https://query.wikidata.org/sparql'
+    # Query di Lorenzo Losa
     sparql = '
-    SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons
+    SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel
     WHERE {
     ?item wdt:P2186 ?wlmid ;
               wdt:P17 wd:Q38 ;
@@ -17,6 +18,13 @@ class ImportJob < ApplicationJob
     OPTIONAL { ?item wdt:P373 ?commons }
     OPTIONAL { ?item wdt:P18 ?image }
     OPTIONAL {?sitelink schema:isPartOf <https://it.wikipedia.org/>;schema:about ?item. }
+    VALUES ?typeRegion { wd:Q16110 wd:Q1710033 }.
+
+  ?item wdt:P131* ?regione.
+  ?regione wdt:P31 ?typeRegion.
+
+  
+  
         MINUS { ?item p:P2186 [ pq:P582 ?end ] .
         FILTER ( ?end <= "2020-09-01T00:00:00+00:00"^^xsd:dateTime )
               }
@@ -25,7 +33,7 @@ class ImportJob < ApplicationJob
 
     if ENV['REGIONE'] == 'PUGLIA'
       sparql = '
-      SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons
+      SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel
       WHERE {
       ?item wdt:P2186 ?wlmid ;
               wdt:P131* wd:Q1447;
@@ -34,14 +42,24 @@ class ImportJob < ApplicationJob
       OPTIONAL { ?item wdt:P373 ?commons }
       OPTIONAL { ?item wdt:P18 ?image }
       OPTIONAL {?sitelink schema:isPartOf <https://it.wikipedia.org/>;schema:about ?item. }
+      VALUES ?typeRegion { wd:Q16110 wd:Q1710033 }.
+
+    ?item wdt:P131* ?regione.
+    ?regione wdt:P31 ?typeRegion.
+  
           MINUS { ?item p:P2186 [ pq:P582 ?end ] .
           FILTER ( ?end <= "2020-09-01T00:00:00+00:00"^^xsd:dateTime )
                 }
       SERVICE wikibase:label { bd:serviceParam wikibase:language "it" }
         }'
     end
-    client = SPARQL::Client.new(endpoint, method: :get, headers: { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1' })
-    monuments = client.query(sparql)
+
+    begin
+      client = SPARQL::Client.new(endpoint, method: :get, headers: { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1' })
+      monuments = client.query(sparql)  
+    rescue
+      retry
+    end
 
     monuments.each do |row|
       @mon = Monument.new
@@ -69,6 +87,10 @@ class ImportJob < ApplicationJob
         @mon.commons = val.to_s if key.to_s == 'commons'
         @mon.itemdescription = val.to_s if key.to_s == 'itemDescription'
         @mon.wikipedia = val.to_s if key.to_s == 'sitelink'
+
+        if key.to_s == 'regioneLabel'
+          @mon.regione = val.to_s
+        end
       end
       @mon.save
     end
