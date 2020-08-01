@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_13_114313) do
+ActiveRecord::Schema.define(version: 2020_08_01_205246) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -29,6 +29,8 @@ ActiveRecord::Schema.define(version: 2020_07_13_114313) do
     t.boolean "with_photos"
     t.integer "photos_count"
     t.string "commons"
+    t.string "uploadurl"
+    t.string "regione"
   end
 
   create_table "nophotos", force: :cascade do |t|

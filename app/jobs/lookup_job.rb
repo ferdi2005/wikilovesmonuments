@@ -44,7 +44,7 @@ class LookupJob < ApplicationJob
       end
       monurl.gsub!('-+unknown+region', newstring)
 
-      monument.update_attribute(:url, monurl)
+      monument.update_attribute(:uploadurl, monurl)
   end
 
   def perform(*_args)
