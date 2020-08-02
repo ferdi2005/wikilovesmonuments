@@ -54,6 +54,8 @@ class LookupJob < ApplicationJob
       notwlm.gsub!(')', '%29') # fix parentesi )
       notwlm.gsub!(" ", "")
       notwlm.gsub!("+-+unknown+region", "")
+      notwlm.gsub!("&campaign=wlm-it", "")
+      notwlm.gsub!("&id=#{monument.wlmid}", "")
 
 
       # link non partecipante al concorso
