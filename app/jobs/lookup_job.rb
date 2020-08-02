@@ -8,10 +8,7 @@ class LookupJob < ApplicationJob
     mon = HTTParty.get("https://it.wikipedia.org/w/api.php?action=parse&text={{%23invoke:WLM|upload_url|#{monument.item}}}&contentmodel=wikitext&format=json",
       headers: { 'User-Agent' => 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using HTTParty Ruby Gem' },
       uri_adapter: Addressable::URI).to_a
-      monbase = mon[0][1]['externallinks'][0]
-      monbase.gsub!('(', '%28') # fix parentesi (
-      monbase.gsub!(')', '%29') # fix parentesi )
-  
+      baselink = mon[0][1]['externallinks'][0] + " "
       monurl = mon[0][1]['externallinks'][0]
       monurl.gsub!('(', '%28') # fix parentesi (
       monurl.gsub!(')', '%29') # fix parentesi )
@@ -52,9 +49,16 @@ class LookupJob < ApplicationJob
 
       monument.update_attribute(:uploadurl, monurl)
 
+      notwlm = baselink
+      notwlm.gsub!('(', '%28') # fix parentesi (
+      notwlm.gsub!(')', '%29') # fix parentesi )
+      notwlm.gsub!(" ", "")
+      notwlm.gsub!("+-+unknown+region", "")
+
+
       # link non partecipante al concorso
-      monbase.gsub!("%7CImages+from+Wiki+Loves+Monuments+2019+in+Italy+-+unknown+region&campaign=wlm-it", "")
-      monument.update_attribute(:nonwlmuploadurl, monbase)
+      notwlm.gsub!(/%7CImages\+from\+Wiki\+Loves\+Monuments\+\d{4}\+in\+Italy/, "")
+      monument.update_attribute(:nonwlmuploadurl, notwlm)
     end
 
   def perform(*_args)
