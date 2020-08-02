@@ -23,7 +23,7 @@ L.marker([<%= @monument.latitude %>, <%= @monument.longitude %>]).addTo(mymap)
       <%= link_to 'Item su Wikidata', "https://wikidata.org/wiki/#{@monument.item}", class: 'button is-danger is-medium' %>
       <br />
       <br />
-      <% if Date.today.month == "9" %>
+      <% if Date.today.month == 9 %>
        <%= link_to ' Carica una foto ', @monument.uploadurl, class: 'button is-primary is-medium' %>
      <% else %>
             <%= link_to ' Carica una foto non partecipante a WLM', @monument.nonwlmuploadurl, class: 'button is-primary is-medium' %>
