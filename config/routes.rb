@@ -10,5 +10,9 @@ Rails.application.routes.draw do
   get 'address', to: 'monuments#address'
   get 'show', to: 'monuments#show'
   get 'namesearch', to: 'monuments#namesearch'
+
+  # numerics stat
+
+    get 'nophoto', to: 'numerics#nophoto'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
