@@ -8,7 +8,13 @@ class LookupJob < ApplicationJob
     mon = HTTParty.get("https://it.wikipedia.org/w/api.php?action=parse&text={{%23invoke:WLM|upload_url|#{monument.item}}}&contentmodel=wikitext&format=json",
       headers: { 'User-Agent' => 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using HTTParty Ruby Gem' },
       uri_adapter: Addressable::URI).to_a
+      monbase = mon[0][1]['externallinks'][0]
+      monbase.gsub!('(', '%28') # fix parentesi (
+      monbase.gsub!(')', '%29') # fix parentesi )
+  
       monurl = mon[0][1]['externallinks'][0]
+      monurl.gsub!('(', '%28') # fix parentesi (
+      monurl.gsub!(')', '%29') # fix parentesi )
       regioni = {
         'Abruzzo' => ['Abruzzo', true],
         'Basilicata' => ['Basilicata', true],
@@ -35,7 +41,7 @@ class LookupJob < ApplicationJob
     regarr = regioni[monument.regione]
 
       newstring = '+-+' + regarr[0]
-      if regarr[1] == false && lakecomo == false
+      if regarr[1] == false && !monument.item.in?(lakecomo)
         newstring = newstring + '%7C' + basecat + '+-+' + 'without+local+award'
       end
 
@@ -45,9 +51,14 @@ class LookupJob < ApplicationJob
       monurl.gsub!('+-+unknown+region', newstring)
 
       monument.update_attribute(:uploadurl, monurl)
-  end
+
+      # link non partecipante al concorso
+      monbase.gsub!("%7CImages+from+Wiki+Loves+Monuments+2019+in+Italy+-+unknown+region&campaign=wlm-it", "")
+      monument.update_attribute(:nonwlmuploadurl, monbase)
+    end
 
   def perform(*_args)
+    # Inizio operazioni speciali per WL Lakes Como
     bannedcomo = ['Q28375375', 'Q24937411', 'Q21592570','Q3862651','Q3517634','Q24052892']
     lakecomo = []
     sparql = '
@@ -80,6 +91,7 @@ class LookupJob < ApplicationJob
       end
   end
 
+  # Fine operazioni speciali lakes como
 
     Monument.all.each do |monument|
       createurl(monument, lakecomo)
