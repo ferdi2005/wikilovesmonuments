@@ -68,13 +68,15 @@ class LookupJob < ApplicationJob
     client = SPARQL::Client.new(endpoint, method: :get, headers: { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1' })
     comoquery = client.query(sparql)  
 
-    comoquery.each do |key, val|
+    comoquery.each do |row|
+      row.each do |key, val|
       if key.to_s == 'item'
         itemarray = val.to_s.split('/')
         itemcode = itemarray[4]
         unless itemcode.in?(bannedcomo)
           lakecomo.push(itemcode.to_s)
         end
+      end
       end
   end
 
