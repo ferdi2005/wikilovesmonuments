@@ -4,7 +4,7 @@ class NumericsController < ApplicationController
         nophoto = { 
             "postfix": "Monumenti senza foto",
             "data": [{ 
-                "value": Monument.where(with_photos: false).count
+                "value": Nophoto.last.count
              },
              { 
                  "value": Nophoto.find(nophotobeforeid).count
