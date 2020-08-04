@@ -14,5 +14,7 @@ Rails.application.routes.draw do
   # numerics stat
 
     get 'nophoto', to: 'numerics#nophoto'
+    get 'nophotograph', to: 'numerics#nophotograph'
+
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

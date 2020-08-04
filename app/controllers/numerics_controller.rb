@@ -15,4 +15,18 @@ class NumericsController < ApplicationController
             format.json {render json: nophoto }
         end
     end
+
+    def nophotograph
+        hashdata = []
+        Nophoto.last(31).each do |nophoto|
+            hashdata.push({"value": nophoto.count})
+        end
+        nophoto = { 
+            "postfix": "Monumenti senza foto (grafico)",
+            "data": hashdata
+         }
+        respond_to do |format|
+            format.json {render json: nophoto }
+        end
+    end
 end
