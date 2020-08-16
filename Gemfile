@@ -78,3 +78,5 @@ gem "addressable", "~> 2.7"
 gem "chartkick", "~> 3.3"
 
 gem "groupdate", "~> 5.0"
+
+gem "sentry-raven", "~> 3.0"

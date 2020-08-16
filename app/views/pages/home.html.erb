@@ -10,10 +10,6 @@
 <p id="geoerror" class="is-centered"></p>
 </div>
 <script>
-if (location.protocol != 'https:') {
-  window.location.replace('https://cerca.wikilovesmonuments.it');
-}
-
 function geoloc() {
       if (navigator.geolocation) {
         var location_timeout = setTimeout(1000);
