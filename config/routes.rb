@@ -1,3 +1,4 @@
+require 'sidekiq/web'
 Rails.application.routes.draw do
   get 'import/do'
   root 'pages#home'
@@ -11,6 +12,8 @@ Rails.application.routes.draw do
   get 'show', to: 'monuments#show'
   get 'namesearch', to: 'monuments#namesearch'
 
+  mount Sidekiq::Web => '/sidekiq'
+  
   # numerics stat
 
     get 'nophoto', to: 'numerics#nophoto'
