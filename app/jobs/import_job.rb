@@ -54,46 +54,55 @@ class ImportJob < ApplicationJob
         }'
     end
 
+    retcount = 0
     begin
       client = SPARQL::Client.new(endpoint, method: :get, headers: { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1' })
       monuments = client.query(sparql)  
     rescue
-      retry
-    end
-
-    monuments.each do |row|
-      @mon = Monument.new
-      row.each do |key, val|
-        if key.to_s == 'item'
-          itemarray = val.to_s.split('/')
-          itemcode = itemarray[4]
-          @mon.item = itemcode.to_s
-        end
-        @mon.wlmid = val.to_s if key.to_s == 'wlmid'
-        if key.to_s == 'coords'
-          totalarray = val.to_s.split('(')
-          onlylatlong = totalarray[1].split(')')
-          latlongarray = onlylatlong[0].split(' ')
-          lat = latlongarray[1]
-          long = latlongarray[0]
-          @mon.latitude = BigDecimal(lat)
-          @mon.longitude = BigDecimal(long)
-        end
-        @mon.itemlabel = val.to_s if key.to_s == 'itemLabel'
-        if key.to_s == 'image'
-          filename = val.to_s.split('Special:FilePath/')[1]
-          @mon.image = filename.to_s
-        end
-        @mon.commons = val.to_s if key.to_s == 'commons'
-        @mon.itemdescription = val.to_s if key.to_s == 'itemDescription'
-        @mon.wikipedia = val.to_s if key.to_s == 'sitelink'
-
-        if key.to_s == 'regioneLabel'
-          @mon.regione = val.to_s
-        end
+      retcount = retcount + 1
+      if retcount < 3
+        retry
+      else
+        @stop = true
+        Raven.capture_message("Impossibile eseguire il job di importazione per errore nella connessione a SPARQL", :level => 'fatal')
       end
-      @mon.save
     end
-    LookupJob.perform_later
+
+    unless @stop == true
+      monuments.each do |row|
+        @mon = Monument.new
+        row.each do |key, val|
+          if key.to_s == 'item'
+            itemarray = val.to_s.split('/')
+            itemcode = itemarray[4]
+            @mon.item = itemcode.to_s
+          end
+          @mon.wlmid = val.to_s if key.to_s == 'wlmid'
+          if key.to_s == 'coords'
+            totalarray = val.to_s.split('(')
+            onlylatlong = totalarray[1].split(')')
+            latlongarray = onlylatlong[0].split(' ')
+            lat = latlongarray[1]
+            long = latlongarray[0]
+            @mon.latitude = BigDecimal(lat)
+            @mon.longitude = BigDecimal(long)
+          end
+          @mon.itemlabel = val.to_s if key.to_s == 'itemLabel'
+          if key.to_s == 'image'
+            filename = val.to_s.split('Special:FilePath/')[1]
+            @mon.image = filename.to_s
+          end
+          @mon.commons = val.to_s if key.to_s == 'commons'
+          @mon.itemdescription = val.to_s if key.to_s == 'itemDescription'
+          @mon.wikipedia = val.to_s if key.to_s == 'sitelink'
+
+          if key.to_s == 'regioneLabel'
+            @mon.regione = val.to_s
+          end
+        end
+        @mon.save
+      end
+      LookupJob.perform_later
+    end
   end
 end
