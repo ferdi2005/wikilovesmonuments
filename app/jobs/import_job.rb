@@ -33,7 +33,7 @@ class ImportJob < ApplicationJob
 
     if ENV['REGIONE'] == 'PUGLIA'
       sparql = '
-      SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel
+      SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons
       WHERE {
       ?item wdt:P2186 ?wlmid ;
               wdt:P131* wd:Q1447;
@@ -42,10 +42,6 @@ class ImportJob < ApplicationJob
       OPTIONAL { ?item wdt:P373 ?commons }
       OPTIONAL { ?item wdt:P18 ?image }
       OPTIONAL {?sitelink schema:isPartOf <https://it.wikipedia.org/>;schema:about ?item. }
-      VALUES ?typeRegion { wd:Q16110 wd:Q1710033 }.
-
-    ?item wdt:P131* ?regione.
-    ?regione wdt:P31 ?typeRegion.
   
           MINUS { ?item p:P2186 [ pq:P582 ?end ] .
           FILTER ( ?end <= "2020-09-01T00:00:00+00:00"^^xsd:dateTime )
@@ -98,6 +94,10 @@ class ImportJob < ApplicationJob
 
           if key.to_s == 'regioneLabel'
             @mon.regione = val.to_s
+          end
+
+          if ENV['REGIONE'] == 'PUGLIA'
+            @mon.regione = "Puglia"
           end
         end
         @mon.save
