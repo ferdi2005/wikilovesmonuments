@@ -135,8 +135,31 @@ class LookupJob < ApplicationJob
 
     Nophoto.create(count: nophoto, monuments: Monument.count, with_commons: Monument.where.not(commons:nil).count, with_image: Monument.where.not(image:nil).count, nowlm: Monument.where(with_photos: true, photos_count: 0).count)
 
+       regioni = ['Abruzzo',
+        'Basilicata',
+        'Calabria',
+        'Campania',
+        'Emilia-Romagna',
+        'Friuli-Venezia Giulia',
+        'Lazio',
+        'Liguria',
+        'Lombardia',
+        'Marche',
+        'Molise',
+        'Piemonte',
+        'Puglia',
+        'Sardegna',
+        'Sicilia',
+        'Toscana',
+        'Trentino-Alto Adige',
+        'Umbria',
+        "Valle d'Aosta",
+        'Veneto']
 
+        regioni.each do |reg|
+          nophoto = Monument.where(with_photos: false, regione: reg).count
+          Nophoto.create(regione: reg, count: nophoto, monuments: Monument.where(regione: reg).count, with_commons: Monument.where(regione:reg).where.not(commons:nil).count, with_image: Monument.where(regione: reg).where.not(image:nil).count, nowlm: Monument.where(regione: reg, with_photos: true, photos_count: 0).count)
+        end
 
-    # crea URL
   end
 end
