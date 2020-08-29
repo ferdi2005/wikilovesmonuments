@@ -1,4 +1,5 @@
 class Monument < ApplicationRecord
+  validates :item, uniqueness: true
   reverse_geocoded_by :latitude, :longitude
 
   def self.search(query = '')
