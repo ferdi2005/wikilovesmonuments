@@ -15,6 +15,10 @@ Rails.application.routes.draw do
 
     get 'nophoto', to: 'numerics#nophoto'
     get 'nophotograph', to: 'numerics#nophotograph'
+  
+    # concorsi-locali stat
+    get 'allregionscount', to: 'numerics#allregionscount'
+    get 'allregionsdifference', to: 'numerics#allregionsdifference'
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

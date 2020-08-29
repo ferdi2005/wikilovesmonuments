@@ -63,4 +63,35 @@ class NumericsController < ApplicationController
             format.json {render json: nophoto }
         end
     end
+
+    def allregionscount
+    regioni = ['Abruzzo',
+            'Basilicata',
+            'Calabria',
+            'Campania',
+            'Emilia-Romagna',
+            'Friuli-Venezia Giulia',
+            'Lazio',
+            'Liguria',
+            'Lombardia',
+            'Marche',
+            'Molise',
+            'Piemonte',
+            'Puglia',
+            'Sardegna',
+            'Sicilia',
+            'Toscana',
+            'Trentino-Alto Adige',
+            'Umbria',
+            "Valle d'Aosta",
+            'Veneto']
+            result = {}
+        regioni.each do |reg|
+            result[reg] = Monument.where(regione: reg).count
+        end
+        respond_to do |format|
+            format.json {render json: result }
+        end
+
+    end
 end
