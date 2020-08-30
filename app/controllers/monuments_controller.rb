@@ -4,12 +4,12 @@ class MonumentsController < ApplicationController
 
   def index
     if params[:latitude] && params[:longitude]
-      @pagy, @monument = pagy(Monument.near([BigDecimal.new(params[:latitude]), BigDecimal.new(params[:longitude])]))
-      @monument_nopagy = Monument.near([BigDecimal.new(params[:latitude]), BigDecimal.new(params[:longitude])])
+      @pagy, @monument = pagy(Monument.where.not(hidden: true).near([BigDecimal.new(params[:latitude]), BigDecimal.new(params[:longitude])]))
+      @monument_nopagy = Monument.where.not(hidden: true).near([BigDecimal.new(params[:latitude]), BigDecimal.new(params[:longitude])])
       @geocenter = [params[:latitude].to_f, params[:longitude].to_f]
     elsif params[:city]
-      @pagy, @monument = pagy(Monument.near("#{params[:city]}, IT"))
-      @monument_nopagy = Monument.near("#{params[:city]}, IT")
+      @pagy, @monument = pagy(Monument.where.not(hidden: true).near("#{params[:city]}, IT"))
+      @monument_nopagy = Monument.where.not(hidden: true).near("#{params[:city]}, IT")
       result = Geocoder.search("#{params[:city]}, IT")
       @geocenter = result.try(:first).try(:coordinates)
     end
@@ -36,7 +36,7 @@ class MonumentsController < ApplicationController
   end
   def map
     flash[:warning] = "L'utilizzo di questa pagina richiede numerose risorse per il server e per il tuo computer, molto probabilmente si bloccherà facilmente"
-   @monuments = Monument.all
+   @monuments = Monument.where.not(hidden: true)
   end 
 
   def namesearch
