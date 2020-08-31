@@ -8,9 +8,7 @@ class ImportController < ApplicationController
       render 'do'
       flash[:danger] = 'La password inserita non è corretta'
     else
-      ImportJob.perform_later
       redirect_to root_path
-      flash[:success] = "Import schedulato"  
     end
   end
 end
