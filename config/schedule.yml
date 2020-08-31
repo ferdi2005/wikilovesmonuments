@@ -1,0 +1,3 @@
+import_job:
+  cron: "0 3 * * *"
+  class: "ImportJob"

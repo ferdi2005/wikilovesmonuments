@@ -33,7 +33,7 @@ gem 'pagy'
 
 gem 'sidekiq'
 
-gem 'sidekiq-scheduler'
+gem 'sidekiq-cron'
 
 gem 'httparty'
 # Use ActiveStorage variant

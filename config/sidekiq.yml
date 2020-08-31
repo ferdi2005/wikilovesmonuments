@@ -1,4 +1,0 @@
-:schedule:
-  import:
-    cron: '0 3 * * *'
-    class: ImportJob

@@ -75,7 +75,6 @@ GEM
     concurrent-ruby (1.1.7)
     connection_pool (2.2.3)
     crass (1.0.6)
-    e2mmap (0.1.0)
     ebnf (2.1.1)
       htmlentities (~> 4.3)
       rdf (~> 3.1)
@@ -187,8 +186,6 @@ GEM
     regexp_parser (1.7.1)
     ruby_dep (1.5.0)
     rubyzip (2.3.0)
-    rufus-scheduler (3.6.0)
-      fugit (~> 1.1, >= 1.1.6)
     sass (3.7.4)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -210,13 +207,9 @@ GEM
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
-    sidekiq-scheduler (3.0.1)
-      e2mmap
-      redis (>= 3, < 5)
-      rufus-scheduler (~> 3.2)
-      sidekiq (>= 3)
-      thwait
-      tilt (>= 1.4.0)
+    sidekiq-cron (1.2.0)
+      fugit (~> 1.1)
+      sidekiq (>= 4.2.1)
     sparql (3.1.2)
       builder (~> 3.2)
       ebnf (>= 1.1)
@@ -243,8 +236,6 @@ GEM
       rdf (~> 3.1)
     thor (1.0.1)
     thread_safe (0.3.6)
-    thwait (0.2.0)
-      e2mmap
     tilt (2.0.10)
     turbolinks (5.2.1)
       turbolinks-source (~> 5.2)
@@ -291,7 +282,7 @@ DEPENDENCIES
   selenium-webdriver
   sentry-raven (~> 3.0)
   sidekiq
-  sidekiq-scheduler
+  sidekiq-cron
   sparql
   spring
   spring-watcher-listen (~> 2.0.0)
