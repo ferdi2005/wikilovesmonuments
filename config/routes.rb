@@ -1,5 +1,5 @@
-require 'sidekiq/web'
-require 'sidekiq/cron/web'
+# require 'sidekiq/web'
+# require 'sidekiq/cron/web'
 Rails.application.routes.draw do
   get 'import/do'
   root 'pages#home'
@@ -22,7 +22,7 @@ Rails.application.routes.draw do
     get 'allregionscount', to: 'numerics#allregionscount'
     get 'allregionsdifference', to: 'numerics#allregionsdifference'
 
-      mount Sidekiq::Web => '/secret-sidekiq'
+    # mount Sidekiq::Web => '/secret-sidekiq'
 
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
