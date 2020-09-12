@@ -10,10 +10,12 @@ class ImportJob < ApplicationJob
     endpoint = 'https://query.wikidata.org/sparql'
     # Query di Lorenzo Losa
     sparql = '
-    SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel
+   SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel
     WHERE {
-    ?item wdt:P2186 ?wlmid ;
-              wdt:P17 wd:Q38
+ ?item p:P2186 ?wlmst .
+  ?wlmst ps:P2186 ?wlmid .
+  
+      ?item wdt:P17 wd:Q38 . 
       MINUS {?item wdt:P31 wd:Q747074.}
       MINUS {?item wdt:P31 wd:Q954172.}
 
@@ -29,10 +31,15 @@ class ImportJob < ApplicationJob
 
 
 
-        MINUS { ?item p:P2186 [ pq:P582 ?end ] .
-        FILTER ( ?end <= "2020-09-01T00:00:00+00:00"^^xsd:dateTime )
-              }
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "it" }
+  # esclude i monumenti che hanno una data di termine precedente alla data di inizio del concorso
+  MINUS {
+    ?wlmst pqv:P582 [ wikibase:timeValue ?end ; wikibase:timePrecision ?eprec ] .
+    FILTER (
+      ( ?eprec >  9 && ?end < "2020-09-01T00:00:00+00:00"^^xsd:dateTime ) ||
+      ( ?eprec < 10 && ?end < "2020-01-01T00:00:00+00:00"^^xsd:dateTime )
+    )
+  }
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "it" }
       }'
 
     retcount = 0
