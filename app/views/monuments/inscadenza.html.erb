@@ -3,7 +3,7 @@
 <% if @monument.any? %>
 <div id="mapid" class="is-centered" style="height: 300px;width:100%;"></div>
 <script>
-    var mymap = L.map('mapid').setView([41.9109, 12.4818], 4);
+    var mymap = L.map('mapid').setView([41.9109, 12.4818], 5);
     L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y}?access_token=<%= ENV['MAPBOX_KEY'] %>', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(mymap);
