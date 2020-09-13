@@ -10,7 +10,7 @@ class ImportJob < ApplicationJob
     endpoint = 'https://query.wikidata.org/sparql'
     # Query di Lorenzo Losa
     sparql = '
-   SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel
+    SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate
     WHERE {
  ?item p:P2186 ?wlmst .
   ?wlmst ps:P2186 ?wlmid .
@@ -19,8 +19,8 @@ class ImportJob < ApplicationJob
       MINUS {?item wdt:P31 wd:Q747074.}
       MINUS {?item wdt:P31 wd:Q954172.}
 
-
     OPTIONAL {?item wdt:P625 ?coords. }
+    OPTIONAL { ?wlmst pqv:P582 [ wikibase:timeValue ?enddate ] .}
     OPTIONAL { ?item wdt:P373 ?commons. }
     OPTIONAL { ?item wdt:P18 ?image. }
     OPTIONAL {?sitelink schema:isPartOf <https://it.wikipedia.org/>;schema:about ?item. }
@@ -85,12 +85,16 @@ class ImportJob < ApplicationJob
           @mon.wikipedia = val.to_s if key.to_s == 'sitelink'
 
           @mon.regione = val.to_s if key.to_s == 'regioneLabel'
+          @mon.enddate = val.to_s if key.to_s == 'enddate'
         end
 
         if @mon.latitude.blank? || @mon.longitude.blank?
           @mon.hidden = true
         end
-        @mon.save
+
+        if @mon.enddate.nil? || @mon.enddate > Date.today
+          @mon.save
+        end
       end
       LookupJob.perform_later
     end

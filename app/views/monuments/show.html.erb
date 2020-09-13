@@ -3,39 +3,44 @@
 <!-- map -->
 <div id="mapid" class="is-centered" style="height: 360px;"></div>
 <script>
-var mymap = L.map('mapid').setView([<%= @monument.latitude %>, <%= @monument.longitude %>], 18);
-L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y}?access_token=<%= ENV['MAPBOX_KEY'] %>', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(mymap);
+    var mymap = L.map('mapid').setView([ < %= @monument.latitude % > , < %= @monument.longitude % > ], 18);
+    L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y}?access_token=<%= ENV['
+        MAPBOX_KEY '] %>', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(mymap);
 
-L.marker([<%= @monument.latitude %>, <%= @monument.longitude %>]).addTo(mymap)
-    .bindPopup('<%= @monument.itemlabel.capitalize %>')
-    .openPopup();
+    L.marker([ < %= @monument.latitude % > , < %= @monument.longitude % > ]).addTo(mymap)
+        .bindPopup('<%= @monument.itemlabel.capitalize %>')
+        .openPopup();
 </script>
 <!-- end map stuff -->
 
 <br />
-   <b>Indirizzo:</b><% result = Geocoder.search([@monument.latitude, @monument.longitude]) %>
-    <a href="https://www.openstreetmap.org/?mlat=<%= @monument.latitude %>&mlon=<%= @monument.longitude %>"><%= result.first.address %> </a>
-    <hr />
+<b>Indirizzo:</b><% result = Geocoder.search([@monument.latitude, @monument.longitude]) %>
+<a href="https://www.openstreetmap.org/?mlat=<%= @monument.latitude %>&mlon=<%= @monument.longitude %>"><%= result.first.address %> </a>
+<hr />
+<br />
+<div class="buttons is-vertical">
+    <%= link_to 'Item su Wikidata', "https://wikidata.org/wiki/#{@monument.item}", class: 'button is-danger is-medium' %>
     <br />
-    <div class="buttons is-vertical">
-      <%= link_to 'Item su Wikidata', "https://wikidata.org/wiki/#{@monument.item}", class: 'button is-danger is-medium' %>
-      <br />
-      <br />
-      <% if Date.today.month == 9 %>
-       <%= link_to ' Carica una foto ', @monument.uploadurl, class: 'button is-primary is-medium' %>
-     <% else %>
-            <%= link_to ' Carica una foto non partecipante a WLM', @monument.nonwlmuploadurl, class: 'button is-primary is-medium' %>
-            <p>Solo le foto caricate dall'1 al 30 settembre partecipano a Wiki Loves Monuments.</p>
+    <br />
+    <% if Date.today.month == 9 %>
+    <%= link_to ' Carica una foto ', @monument.uploadurl, class: 'button is-primary is-medium' %>
+    <% else %>
+    <%= link_to ' Carica una foto non partecipante a WLM', @monument.nonwlmuploadurl, class: 'button is-primary is-medium' %>
+    <p>Solo le foto caricate dall'1 al 30 settembre partecipano a Wiki Loves Monuments.</p>
     <% end %>
-       <br />
-       <br />
-     <%= link_to 'Categoria su Commons', "https://commons.wikimedia.org/wiki/Category:#{@monument.commons}", class: 'button is-danger is-medium' unless @monument.commons.nil?%>
+    <br />
+    <br />
+    <%= link_to 'Categoria su Commons', "https://commons.wikimedia.org/wiki/Category:#{@monument.commons}", class: 'button is-danger is-medium' unless @monument.commons.nil?%>
 
-      </div>
+</div>
 <% if @monument.with_photos %>
-    <p>Il monumento ha <%= @monument.photos_count unless @monument.photos_count.nil? %> foto.</p>
+<p>Il monumento ha <%= @monument.photos_count unless @monument.photos_count.nil? %> foto.</p>
 <% else %>
-    <p>Il monumento non ha foto</p>
+<p>Il monumento non ha foto</p>
+<% end %>
+
+<% unless @monument.enddate.nil? %>
+<p><b>Data di scadenza</b>: <%=monument.enddate.strftime("%d-%M-%Y") %>
 <% end %>

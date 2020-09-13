@@ -45,4 +45,8 @@ class MonumentsController < ApplicationController
       format.json { render json: @monuments }
     end
   end
+
+  def inscadenza
+    @monument = Monument.where.not(enddate: nil).sort_by { |m| m.enddate }
+  end
 end

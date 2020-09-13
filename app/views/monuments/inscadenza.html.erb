@@ -1,0 +1,56 @@
+<% provide(:title, 'Monumenti in scadenza') %>
+<h1 class="title is-2 is-danger">Lista monumenti in scadenza</h1>
+<% if @monument.any? %>
+<div id="mapid" class="is-centered" style="height: 300px;width:100%;"></div>
+<script>
+    var mymap = L.map('mapid').setView('41,9109; 12,4818', 8);
+    L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y}?access_token=<%= ENV[' MAPBOX_KEY '] %>', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(mymap);
+        var redIcon = new L.Icon({
+            iconUrl: '<%= image_url 'marker-icon-2x-red.png' %>',
+            shadowUrl: '<%= image_url 'marker-shadow.png' %>',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+    var greenIcon = new L.Icon({
+        iconUrl: '<%= image_url 'marker-icon-2x-green.png' %>',
+        shadowUrl: '<%= image_url 'marker-shadow.png' %>',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    }); <% @monument.each do |monument| %>
+            L.marker([ <%= monument.latitude %>, <%= monument.longitude %> ], {
+                icon: <%= monument.with_photos ? 'greenIcon' : 'redIcon' %>
+            }).addTo(mymap)
+            .bindPopup('<%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=400" unless monument.image.blank? %><%== ' < br / > ' unless monument.image.blank? %> <%= link_to monument.itemlabel.capitalize, show_path(id: monument.id) %> <br/> Scadenza <%=monument.enddate.strftime("%d-%M-%Y")%> '); 
+				<% end %>
+</script>
+<table class="table">
+    <thead>
+        <th>Nome</th>
+        <th>Scadenza</th>
+        <th>Link</th>
+    </thead>
+    <tbody>
+        <% @monument.each do |monument| %>
+        <tr>
+            <td>
+                <%= monument.itemlabel %>
+            </td>
+            <td>
+                <%= monument.enddate.strftime("%d-%M-%Y") %>
+            </td>
+            <td>
+                <i class="fas fa-search"></i> <%= link_to 'Maggiori informazioni', show_path(id: monument.id), class: 'button is-link'%>
+            </td>
+            <% end %>
+    </tbody>
+</table>
+<% else %>
+<h1 class="is-centered title is-3 is-red">Nessun monumento in scadenza</h1>
+<% end %>
