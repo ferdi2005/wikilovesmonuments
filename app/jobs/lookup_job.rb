@@ -65,7 +65,7 @@ class LookupJob < ApplicationJob
 
   def perform(*_args)
     # Inizio operazioni speciali per WL Lakes Como
-    bannedcomo = ['Q28375375', 'Q24937411', 'Q21592570','Q3862651','Q3517634','Q24052892']
+    bannedcomo = ['Q28375375', 'Q24937411', 'Q21592570','Q3862651','Q3517634','Q24052892', "Q533156"]
     lakecomo = []
     sparql = '
     SELECT DISTINCT ?item
