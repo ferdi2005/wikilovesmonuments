@@ -22,6 +22,8 @@ Rails.application.routes.draw do
     get 'allregionscount', to: 'numerics#allregionscount'
     get 'allregionsdifference', to: 'numerics#allregionsdifference'
 
+    get 'numerics-monuments', to: 'numerics#monuments'
+
     # mount Sidekiq::Web => '/secret-sidekiq'
 
 
