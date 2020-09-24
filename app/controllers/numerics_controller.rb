@@ -1,4 +1,36 @@
 class NumericsController < ApplicationController
+    def monuments
+        if params[:regione].blank?
+            nophotobeforeid = Nophoto.where(regione: nil).last(2).first
+            nophoto = { 
+                "postfix": "Monumenti",
+                "data": [{ 
+                    "value": Nophoto.where(regione: nil).last.monuments
+                },
+                { 
+                    "value": nophotobeforeid.monuments
+                }
+                ]
+            }
+        else
+            nophotobeforeid = Nophoto.where(regione: params[:regione]).last(2).first
+            nophoto = { 
+                "postfix": "Monumenti senza foto",
+                "data": [{ 
+                    "value": Nophoto.where(regione: params[:regione]).last.monuments
+                },
+                { 
+                    "value": nophotobeforeid.monuments
+                }
+                ]
+            }
+        end
+        respond_to do |format|
+            format.json {render json: nophoto }
+        end
+    end
+
+
     def nophoto
         if params[:regione].blank?
             nophotobeforeid = Nophoto.where(regione: nil).last(2).first
