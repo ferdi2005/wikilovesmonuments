@@ -15,7 +15,7 @@ class NumericsController < ApplicationController
         else
             nophotobeforeid = Nophoto.where(regione: params[:regione]).last(2).first
             nophoto = { 
-                "postfix": "Monumenti senza foto",
+                "postfix": "Monumenti",
                 "data": [{ 
                     "value": Nophoto.where(regione: params[:regione]).last.monuments
                 },
