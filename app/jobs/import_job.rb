@@ -97,6 +97,7 @@ class ImportJob < ApplicationJob
         end
       end
       LookupJob.perform_later
+      CheckDuplicatesJob.perform_later
     end
   end
 end
