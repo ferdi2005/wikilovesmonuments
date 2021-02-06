@@ -13,6 +13,8 @@ Rails.application.routes.draw do
   get 'show', to: 'monuments#show'
   get 'namesearch', to: 'monuments#namesearch'
   get 'inscadenza', to: 'monuments#inscadenza'
+  get 'nextid', to: "monuments#nextid"
+  get 'findnextid', to: "monuments#findnextid"
   # numerics stat
 
     get 'nophoto', to: 'numerics#nophoto'

@@ -50,4 +50,21 @@ class MonumentsController < ApplicationController
   def inscadenza
     @monument = Monument.where.not(enddate: nil).sort_by { |m| m.enddate }
   end
+
+  def nextid; end
+
+  def findnextid
+    if (mon = Monument.find_by(item: params[:id]))
+      wlmids = Monument.where("wlmid LIKE ?", "#{mon.wlmid[0..5]}%").pluck(:wlmid)
+      nextid = wlmids.sort.last[6..10].to_i + 1
+      newid = nextid.to_s.rjust(4, "0")
+      freeid = "#{mon.wlmid[0..5]}#{newid}"
+      result = freeid
+    else
+      result = "Nessun monumento trovato"
+    end
+    respond_to do |format|
+      format.json { render :json => result}
+    end
+  end
 end

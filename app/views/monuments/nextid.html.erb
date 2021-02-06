@@ -1,0 +1,28 @@
+<h2 class="title is-2">Trova l'ID Wiki Loves Monuments immediatamente successivo</h2>
+<label class="label">Item Wikidata del monumento</label>
+<p class="is-info">Unfocusa il campo o premi invio per cercare</p>
+<input class="input" type="text" id="item" />
+
+<script>
+$(document).ready(function(){
+function find() {
+    url = "<%= root_url %>findnextid.json?id=" + $("#item").val();
+    $.ajax({
+        url: url,
+        dataType: "text",
+        success: function(data){
+            alert(data);
+        },
+        error: function (xhr, status) {
+            alert(status);
+        },
+    });
+}
+$("#item").on("focusout", find());
+$("#item").keypress(function(e) {
+  if (e.which == 13) {
+      find();
+    }
+});
+});
+</script>
