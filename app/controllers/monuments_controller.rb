@@ -55,11 +55,15 @@ class MonumentsController < ApplicationController
 
   def findnextid
     if (mon = Monument.find_by(item: params[:id]))
-      wlmids = Monument.where("wlmid LIKE ?", "#{mon.wlmid[0..5]}%").pluck(:wlmid)
-      nextid = wlmids.sort.last[6..10].to_i + 1
+      wlmids = Monument.where(city: mon.city).pluck(:wlmid)
+      selected = wlmids.select { |id| id.match?(/^\d{2}[A-Z]\d{3}\d{4}$/)}
+      nextid = selected.sort.last[6..10].to_i + 1
       newid = nextid.to_s.rjust(4, "0")
-      freeid = "#{mon.wlmid[0..5]}#{newid}"
+      freeid = "#{selected.sort.last[0..5]}#{newid}"
       result = freeid
+      if Monument.where(wlmid: result).any?
+        result = "Qualcosa è andato storto!"
+      end
     else
       result = "Nessun monumento trovato"
     end

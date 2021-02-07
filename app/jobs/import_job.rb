@@ -10,12 +10,14 @@ class ImportJob < ApplicationJob
     endpoint = 'https://query.wikidata.org/sparql'
     # Query di Lorenzo Losa
     sparql = '
-    SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate
+    SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unitLabel
     WHERE {
  ?item p:P2186 ?wlmst .
   ?wlmst ps:P2186 ?wlmid .
   
       ?item wdt:P17 wd:Q38 . 
+      ?item wdt:P131 ?unit .
+
       MINUS {?item wdt:P31 wd:Q747074.}
       MINUS {?item wdt:P31 wd:Q954172.}
 
@@ -86,6 +88,7 @@ class ImportJob < ApplicationJob
 
           @mon.regione = val.to_s if key.to_s == 'regioneLabel'
           @mon.enddate = val.to_s if key.to_s == 'enddate'
+          @mon.city = val.to_s if key.to_s == "unitLabel"
         end
 
         if @mon.latitude.blank? || @mon.longitude.blank?
