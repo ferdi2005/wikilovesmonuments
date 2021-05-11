@@ -4,8 +4,8 @@ class MonumentsController < ApplicationController
 
   def index
     if params[:latitude] && params[:longitude]
-      @pagy, @monument = pagy(Monument.where(hidden: nil).near([BigDecimal.new(params[:latitude]), BigDecimal.new(params[:longitude])]))
-      @monument_nopagy = Monument.where(hidden: nil).near([BigDecimal.new(params[:latitude]), BigDecimal.new(params[:longitude])])
+      @pagy, @monument = pagy(Monument.where(hidden: nil).near([BigDecimal(params[:latitude]), BigDecimal(params[:longitude])]))
+      @monument_nopagy = Monument.where(hidden: nil).near([BigDecimal(params[:latitude]), BigDecimal(params[:longitude])])
       @geocenter = [params[:latitude].to_f, params[:longitude].to_f]
     elsif params[:city]
       @pagy, @monument = pagy(Monument.where(hidden: nil).near("#{params[:city]}, IT"))
