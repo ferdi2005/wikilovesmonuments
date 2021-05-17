@@ -12,6 +12,8 @@ class MonumentsController < ApplicationController
       @monument_nopagy = Monument.where(hidden: nil).near("#{params[:city]}, IT")
       result = Geocoder.search("#{params[:city]}, IT")
       @geocenter = result.try(:first).try(:coordinates)
+    else
+      @monument = []
     end
     respond_to do |format|
       format.html
