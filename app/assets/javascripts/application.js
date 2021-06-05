@@ -21,8 +21,8 @@
 //= require Chart.bundle
 //= require jszip
 //= require pdfmake
-//= require dataTables.buttons
 //= require datatables
+//= require dataTables.buttons
 //= require_tree .
 
 window.addEventListener("turbolinks:load", Pagy.init);
