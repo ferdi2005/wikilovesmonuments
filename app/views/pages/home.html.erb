@@ -50,7 +50,7 @@
         if (consenso) {
             Swal.fire({
                 title: 'Trova i monumenti partecipanti a Wiki Loves Monuments vicino a te!',
-                text: "Alla richiesta di utilizzo della geolocalizzazione che ti verrà presentata dopo, clicca su Ok o su Consenti per assicurarti di poter trovare con facilità i monumenti partecipanti vicino a te. Questo sito NON conserva la tua posizione, né la utilizza per altri scopi che non siano trovare i monumenti di Wiki Loves Monuments. Se accetti, ricorderemo la tua scelta.",
+                text: "Alla richiesta di utilizzo della geolocalizzazione che ti verrà presentata dopo, clicca su OK o su Consenti per assicurarti di poter trovare con facilità i monumenti partecipanti vicino a te. Questo sito NON conserva la tua posizione (se non in eventuali log, che vengono cancellati periodicamente), né la utilizza per altri scopi che non siano trovare i monumenti di Wiki Loves Monuments, né la condivide in modo associato ai tuoi dati personali o comunque con esterni che non siano Mapbox, il partner di geocoding. Se accetti, ricorderemo la tua scelta.",
                 type: 'info',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -79,9 +79,7 @@
     <br />
     <script>
         function empty() {
-            var x;
-            x = document.getElementById("searchTextField").value;
-            if (x == "") {
+            if (document.getElementById("searchTextField").value == "") {
                 alert("Inserisci il nome di una città prima di cercare.");
                 return false;
             };
@@ -90,7 +88,7 @@
     <form method="get" action="/monuments">
         <div class="field has-addons is-centered">
             <div class="control">
-                <input type="text" class="input" id="searchTextField" placeholder="Città" name="city"></input>
+                <input type="text" class="input" id="searchTextField" placeholder="Città" name="city" />
             </div>
             <div class="control">
                 <button type="submit" class="button is-primary" placeholder="Cerca" id="click-form" onClick="return empty()">Cerca</button>

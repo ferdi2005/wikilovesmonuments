@@ -15,7 +15,11 @@ Rails.application.routes.draw do
   get 'inscadenza', to: 'monuments#inscadenza'
   get 'nextid', to: "monuments#nextid"
   get 'findnextid', to: "monuments#findnextid"
-  # numerics stat
+
+  get 'doppioni', to: "monuments#doppioni"
+
+  get 'api', to: "pages#api"
+  # numerics stats
 
     get 'nophoto', to: 'numerics#nophoto'
     get 'nophotograph', to: 'numerics#nophotograph'

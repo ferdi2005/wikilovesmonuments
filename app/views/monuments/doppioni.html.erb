@@ -1,0 +1,31 @@
+<h1 class="title is-2">Monumenti con ID uguale a quello di un altro monumento (doppioni)</h1>
+
+<table id="doppioni" class="table">
+  <thead>
+    <th>Nome</th>
+    <th>Regione</th>
+    <th>ID</th>
+    <th>Item</th>
+    <th>Primo successivo libero</th>
+  </thead>
+  <tbody>
+    <% @monuments.each do |mon| %>
+    <tr>
+        <td><%= mon.itemlabel %></td>
+        <td><%= mon.regione %></td>
+        <td><%= mon.wlmid %></td>
+        <td><%= link_to mon.item, "https://wikidata.org/wiki/#{mon.item}" %></td>
+        <td><%= mon.find_next_id unless mon.find_next_id.in? 0..1 %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<script>
+    $('#doppioni').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+        ]
+    });
+</script>

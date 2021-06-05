@@ -57,18 +57,13 @@ class MonumentsController < ApplicationController
 
   def findnextid
     if (mon = Monument.find_by(item: params[:id]))
-      wlmids = Monument.where(city: mon.city).pluck(:wlmid)
-      selected = wlmids.select { |id| id.match?(/^\d{2}[A-Z]\d{3}\d{4}$/)}
-      if selected.empty?
-        nextid = selected.sort.last[6..10].to_i + 1
-        newid = nextid.to_s.rjust(4, "0")
-        freeid = "#{selected.sort.last[0..5]}#{newid}"
-        result = freeid
-        if Monument.where(wlmid: result).any?
-          result = "Errore! Qualcosa è andato storto!"
-        end
-      else
+      case mon.find_next_id
+      when 0
+        result = "Errore! Qualcosa è andato storto!"
+      when 1
         result = "Nessun monumento con l'ID nel formato usuale nella città (es. 16A6620001)"
+      else
+        result = mon.find_next_id
       end
     else
       result = "Nessun monumento trovato"
@@ -76,5 +71,9 @@ class MonumentsController < ApplicationController
     respond_to do |format|
       format.json { render :json => result}
     end
+  end
+
+  def doppioni
+    @monuments = Monument.where(duplicate: true)
   end
 end

@@ -1,6 +1,5 @@
 class ImportController < ApplicationController
   def do
-
   end
 
   def import
