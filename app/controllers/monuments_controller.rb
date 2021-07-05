@@ -30,6 +30,15 @@ class MonumentsController < ApplicationController
     end
   end
 
+
+  def show_by_wlmid
+    @monument = Monument.find_by(wlmid: params[:wlmid])
+    respond_to do |format|
+      format.html { redirect_to show_path(id: @monument.id)}
+      format.json { render json: @monument }
+    end
+  end
+  
   def address
     @monument = Monument.find(params[:id])
     result = Geocoder.search([@monument.latitude, @monument.longitude])
