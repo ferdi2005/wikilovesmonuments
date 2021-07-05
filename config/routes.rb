@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   get 'address', to: 'monuments#address'
   get 'show', to: 'monuments#show'
   get 'show_by_wlmid', to: 'monuments#show_by_wlmid'
+  get 'show_by_wikidata', to: 'monuments#show_by_wikidata'
   get 'namesearch', to: 'monuments#namesearch'
   get 'inscadenza', to: 'monuments#inscadenza'
   get 'nextid', to: "monuments#nextid"

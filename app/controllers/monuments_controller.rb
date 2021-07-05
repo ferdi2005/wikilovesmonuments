@@ -38,6 +38,15 @@ class MonumentsController < ApplicationController
       format.json { render json: @monument }
     end
   end
+
+  def show_by_wikidata
+    @monument = Monument.find_by(item: params[:item])
+    respond_to do |format|
+      format.html { redirect_to show_path(id: @monument.id)}
+      format.json { render json: @monument }
+    end
+  end
+
   
   def address
     @monument = Monument.find(params[:id])
