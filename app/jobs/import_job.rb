@@ -10,7 +10,7 @@ class ImportJob < ApplicationJob
     endpoint = 'https://query.wikidata.org/sparql'
     # Query di Lorenzo Losa
     sparql = '
-    SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unitLabel
+    SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unitLabel ?address
     WHERE {
  ?item p:P2186 ?wlmst .
   ?wlmst ps:P2186 ?wlmid .
@@ -25,6 +25,7 @@ class ImportJob < ApplicationJob
     OPTIONAL { ?wlmst pqv:P582 [ wikibase:timeValue ?enddate ] .}
     OPTIONAL { ?item wdt:P373 ?commons. }
     OPTIONAL { ?item wdt:P18 ?image. }
+    OPTIONAL { ?item wdt:P6375 ?address.}
     OPTIONAL {?sitelink schema:isPartOf <https://it.wikipedia.org/>;schema:about ?item. }
     VALUES ?typeRegion { wd:Q16110 wd:Q1710033 }.
 
@@ -89,6 +90,7 @@ class ImportJob < ApplicationJob
           @mon.regione = val.to_s if key.to_s == 'regioneLabel'
           @mon.enddate = val.to_s if key.to_s == 'enddate'
           @mon.city = val.to_s if key.to_s == "unitLabel"
+          @mon.address = val.to_s if key.to_s == "address"
         end
 
         if @mon.latitude.blank? || @mon.longitude.blank?
