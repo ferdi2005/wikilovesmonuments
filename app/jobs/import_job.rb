@@ -10,7 +10,7 @@ class ImportJob < ApplicationJob
     endpoint = 'https://query.wikidata.org/sparql'
     # Query di Lorenzo Losa
     sparql = '
-    SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unitLabel ?address
+    SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unitLabel ?address ?instanceof
     WHERE {
  ?item p:P2186 ?wlmst .
   ?wlmst ps:P2186 ?wlmid .
@@ -20,7 +20,8 @@ class ImportJob < ApplicationJob
 
       MINUS {?item wdt:P31 wd:Q747074.}
       MINUS {?item wdt:P31 wd:Q954172.}
-
+    
+    OPTIONAL {?item wdt:P31 ?instanceof }
     OPTIONAL {?item wdt:P625 ?coords. }
     OPTIONAL { ?wlmst pqv:P582 [ wikibase:timeValue ?enddate ] .}
     OPTIONAL { ?item wdt:P373 ?commons. }
@@ -51,7 +52,7 @@ class ImportJob < ApplicationJob
       monuments = client.query(sparql)
     rescue StandardError
       retcount += 1
-      if retcount < 3
+      if retcount < 5
         retry
       else
         @stop = true
@@ -91,6 +92,10 @@ class ImportJob < ApplicationJob
           @mon.enddate = val.to_s if key.to_s == 'enddate'
           @mon.city = val.to_s if key.to_s == "unitLabel"
           @mon.address = val.to_s if key.to_s == "address"
+          
+          if val.to_s == "instanceof" && key.to_s == "Q811534"
+            @mon.tree = true
+          end
         end
 
         if @mon.latitude.blank? || @mon.longitude.blank?

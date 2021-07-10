@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_06_225117) do
+ActiveRecord::Schema.define(version: 2021_07_10_000336) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -37,6 +37,7 @@ ActiveRecord::Schema.define(version: 2021_07_06_225117) do
     t.boolean "duplicate", default: false
     t.string "city"
     t.string "address"
+    t.boolean "tree", default: false
   end
 
   create_table "nophotos", force: :cascade do |t|
