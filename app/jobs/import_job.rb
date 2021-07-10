@@ -61,43 +61,38 @@ class ImportJob < ApplicationJob
     end
 
     unless @stop == true
-      monuments.each do |row|
+      monuments.each do |monument|
         @mon = Monument.new
-        row.each do |key, val|
-          if key.to_s == 'item'
-            itemarray = val.to_s.split('/')
-            itemcode = itemarray[4]
-            @mon.item = itemcode.to_s
-          end
-          @mon.wlmid = val.to_s if key.to_s == 'wlmid'
-          if key.to_s == 'coords'
-            totalarray = val.to_s.split('(')
-            onlylatlong = totalarray[1].split(')')
-            latlongarray = onlylatlong[0].split(' ')
-            lat = latlongarray[1]
-            long = latlongarray[0]
-            @mon.latitude = BigDecimal(lat)
-            @mon.longitude = BigDecimal(long)
-          end
-          @mon.itemlabel = val.to_s if key.to_s == 'itemLabel'
-          if key.to_s == 'image'
-            filename = val.to_s.split('Special:FilePath/')[1]
-            @mon.image = filename.to_s
-          end
-          @mon.commons = val.to_s if key.to_s == 'commons'
-          @mon.itemdescription = val.to_s if key.to_s == 'itemDescription'
-          @mon.wikipedia = val.to_s if key.to_s == 'sitelink'
+          @mon.item = monument[:item].to_s.split('/')[4]
 
-          @mon.regione = val.to_s if key.to_s == 'regioneLabel'
-          @mon.enddate = val.to_s if key.to_s == 'enddate'
-          @mon.city = val.to_s if key.to_s == "unitLabel"
-          @mon.address = val.to_s if key.to_s == "address"
+          @mon.wlmid = monument[:wlmid].to_s
           
-          if val.to_s == "instanceof" && key.to_s == "Q811534"
-            @mon.tree = true
-          end
-        end
+          latlongarray = monument[:coords].to_s.split('(')[1].split(')')[0].split(' ')
+          lat = latlongarray[1]
+          long = latlongarray[0]
+          @mon.latitude = BigDecimal(lat)
+          @mon.longitude = BigDecimal(long)
 
+          @mon.itemlabel = monument[:itemLabel].to_s
+          
+          @mon.image = monument[:image].to_s.split('Special:FilePath/')[1]
+
+          @mon.commons = monument[:commons].to_s
+
+          @mon.itemdescription = monument[:itemDescription].to_s
+
+          @mon.wikipedia = monument[:sitelink].to_s
+
+          @mon.regione = monument[:regioneLabel].to_s
+
+          @mon.enddate = monument[:enddate].to_s
+
+          @mon.city = monument[:unitLabel].to_s
+
+          @mon.address = monument[:address].to_s
+
+          @mon.tree = true if monument[:instanceof].to_s == "http://www.wikidata.org/entity/Q811534"
+          
         if @mon.latitude.blank? || @mon.longitude.blank?
           @mon.hidden = true
         end
