@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class ImportJob < ApplicationJob
   queue_as :default
 
@@ -67,11 +65,13 @@ class ImportJob < ApplicationJob
 
           @mon.wlmid = monument[:wlmid].to_s
           
-          latlongarray = monument[:coords].to_s.split('(')[1].split(')')[0].split(' ')
-          lat = latlongarray[1]
-          long = latlongarray[0]
-          @mon.latitude = BigDecimal(lat)
-          @mon.longitude = BigDecimal(long)
+          latlongarray = monument[:coords].to_s.try(:split, '(').try(:[], 1).try(:split, ')').try(:[], 0).try(:split, ' ')
+          unless latlongarray.nil?
+            lat = latlongarray[1]
+            long = latlongarray[0]
+            @mon.latitude = BigDecimal(lat)
+            @mon.longitude = BigDecimal(long)
+          end
 
           @mon.itemlabel = monument[:itemLabel].to_s
           
