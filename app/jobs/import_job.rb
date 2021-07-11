@@ -7,8 +7,7 @@ class ImportJob < ApplicationJob
     ActiveRecord::Base.connection.reset_pk_sequence!(Monument.table_name)
     endpoint = 'https://query.wikidata.org/sparql'
     # Query di Lorenzo Losa
-    sparql = '
-    SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unitLabel ?address ?instanceof
+    sparql = 'SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unitLabel ?address ?instanceof
     WHERE {
  ?item p:P2186 ?wlmst .
   ?wlmst ps:P2186 ?wlmid .
@@ -32,6 +31,15 @@ class ImportJob < ApplicationJob
   ?regione wdt:P31 ?typeRegion.
 
 
+    # esclude i monumenti che hanno una data di inizio successiva al termine del concorso
+  MINUS {
+    ?wlmst pqv:P580 [ wikibase:timeValue ?start ; wikibase:timePrecision ?sprec ] .
+    FILTER (
+      # precisione 9 è anno
+      ( ?sprec >  9 && ?start >= "2021-10-01T00:00:00+00:00"^^xsd:dateTime ) ||
+      ( ?sprec < 10 && ?start >= "2022-01-01T00:00:00+00:00"^^xsd:dateTime )
+    )
+  }
 
   # esclude i monumenti che hanno una data di termine precedente alla data di inizio del concorso
   MINUS {
@@ -41,6 +49,13 @@ class ImportJob < ApplicationJob
       ( ?eprec < 10 && ?end < "2020-01-01T00:00:00+00:00"^^xsd:dateTime )
     )
   }
+      
+        # esclude i monumenti per cui è indicata una data con un anno diverso da quello del concorso
+  MINUS {
+    ?wlmst pq:P585 ?date .
+    FILTER ( ?date < "2021-01-01T00:00:00+00:00"^^xsd:dateTime || ?date >= "2022-01-01T00:00:00+00:00"^^xsd:dateTime )
+  }
+
       SERVICE wikibase:label { bd:serviceParam wikibase:language "it" }
       }'
 
