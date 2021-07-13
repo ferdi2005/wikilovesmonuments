@@ -2,12 +2,9 @@ class ImportJob < ApplicationJob
   queue_as :default
 
   def perform
-    Monument.delete_all
-    # Resetta gli id in modo che partano da 1
-    ActiveRecord::Base.connection.reset_pk_sequence!(Monument.table_name)
     endpoint = 'https://query.wikidata.org/sparql'
     # Query di Lorenzo Losa
-    sparql = 'SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unitLabel ?address ?instanceof
+    sparql = 'SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unitLabel ?address ?instanceof ?year
     WHERE {
  ?item p:P2186 ?wlmst .
   ?wlmst ps:P2186 ?wlmid .
@@ -21,6 +18,7 @@ class ImportJob < ApplicationJob
     OPTIONAL {?item wdt:P31 ?instanceof }
     OPTIONAL {?item wdt:P625 ?coords. }
     OPTIONAL { ?wlmst pqv:P582 [ wikibase:timeValue ?enddate ] .}
+    OPTIONAL { ?wlmst pqv:P585 [ wikibase:timeValue ?year ] .}
     OPTIONAL { ?item wdt:P373 ?commons. }
     OPTIONAL { ?item wdt:P18 ?image. }
     OPTIONAL { ?item wdt:P6375 ?address.}
@@ -38,15 +36,6 @@ class ImportJob < ApplicationJob
       # precisione 9 è anno
       ( ?sprec >  9 && ?start >= "2021-10-01T00:00:00+00:00"^^xsd:dateTime ) ||
       ( ?sprec < 10 && ?start >= "2022-01-01T00:00:00+00:00"^^xsd:dateTime )
-    )
-  }
-
-  # esclude i monumenti che hanno una data di termine precedente alla data di inizio del concorso
-  MINUS {
-    ?wlmst pqv:P582 [ wikibase:timeValue ?end ; wikibase:timePrecision ?eprec ] .
-    FILTER (
-      ( ?eprec >  9 && ?end < "2020-09-01T00:00:00+00:00"^^xsd:dateTime ) ||
-      ( ?eprec < 10 && ?end < "2020-01-01T00:00:00+00:00"^^xsd:dateTime )
     )
   }
       
@@ -75,49 +64,63 @@ class ImportJob < ApplicationJob
 
     unless @stop == true
       monuments.each do |monument|
-        @mon = Monument.new
-          @mon.item = monument[:item].to_s.split('/')[4]
+        unless (@mon = Monument.find_by(item: monument[:item].to_s.split('/')[4]))
+          @mon = Monument.new
+        end
+        
+        @mon.item = monument[:item].to_s.split('/')[4]
 
-          @mon.wlmid = monument[:wlmid].to_s
+        @mon.wlmid = monument[:wlmid].to_s
           
-          latlongarray = monument[:coords].to_s.try(:split, '(').try(:[], 1).try(:split, ')').try(:[], 0).try(:split, ' ')
-          unless latlongarray.nil?
-            lat = latlongarray[1]
-            long = latlongarray[0]
-            @mon.latitude = BigDecimal(lat)
-            @mon.longitude = BigDecimal(long)
+        latlongarray = monument[:coords].to_s.try(:split, '(').try(:[], 1).try(:split, ')').try(:[], 0).try(:split, ' ')
+        unless latlongarray.nil?
+          lat = latlongarray[1]
+          long = latlongarray[0]
+          @mon.latitude = BigDecimal(lat)
+          @mon.longitude = BigDecimal(long)
+        end
+
+        @mon.itemlabel = monument[:itemLabel].to_s
+          
+        @mon.image = monument[:image].to_s.split('Special:FilePath/')[1]
+
+        @mon.commons = monument[:commons].to_s
+
+        @mon.itemdescription = monument[:itemDescription].to_s
+
+        @mon.wikipedia = monument[:sitelink].to_s
+
+        @mon.regione = monument[:regioneLabel].to_s
+
+        @mon.enddate = monument[:enddate].to_s
+
+        @mon.year = monument[:year].to_s
+
+        @mon.city = monument[:unitLabel].to_s
+
+        @mon.address = monument[:address].to_s
+
+        @mon.tree = true if monument[:instanceof].to_s == "http://www.wikidata.org/entity/Q811534"
+          
+        @mon.hidden = true if @mon.latitude.blank? || @mon.longitude.blank?
+
+        if !@mon.year.try(:year).nil? && @mon.year.try(:year) != Date.today.year
+          @mon.noupload = true
+        else
+          @mon.noupload = false
+        end
+
+        unless @mon.enddate.nil?
+          if @mon.enddate < Date.today
+            @mon.noupload = true
+          else 
+            @mon.noupload = false
           end
-
-          @mon.itemlabel = monument[:itemLabel].to_s
-          
-          @mon.image = monument[:image].to_s.split('Special:FilePath/')[1]
-
-          @mon.commons = monument[:commons].to_s
-
-          @mon.itemdescription = monument[:itemDescription].to_s
-
-          @mon.wikipedia = monument[:sitelink].to_s
-
-          @mon.regione = monument[:regioneLabel].to_s
-
-          @mon.enddate = monument[:enddate].to_s
-
-          @mon.city = monument[:unitLabel].to_s
-
-          @mon.address = monument[:address].to_s
-
-          @mon.tree = true if monument[:instanceof].to_s == "http://www.wikidata.org/entity/Q811534"
-          
-        if @mon.latitude.blank? || @mon.longitude.blank?
-          @mon.hidden = true
         end
-
-        if @mon.enddate.nil? || @mon.enddate > Date.today
-          @mon.save
-        end
+        
+        @mon.save
       end
       LookupJob.perform_later
-      CheckDuplicatesJob.perform_later
     end
   end
 end

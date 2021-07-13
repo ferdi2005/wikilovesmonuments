@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_10_000336) do
+ActiveRecord::Schema.define(version: 2021_07_13_160459) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -38,6 +38,8 @@ ActiveRecord::Schema.define(version: 2021_07_10_000336) do
     t.string "city"
     t.string "address"
     t.boolean "tree", default: false
+    t.boolean "noupload", default: false
+    t.date "year"
   end
 
   create_table "nophotos", force: :cascade do |t|
