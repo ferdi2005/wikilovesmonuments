@@ -62,7 +62,7 @@ class ImportJob < ApplicationJob
     begin
       client = SPARQL::Client.new(endpoint, method: :get, headers: { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1' })
       monuments = client.query(sparql)
-    rescue StandardError
+    rescue => e
       retcount += 1
       if retcount < 5
         retry
