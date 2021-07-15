@@ -1,6 +1,16 @@
 class ImportJob < ApplicationJob
   queue_as :default
 
+  def normalize_value(value)
+    if value.to_s == ""
+      return nil
+    elsif value.start_with?("_:")
+      return nil
+    else
+      return value.to_s
+    end
+  end
+
   def perform
     endpoint = 'https://query.wikidata.org/sparql'
     # Query di Lorenzo Losa
@@ -64,43 +74,46 @@ class ImportJob < ApplicationJob
 
     unless @stop == true
       monuments.each do |monument|
-        unless (@mon = Monument.find_by(item: monument[:item].to_s.split('/')[4]))
+        unless (@mon = Monument.find_by(item: normalize_value(monument[:item]).split('/')[4]))
           @mon = Monument.new
         end
         
-        @mon.item = monument[:item].to_s.split('/')[4]
+        @mon.item = normalize_value(monument[:item]).split('/')[4]
 
-        @mon.wlmid = monument[:wlmid].to_s
+        @mon.wlmid = normalize_value(monument[:wlmid])
           
-        latlongarray = monument[:coords].to_s.try(:split, '(').try(:[], 1).try(:split, ')').try(:[], 0).try(:split, ' ')
+        latlongarray = normalize_value(monument[:coords]).try(:split, '(').try(:[], 1).try(:split, ')').try(:[], 0).try(:split, ' ')
         unless latlongarray.nil?
           lat = latlongarray[1]
           long = latlongarray[0]
           @mon.latitude = BigDecimal(lat)
           @mon.longitude = BigDecimal(long)
+        else
+          @mon.latitude = nil
+          @mon.longitude = nil
         end
 
-        @mon.itemlabel = monument[:itemLabel].to_s
+        @mon.itemlabel = normalize_value(monument[:itemLabel])
           
-        @mon.image = monument[:image].to_s.split('Special:FilePath/')[1]
+        @mon.image = normalize_value(monument[:image]).split('Special:FilePath/')[1]
 
-        @mon.commons = monument[:commons].to_s
+        @mon.commons = normalize_value(monument[:commons])
 
-        @mon.itemdescription = monument[:itemDescription].to_s
+        @mon.itemdescription = normalize_value(monument[:itemDescription])
 
-        @mon.wikipedia = monument[:sitelink].to_s
+        @mon.wikipedia = normalize_value(monument[:sitelink])
 
-        @mon.regione = monument[:regioneLabel].to_s
+        @mon.regione = normalize_value(monument[:regioneLabel])
 
-        @mon.enddate = monument[:enddate].to_s
+        @mon.enddate = normalize_value(monument[:enddate])
 
-        @mon.year = monument[:year].to_s
+        @mon.year = normalize_value(monument[:year])
 
-        @mon.city = monument[:unitLabel].to_s
+        @mon.city = normalize_value(monument[:unitLabel])
 
-        @mon.address = monument[:address].to_s
+        @mon.address = normalize_value(monument[:address])
 
-        @mon.tree = true if monument[:instanceof].to_s == "http://www.wikidata.org/entity/Q811534"
+        @mon.tree = true if normalize_value(monument[:instanceof]) == "http://www.wikidata.org/entity/Q811534"
           
         @mon.hidden = true if @mon.latitude.blank? || @mon.longitude.blank?
 
