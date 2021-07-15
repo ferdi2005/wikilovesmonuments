@@ -131,7 +131,7 @@ class ImportJob < ApplicationJob
           end
         end
         
-        @mon.save
+        @mon.save unless @mon.wlmid.nil?
       end
       LookupJob.perform_later
     end
