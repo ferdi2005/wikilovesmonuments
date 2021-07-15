@@ -2,10 +2,6 @@ class ImportTownsJob < ApplicationJob
   queue_as :default
 
   def perform(*args)
-
-    Town.destroy_all
-    ActiveRecord::Base.connection.reset_pk_sequence!(Town.table_name)
-
     endpoint = "https://query.wikidata.org/sparql"
     sparql = 'SELECT ?item ?itemLabel WHERE {
       { ?item wdt:P31 wd:Q747074. }
@@ -29,6 +25,9 @@ class ImportTownsJob < ApplicationJob
         Raven.capture_message('Impossibile eseguire il job di importazione dei comuni per errore nella connessione a SPARQL', level: 'fatal')
       end
     end
+
+    Town.destroy_all
+    ActiveRecord::Base.connection.reset_pk_sequence!(Town.table_name)
     
     towns.each do |town|
       Town.create(name: town[:itemLabel])
