@@ -95,7 +95,7 @@ class ImportJob < ApplicationJob
 
         @mon.itemlabel = normalize_value(monument[:itemLabel])
           
-        @mon.image = normalize_value(monument[:image]).split('Special:FilePath/')[1]
+        @mon.image = normalize_value(monument[:image]).try(:split, 'Special:FilePath/').try(:[], 1)
 
         @mon.commons = normalize_value(monument[:commons])
 
