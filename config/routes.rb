@@ -1,6 +1,7 @@
 # require 'sidekiq/web'
 # require 'sidekiq/cron/web'
 Rails.application.routes.draw do
+  get 'towns/search'
   get 'import/do'
   root 'pages#home'
   get 'about', to: 'pages#about'

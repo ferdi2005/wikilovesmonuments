@@ -68,7 +68,11 @@ class MonumentsController < ApplicationController
   def namesearch
     @monuments = Monument.search(params[:search].strip)
     respond_to do |format|
-      format.json { render json: @monuments }
+      if params[:lat].blank? || params[:lon].blank?
+        format.json { render json: @monuments }
+      else 
+        format.json { render json: @monuments.as_json.map {|mon| mon.merge!({"distance": Monument.find(mon["id"]).distance_to([params[:lat], params[:lon]])})} }
+      end
     end
   end
 
