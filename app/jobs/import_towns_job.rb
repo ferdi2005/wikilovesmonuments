@@ -3,12 +3,14 @@ class ImportTownsJob < ApplicationJob
 
   def perform(*args)
     endpoint = "https://query.wikidata.org/sparql"
-    sparql = 'SELECT ?item ?itemLabel WHERE {
+    sparql = 'SELECT ?item ?itemLabel ?townLabel WHERE {
       { ?item wdt:P31 wd:Q747074. }
       UNION
       { ?item wdt:P31 wd:Q954172. }
       UNION
       { ?item wdt:P31 wd:Q1134686. }
+
+      ?item wdt:P131 ?town .
       SERVICE wikibase:label { bd:serviceParam wikibase:language "it". }
     }'
     
@@ -26,11 +28,22 @@ class ImportTownsJob < ApplicationJob
       end
     end
 
-    Town.destroy_all
+    Town.delete_all
     ActiveRecord::Base.connection.reset_pk_sequence!(Town.table_name)
     
     towns.each do |town|
-      Town.create(name: town[:itemLabel])
+      if town[:townLabel].to_s == ""
+        disambiguation = nil
+        visible_name = town[:itemLabel].to_s.strip
+        search_name = town[:itemLabel].to_s.strip
+      else
+        disambiguation = town[:townLabel].to_s.match(/(città metropolitana di)?(provincia di)?(provincia autonoma di)?(.+)/i)[4].strip
+        visible_name = "#{town[:itemLabel].to_s.strip} (#{disambiguation.to_s.strip})"
+        search_name = "#{town[:itemLabel].to_s.strip}, #{disambiguation.to_s.strip}"
+        item = town[:item].to_s.split('/')[4]
+      end
+
+      Town.create(item: item, name: town[:itemLabel].to_s.strip, disambiguation: disambiguation, visible_name: visible_name, search_name: search_name)
     end
   end
 end

@@ -17,6 +17,16 @@ class MonumentsController < ApplicationController
       @monument_nopagy = Monument.where(hidden: nil).near("#{params[:city]}, IT")
       result = Geocoder.search("#{params[:city]}, IT")
       @geocenter = result.try(:first).try(:coordinates)
+    elsif params[:townid]
+      town = Town.find_by(item: params[:townid])
+      if town
+        @pagy, @monument = pagy(Monument.where(hidden: nil).near("#{town.search_name}, IT"))
+        @monument_nopagy = Monument.where(hidden: nil).near("#{town.search_name}, IT")
+        result = Geocoder.search("#{town.search_name}, IT")
+        @geocenter = result.try(:first).try(:coordinates)
+      else
+        @monument = []
+      end
     else
       @monument = []
     end
