@@ -19,13 +19,15 @@ class MonumentsController < ApplicationController
       @geocenter = result.try(:first).try(:coordinates)
     elsif params[:townid]
       town = Town.find_by(item: params[:townid])
-      if town
+      if town.latitude != nil && town.longitude != nil
+        @pagy, @monument = pagy(Monument.where(hidden: nil).near(town))
+        @monument_nopagy = Monument.where(hidden: nil).near(town)
+        @geocenter = [town.latitude, town.longitude]
+      else 
         @pagy, @monument = pagy(Monument.where(hidden: nil).near("#{town.search_name}, IT"))
         @monument_nopagy = Monument.where(hidden: nil).near("#{town.search_name}, IT")
         result = Geocoder.search("#{town.search_name}, IT")
         @geocenter = result.try(:first).try(:coordinates)
-      else
-        @monument = []
       end
     else
       @monument = []

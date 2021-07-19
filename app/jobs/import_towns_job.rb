@@ -1,9 +1,19 @@
 class ImportTownsJob < ApplicationJob
   queue_as :default
 
+  def normalize_value(value)
+    if value.to_s == ""
+      return nil
+    elsif value.start_with?("_:")
+      return nil
+    else
+      return value.to_s
+    end
+  end
+
   def perform(*args)
     endpoint = "https://query.wikidata.org/sparql"
-    sparql = 'SELECT ?item ?itemLabel ?townLabel WHERE {
+    sparql = 'SELECT ?item ?itemLabel ?townLabel ?coords WHERE {
       { ?item wdt:P31 wd:Q747074. }
       UNION
       { ?item wdt:P31 wd:Q954172. }
@@ -11,6 +21,7 @@ class ImportTownsJob < ApplicationJob
       { ?item wdt:P31 wd:Q1134686. }
 
       ?item wdt:P131 ?town .
+      OPTIONAL {?item wdt:P625 ?coords. }
       SERVICE wikibase:label { bd:serviceParam wikibase:language "it". }
     }'
     
@@ -32,7 +43,18 @@ class ImportTownsJob < ApplicationJob
     ActiveRecord::Base.connection.reset_pk_sequence!(Town.table_name)
     
     towns.each do |town|
-      if town[:townLabel].to_s == ""
+      latlongarray = normalize_value(town[:coords]).try(:split, '(').try(:[], 1).try(:split, ')').try(:[], 0).try(:split, ' ')
+      unless latlongarray.nil?
+        lat = latlongarray[1]
+        long = latlongarray[0]
+        latitude = BigDecimal(lat)
+        longitude = BigDecimal(long)
+      else
+        latitude = nil
+        longitude = nil
+      end
+
+      if town[:townLabel].to_s.strip == ""
         disambiguation = nil
         visible_name = town[:itemLabel].to_s.strip
         search_name = town[:itemLabel].to_s.strip
@@ -43,7 +65,7 @@ class ImportTownsJob < ApplicationJob
         item = town[:item].to_s.split('/')[4]
       end
 
-      Town.create(item: item, name: town[:itemLabel].to_s.strip, disambiguation: disambiguation, visible_name: visible_name, search_name: search_name)
+      Town.create(item: item, name: town[:itemLabel].to_s.strip, disambiguation: disambiguation, visible_name: visible_name, search_name: search_name, latitude: latitude, longitude: longitude)
     end
   end
 end
