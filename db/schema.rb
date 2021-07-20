@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_19_074004) do
+ActiveRecord::Schema.define(version: 2021_07_20_174208) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -63,6 +63,7 @@ ActiveRecord::Schema.define(version: 2021_07_19_074004) do
     t.string "search_name"
     t.decimal "latitude"
     t.decimal "longitude"
+    t.string "english_name"
     t.index ["name", "disambiguation"], name: "index_towns_on_name_and_disambiguation", unique: true
   end
 
