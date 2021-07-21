@@ -113,6 +113,8 @@ class ImportJob < ApplicationJob
 
         @mon.address = normalize_value(monument[:address])
 
+        @mon.allphotos = "https://commons.wikimedia.org/w/index.php?search=#{CGI.escape('"')}#{normalize_value(monument[:wlmid])}#{CGI.escape('"')}" unless normalize_value(monument[:wlmid]).nil?
+
         @mon.tree = true if normalize_value(monument[:instanceof]) == "http://www.wikidata.org/entity/Q811534"
           
         @mon.hidden = true if @mon.latitude.blank? || @mon.longitude.blank?
