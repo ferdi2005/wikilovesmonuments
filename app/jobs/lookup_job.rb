@@ -7,9 +7,9 @@ class LookupJob < ApplicationJob
     basecat = "Images+from+Wiki+Loves+Monuments+#{Date.today.year}+in+Italy"
     mon = HTTParty.get("https://it.wikipedia.org/w/api.php?action=parse&text={{%23invoke:WLM|upload_url|#{monument.item}}}&contentmodel=wikitext&format=json",
                        headers: { 'User-Agent' => 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using HTTParty Ruby Gem' },
-                       uri_adapter: Addressable::URI).to_a
-    baselink = mon[0][1]['externallinks'][0] + ' '
-    monurl = mon[0][1]['externallinks'][0]
+                       uri_adapter: Addressable::URI).to_h
+    baselink = mon["parse"]["externallinks"].first + ' '
+    monurl = mon["parse"]["externallinks"].first
     monurl.gsub!('(', '%28') # fix parentesi (
     monurl.gsub!(')', '%29') # fix parentesi )
     regioni = {
@@ -102,7 +102,7 @@ class LookupJob < ApplicationJob
       begin
         count = HTTParty.get("https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=#{search}&srwhat=text&srnamespace=6&srlimit=1&format=json",
                              headers: { 'User-Agent' => 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using HTTParty Ruby Gem' },
-                             uri_adapter: Addressable::URI).to_a
+                             uri_adapter: Addressable::URI).to_h
       rescue StandardError
         retimes += 1
         if retimes < 4
@@ -113,11 +113,8 @@ class LookupJob < ApplicationJob
           next
         end
       end
-      totalhits = if count[1][0] == 'continue'
-                    count[2][1]['searchinfo']['totalhits']
-                  else
-                    count[1][1]['searchinfo']['totalhits']
-                  end
+      totalhits = count['query']['searchinfo']['totalhits']
+
       if totalhits > 0
         monument.update_attributes(with_photos: true, photos_count: totalhits)
       else
