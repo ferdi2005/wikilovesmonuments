@@ -7,3 +7,6 @@ check_duplicates:
 import_towns_job:
   cron: "0 3 1 * *"
   class: "ImportTownsJob"
+lookup_job:
+  cron: "0 */3 * * *"
+  class: "LookupJob"
