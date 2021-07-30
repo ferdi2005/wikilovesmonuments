@@ -103,17 +103,19 @@ class LookupJob < ApplicationJob
         count = HTTParty.get("https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=#{search}&srwhat=text&srnamespace=6&srlimit=1&format=json",
                              headers: { 'User-Agent' => 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using HTTParty Ruby Gem' },
                              uri_adapter: Addressable::URI).to_h
-      rescue StandardError
+      rescue => e
         retimes += 1
         if retimes < 4
-          puts "Retrying for ID: #{monument.id} - WLMID: #{monument.wlmid}"
+          puts "Retrying for ID: #{monument.id} - WLMID: #{monument.wlmid} - error: #{e}"
           retry
         else
-          puts "Skipping ID: #{monument.id} - WLMID: #{monument.wlmid}"
+          puts "Skipping ID: #{monument.id} - WLMID: #{monument.wlmid} - error: #{e}"
           next
         end
-      end
-      totalhits = count['query']['searchinfo']['totalhits']
+      end      
+      totalhits = count.try(:[], 'query').try(:[], 'searchinfo').try(:[], 'totalhits')
+      
+      next if totalhits.nil?
 
       if totalhits > 0
         monument.update_attributes(with_photos: true, photos_count: totalhits)
