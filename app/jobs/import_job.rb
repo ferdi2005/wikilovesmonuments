@@ -16,45 +16,38 @@ class ImportJob < ApplicationJob
     # Query di Lorenzo Losa
     sparql = 'SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unitLabel ?address ?instanceof ?year
     WHERE {
- ?item p:P2186 ?wlmst .
-  ?wlmst ps:P2186 ?wlmid .
-  
+      ?item p:P2186 ?wlmst .
+      ?wlmst ps:P2186 ?wlmid .
+
       ?item wdt:P17 wd:Q38 . 
       ?item wdt:P131 ?unit .
-
+      
       MINUS {?item wdt:P31 wd:Q747074.}
       MINUS {?item wdt:P31 wd:Q954172.}
     
-    OPTIONAL {?item wdt:P31 ?instanceof }
-    OPTIONAL {?item wdt:P625 ?coords. }
-    OPTIONAL { ?wlmst pqv:P582 [ wikibase:timeValue ?enddate ] .}
-    OPTIONAL { ?wlmst pqv:P585 [ wikibase:timeValue ?year ] .}
-    OPTIONAL { ?item wdt:P373 ?commons. }
-    OPTIONAL { ?item wdt:P18 ?image. }
-    OPTIONAL { ?item wdt:P6375 ?address.}
-    OPTIONAL {?sitelink schema:isPartOf <https://it.wikipedia.org/>;schema:about ?item. }
-    VALUES ?typeRegion { wd:Q16110 wd:Q1710033 }.
+      OPTIONAL {?item wdt:P31 ?instanceof }
+      OPTIONAL {?item wdt:P625 ?coords. }
+      OPTIONAL { ?wlmst pqv:P582 [ wikibase:timeValue ?enddate ] .}
+      OPTIONAL { ?wlmst pqv:P585 [ wikibase:timeValue ?year ] .}
+      OPTIONAL { ?item wdt:P373 ?commons. }
+      OPTIONAL { ?item wdt:P18 ?image. }
+      OPTIONAL { ?item wdt:P6375 ?address.}
+      OPTIONAL {?sitelink schema:isPartOf <https://it.wikipedia.org/>;schema:about ?item. }
+      VALUES ?typeRegion { wd:Q16110 wd:Q1710033 }.
 
-  ?item wdt:P131* ?regione.
-  ?regione wdt:P31 ?typeRegion.
+      ?item wdt:P131* ?regione.
+      ?regione wdt:P31 ?typeRegion.
 
-
-    # esclude i monumenti che hanno una data di inizio successiva al termine del concorso
-  MINUS {
-    ?wlmst pqv:P580 [ wikibase:timeValue ?start ; wikibase:timePrecision ?sprec ] .
-    FILTER (
-      # precisione 9 è anno
-      ( ?sprec >  9 && ?start >= "' + Date.today.year.to_s + '-10-01T00:00:00+00:00"^^xsd:dateTime ) ||
-      ( ?sprec < 10 && ?start >= "' + (Date.today.year + 1).to_s + '-01-01T00:00:00+00:00"^^xsd:dateTime )
-    )
-  }
+      # esclude i monumenti che hanno una data di inizio successiva al termine del concorso
+      MINUS {
+        ?wlmst pqv:P580 [ wikibase:timeValue ?start ; wikibase:timePrecision ?sprec ] .
+        FILTER (
+          # precisione 9 è anno
+          ( ?sprec >  9 && ?start >= "' + Date.today.year.to_s + '-10-01T00:00:00+00:00"^^xsd:dateTime ) ||
+          ( ?sprec < 10 && ?start >= "' + (Date.today.year + 1).to_s + '-01-01T00:00:00+00:00"^^xsd:dateTime )
+        )
+      }
       
-        # esclude i monumenti per cui è indicata una data con un anno diverso da quello del concorso
-  MINUS {
-    ?wlmst pq:P585 ?date .
-    FILTER ( ?date < "' + Date.today.year.to_s + '-01-01T00:00:00+00:00"^^xsd:dateTime || ?date >= "' + (Date.today.year + 1).to_s + '-01-01T00:00:00+00:00"^^xsd:dateTime )
-  }
-
       SERVICE wikibase:label { bd:serviceParam wikibase:language "it" }
       }'
 
