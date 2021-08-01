@@ -44,15 +44,15 @@ class ImportJob < ApplicationJob
     ?wlmst pqv:P580 [ wikibase:timeValue ?start ; wikibase:timePrecision ?sprec ] .
     FILTER (
       # precisione 9 è anno
-      ( ?sprec >  9 && ?start >= "2021-10-01T00:00:00+00:00"^^xsd:dateTime ) ||
-      ( ?sprec < 10 && ?start >= "2022-01-01T00:00:00+00:00"^^xsd:dateTime )
+      ( ?sprec >  9 && ?start >= "' + Date.today.year.to_s + '-10-01T00:00:00+00:00"^^xsd:dateTime ) ||
+      ( ?sprec < 10 && ?start >= "' + (Date.today.year + 1).to_s + '-01-01T00:00:00+00:00"^^xsd:dateTime )
     )
   }
       
         # esclude i monumenti per cui è indicata una data con un anno diverso da quello del concorso
   MINUS {
     ?wlmst pq:P585 ?date .
-    FILTER ( ?date < "2021-01-01T00:00:00+00:00"^^xsd:dateTime || ?date >= "2022-01-01T00:00:00+00:00"^^xsd:dateTime )
+    FILTER ( ?date < "' + Date.today.year.to_s + '-01-01T00:00:00+00:00"^^xsd:dateTime || ?date >= "' + (Date.today.year + 1).to_s + '-01-01T00:00:00+00:00"^^xsd:dateTime )
   }
 
       SERVICE wikibase:label { bd:serviceParam wikibase:language "it" }
