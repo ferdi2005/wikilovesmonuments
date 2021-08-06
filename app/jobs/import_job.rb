@@ -14,7 +14,7 @@ class ImportJob < ApplicationJob
   def perform
     endpoint = 'https://query.wikidata.org/sparql'
     # Query di Lorenzo Losa
-    sparql = 'SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unitLabel ?address ?instanceof ?year
+    sparql = 'SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unit ?unitLabel ?address ?instanceof ?year
     WHERE {
       ?item p:P2186 ?wlmst .
       ?wlmst ps:P2186 ?wlmid .
@@ -86,6 +86,7 @@ class ImportJob < ApplicationJob
           @mon.longitude = nil
         end
 
+
         @mon.itemlabel = normalize_value(monument[:itemLabel])
           
         @mon.image = normalize_value(monument[:image]).try(:split, 'Special:FilePath/').try(:[], 1)
@@ -101,6 +102,8 @@ class ImportJob < ApplicationJob
         @mon.enddate = normalize_value(monument[:enddate])
 
         @mon.year = normalize_value(monument[:year])
+
+        @mon.city_item = normalize_value(monument[:unit]).split('/')[4]
 
         @mon.city = normalize_value(monument[:unitLabel])
 

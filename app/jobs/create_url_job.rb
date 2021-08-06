@@ -1,7 +1,7 @@
 class CreateUrlJob < ApplicationJob
   queue_as :default
 
-  def createurl(monument, lakecomo)
+  def createurl(monument)
     basecat = "Images+from+Wiki+Loves+Monuments+#{Date.today.year}+in+Italy"
     mon = HTTParty.get("https://it.wikipedia.org/w/api.php?action=parse&text={{%23invoke:WLM|upload_url|#{monument.item}}}&contentmodel=wikitext&format=json",
                        headers: { 'User-Agent' => 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using HTTParty Ruby Gem' },
@@ -38,11 +38,12 @@ class CreateUrlJob < ApplicationJob
     regarr = regioni[monument.regione]
 
     newstring = '+-+' + regarr[0]
-    if regarr[1] == false && !monument.item.in?(lakecomo)
+    if regarr[1] == false && !monument.item.in?(@lakecomo)
       newstring = newstring + '%7C' + basecat + '+-+' + 'without+local+award'
     end
 
-    newstring = newstring + '%7C' + basecat + '+-+' + 'Lake+Como' if monument.item.in?(lakecomo)
+    newstring = newstring + '%7C' + basecat + '+-+' + 'Lake+Como' if monument.item.in?(@lakecomo)
+    newstring = newstring + '%7C' + basecat + '+-+' + 'Valle+del+Primo+Presepe' if monument.city_item.in?(@valle_del_primo_presepe)
     monurl.gsub!('+-+unknown+region', newstring)
 
     monument.update!(uploadurl: monurl)
@@ -63,7 +64,7 @@ class CreateUrlJob < ApplicationJob
   def perform(*args)
     # Inizio operazioni speciali per WL Lakes Como
     bannedcomo = %w[Q28375375 Q24937411 Q21592570 Q3862651 Q3517634 Q24052892 Q533156]
-    lakecomo = []
+    @lakecomo = []
     sparql = '
     SELECT DISTINCT ?item
     WHERE {
@@ -89,14 +90,17 @@ class CreateUrlJob < ApplicationJob
 
         itemarray = val.to_s.split('/')
         itemcode = itemarray[4]
-        lakecomo.push(itemcode.to_s) unless itemcode.in?(bannedcomo)
+        @lakecomo.push(itemcode.to_s) unless itemcode.in?(bannedcomo)
       end
     end
 
     # Fine operazioni speciali lakes como    
 
+    # Comuni partecipanti a Valle del primo presepe
+    @valle_del_primo_presepe = %w[Q223423 Q223427 Q223434 Q223459 Q223472 Q223476 Q223509 Q224039 Q224043 Q118085 Q224109 Q224144 Q224149 Q224172 Q224211 Q224264 Q224300 Q224333 Q13396 Q224405]
+
     Monument.all.each do |monument|
-      createurl(monument, lakecomo)
+      createurl(monument)
     end
   end
 end
