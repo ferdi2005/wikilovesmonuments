@@ -22,7 +22,7 @@ class CreateUrlJob < ApplicationJob
       'Lazio' => ['Lazio', false],
       'Liguria' => ['Liguria', true],
       'Lombardia' => ['Lombardy', false],
-      'Marche' => ['Marche', false],
+      'Marche' => ['Marche', true],
       'Molise' => ['Molise', false],
       'Piemonte' => ['Piedmont', false],
       'Puglia' => ['Apulia', true],
