@@ -37,7 +37,7 @@ class LookupJob < ApplicationJob
       nophoto = Monument.where(with_photos: false).count
 
       Nophoto.create(count: nophoto, monuments: Monument.count, with_commons: Monument.where.not(commons: nil).count,
-                     with_image: Monument.where.not(image: nil).count, nowlm: Monument.where(with_photos: true, photos_count: 0).count)
+                     with_image: Monument.where.not(image: nil).count, nowlm: Monument.where(with_photos: true, photos_count: 0).count, cities: Monument.where(tree: false).pluck(:city).uniq.count, cities_with_trees: Monument.distinct.pluck(:city).count)
 
       regioni = ['Abruzzo',
                  'Basilicata',
@@ -63,7 +63,7 @@ class LookupJob < ApplicationJob
       regioni.each do |reg|
         nophoto = Monument.where(with_photos: false, regione: reg).count
         Nophoto.create(regione: reg, count: nophoto, monuments: Monument.where(regione: reg).count,
-                       with_commons: Monument.where(regione: reg).where.not(commons: nil).count, with_image: Monument.where(regione: reg).where.not(image: nil).count, nowlm: Monument.where(regione: reg, with_photos: true, photos_count: 0).count)
+                       with_commons: Monument.where(regione: reg).where.not(commons: nil).count, with_image: Monument.where(regione: reg).where.not(image: nil).count, nowlm: Monument.where(regione: reg, with_photos: true, photos_count: 0).count, cities: Monument.where(regione: reg, tree: false).pluck(:city).uniq.count, cities_with_trees: Monument.where(regione: reg).pluck(:city).uniq.count)
       end
     end
   end
