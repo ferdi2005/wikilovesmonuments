@@ -67,11 +67,16 @@ class MonumentsController < ApplicationController
   
   def address
     @monument = Monument.find(params[:id])
-    result = Geocoder.search([@monument.latitude, @monument.longitude])
+    result = Geocoder.search([@monument.latitude, @monument.longitude]).try(:first).try(:address)
     respond_to do |format|
-      format.json { render json: result.first.address }
+      if result.nil?
+        format.json { render json: nil, status: :not_found }
+      else
+        format.json { render json: result }
+      end
     end
   end
+
   def map
     flash[:warning] = "L'utilizzo di questa pagina richiede numerose risorse per il server e per il tuo computer, molto probabilmente si bloccherà facilmente"
    @monuments = Monument.where(hidden: nil)
