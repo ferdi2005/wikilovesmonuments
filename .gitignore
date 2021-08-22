@@ -33,3 +33,7 @@
 *.DS_STORE
 
 .idea/*
+
+# Ignora i CSV generati
+/csv/*
+!/csv/.keep
