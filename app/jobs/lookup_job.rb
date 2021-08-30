@@ -26,10 +26,22 @@ class LookupJob < ApplicationJob
       next if totalhits.nil?
 
       if totalhits > 0
-        monument.update_attributes(with_photos: true, photos_count: totalhits)
+        monument.update!(with_photos: true, photos_count: totalhits)
+      elsif !monument.image.nil?
+        monument.update!(with_photos: true, photos_count: totalhits)
+      elsif !monument.commons.nil?
+        begin
+          count = HTTParty.get("https://commons.wikimedia.org/w/api.php", query: { action: :query, prop: :categoryinfo, titles: "Category:" + monument.commons ,format: :json },
+                               headers: { 'User-Agent' => 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using HTTParty Ruby Gem' },
+                               uri_adapter: Addressable::URI).to_h["query"]["pages"].values[0]["categoryinfo"]["files"]
+
+          count > 0 ? with_photos = true : with_photos = false
+          monument.update!(with_photos: with_photos, photos_count: totalhits)
+        rescue => e
+          monument.update!(with_photos: false, photos_count: totalhits)
+        end  
       else
-        monument.update_attributes(with_photos: false, photos_count: totalhits)
-        monument.update_attribute(:with_photos, true) unless monument.image.nil? || monument.commons.nil?
+        monument.update!(with_photos: false, photos_count: totalhits)
       end
     end
 
