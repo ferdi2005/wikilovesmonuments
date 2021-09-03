@@ -46,8 +46,6 @@ class CreateUrlJob < ApplicationJob
     newstring = newstring + '%7C' + basecat + '+-+' + 'Valle+del+Primo+Presepe' if monument.city_item.in?(@valle_del_primo_presepe)
     monurl.gsub!('+-+unknown+region', newstring)
 
-    monument.update!(uploadurl: monurl)
-
     notwlm = baselink
     notwlm.gsub!('(', '%28') # fix parentesi (
     notwlm.gsub!(')', '%29') # fix parentesi )
@@ -58,7 +56,9 @@ class CreateUrlJob < ApplicationJob
 
     # link non partecipante al concorso
     notwlm.gsub!(/%7CImages\+from\+Wiki\+Loves\+Monuments\+\d{4}\+in\+Italy/, '')
-    monument.update!(nonwlmuploadurl: notwlm)
+
+    # Aggiorno nel database
+    monument.update!(uploadurl: monurl, nonwlmuploadurl: notwlm)
   end
 
   def perform(*args)
@@ -74,7 +74,7 @@ class CreateUrlJob < ApplicationJob
     ?item wdt:P131* ?lakecomo .
 
         MINUS { ?item p:P2186 [ pq:P582 ?end ] .
-        FILTER ( ?end <= "2020-09-01T00:00:00+00:00"^^xsd:dateTime )
+        FILTER ( ?end <= "' + Date.today.year.to_s + '-09-01T00:00:00+00:00"^^xsd:dateTime )
               }
     SERVICE wikibase:label { bd:serviceParam wikibase:language "it" }
       }
@@ -84,14 +84,10 @@ class CreateUrlJob < ApplicationJob
                                           headers: { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1' })
     comoquery = client.query(sparql)
 
-    comoquery.each do |row|
-      row.each do |key, val|
-        next unless key.to_s == 'item'
-
-        itemarray = val.to_s.split('/')
+    comoquery.each do |como|
+        itemarray = como[:item].to_s.split('/')
         itemcode = itemarray[4]
         @lakecomo.push(itemcode.to_s) unless itemcode.in?(bannedcomo)
-      end
     end
 
     # Fine operazioni speciali lakes como    
@@ -99,7 +95,7 @@ class CreateUrlJob < ApplicationJob
     # Comuni partecipanti a Valle del primo presepe
     @valle_del_primo_presepe = %w[Q223423 Q223427 Q223434 Q223459 Q223472 Q223476 Q223509 Q224039 Q224043 Q118085 Q224109 Q224144 Q224149 Q224172 Q224211 Q224264 Q224300 Q224333 Q13396 Q224405]
 
-    Monument.all.each do |monument|
+    Monument.find_each do |monument|
       createurl(monument)
     end
   end
