@@ -9,23 +9,23 @@ class MonumentsController < ApplicationController
       else
         range = 50
       end
-      @pagy, @monument = pagy(Monument.where(hidden: nil).near([BigDecimal(params[:latitude]), BigDecimal(params[:longitude])], range, units: :km))
-      @monument_nopagy = Monument.where(hidden: nil).near([BigDecimal(params[:latitude]), BigDecimal(params[:longitude])], range, units: :km)
+      @pagy, @monument = pagy(Monument.where(hidden: false).near([BigDecimal(params[:latitude]), BigDecimal(params[:longitude])], range, units: :km))
+      @monument_nopagy = Monument.where(hidden: false).near([BigDecimal(params[:latitude]), BigDecimal(params[:longitude])], range, units: :km)
       @geocenter = [params[:latitude].to_f, params[:longitude].to_f]
     elsif params[:city]
-      @pagy, @monument = pagy(Monument.where(hidden: nil).near("#{params[:city]}, IT"))
-      @monument_nopagy = Monument.where(hidden: nil).near("#{params[:city]}, IT")
+      @pagy, @monument = pagy(Monument.where(hidden: false).near("#{params[:city]}, IT"))
+      @monument_nopagy = Monument.where(hidden: false).near("#{params[:city]}, IT")
       result = Geocoder.search("#{params[:city]}, IT")
       @geocenter = result.try(:first).try(:coordinates)
     elsif params[:townid]
       town = Town.find_by(item: params[:townid])
       if town.latitude != nil && town.longitude != nil
-        @pagy, @monument = pagy(Monument.where(hidden: nil).near(town))
-        @monument_nopagy = Monument.where(hidden: nil).near(town)
+        @pagy, @monument = pagy(Monument.where(hidden: false).near(town))
+        @monument_nopagy = Monument.where(hidden: false).near(town)
         @geocenter = [town.latitude, town.longitude]
       else 
-        @pagy, @monument = pagy(Monument.where(hidden: nil).near("#{town.search_name}, IT"))
-        @monument_nopagy = Monument.where(hidden: nil).near("#{town.search_name}, IT")
+        @pagy, @monument = pagy(Monument.where(hidden: false).near("#{town.search_name}, IT"))
+        @monument_nopagy = Monument.where(hidden: false).near("#{town.search_name}, IT")
         result = Geocoder.search("#{town.search_name}, IT")
         @geocenter = result.try(:first).try(:coordinates)
       end
@@ -79,7 +79,7 @@ class MonumentsController < ApplicationController
 
   def map
     flash[:warning] = "L'utilizzo di questa pagina richiede numerose risorse per il server e per il tuo computer, molto probabilmente si bloccherà facilmente"
-   @monuments = Monument.where(hidden: nil)
+   @monuments = Monument.where(hidden: false)
   end 
 
   def namesearch
