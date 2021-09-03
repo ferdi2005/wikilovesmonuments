@@ -60,77 +60,94 @@ class ImportJob < ApplicationJob
       if retcount < 5
         retry
       else
-        @stop = true
-        Raven.capture_message('Impossibile eseguire il job di importazione per errore nella connessione a SPARQL', level: 'fatal')
+        Raven.capture_message("Impossibile eseguire il job di importazione per errore nella connessione a SPARQL: #{e}", level: 'fatal')
+        return
       end
     end
 
-    unless @stop == true
-      monuments.each do |monument|
-        unless (@mon = Monument.find_by(item: normalize_value(monument[:item]).split('/')[4]))
-          @mon = Monument.new
-        end
-        
-        @mon.item = normalize_value(monument[:item]).split('/')[4]
+    monuments_to_be_saved = []
+    monuments.uniq.each do |monument|
+      mon = {}
 
-        @mon.wlmid = normalize_value(monument[:wlmid])
-          
-        latlongarray = normalize_value(monument[:coords]).try(:split, '(').try(:[], 1).try(:split, ')').try(:[], 0).try(:split, ' ')
-        unless latlongarray.nil?
-          lat = latlongarray[1]
-          long = latlongarray[0]
-          @mon.latitude = BigDecimal(lat)
-          @mon.longitude = BigDecimal(long)
-        else
-          @mon.latitude = nil
-          @mon.longitude = nil
-        end
+      mon[:item] = normalize_value(monument[:item]).split('/')[4]
 
+      mon[:wlmid] = normalize_value(monument[:wlmid])
 
-        @mon.itemlabel = normalize_value(monument[:itemLabel])
-          
-        @mon.image = normalize_value(monument[:image]).try(:split, 'Special:FilePath/').try(:[], 1)
-
-        @mon.commons = normalize_value(monument[:commons])
-
-        @mon.itemdescription = normalize_value(monument[:itemDescription])
-
-        @mon.wikipedia = normalize_value(monument[:sitelink])
-
-        @mon.regione = normalize_value(monument[:regioneLabel])
-
-        @mon.enddate = normalize_value(monument[:enddate])
-
-        @mon.year = normalize_value(monument[:year])
-
-        @mon.city_item = normalize_value(monument[:unit]).split('/')[4]
-
-        @mon.city = normalize_value(monument[:unitLabel])
-
-        @mon.address = normalize_value(monument[:address])
-
-        @mon.allphotos = "https://commons.wikimedia.org/w/index.php?search=#{CGI.escape('"')}#{normalize_value(monument[:wlmid])}#{CGI.escape('"')}"
-
-        @mon.tree = true if normalize_value(monument[:instanceof]) == "http://www.wikidata.org/entity/Q811534"
-          
-        @mon.hidden = true if @mon.latitude.blank? || @mon.longitude.blank?
-
-        if !@mon.year.try(:year).nil? && @mon.year.try(:year) != Date.today.year
-          @mon.noupload = true
-        else
-          @mon.noupload = false
-        end
-
-        unless @mon.enddate.nil?
-          if @mon.enddate < Date.today
-            @mon.noupload = true
-          else 
-            @mon.noupload = false
-          end
-        end
-        
-        @mon.save unless @mon.wlmid.nil?
+      latlongarray = normalize_value(monument[:coords]).try(:split, '(').try(:[], 1).try(:split, ')').try(:[], 0).try(:split, ' ')
+      unless latlongarray.nil?
+        lat = latlongarray[1]
+        long = latlongarray[0]
+        mon[:latitude] = BigDecimal(lat)
+        mon[:longitude] = BigDecimal(long)
+      else
+        mon[:latitude] = nil
+        mon[:longitude] = nil
       end
+
+      mon[:itemlabel] = normalize_value(monument[:itemLabel])
+
+      mon[:image] = normalize_value(monument[:image]).try(:split, 'Special:FilePath/').try(:[], 1)
+
+      mon[:commons] = normalize_value(monument[:commons])
+
+      mon[:itemdescription] = normalize_value(monument[:itemDescription])
+
+      mon[:wikipedia] = normalize_value(monument[:sitelink])
+
+      mon[:regione] = normalize_value(monument[:regioneLabel])
+
+      mon[:enddate] = normalize_value(monument[:enddate])
+
+      mon[:year] = normalize_value(monument[:year])
+
+      mon[:city_item] = normalize_value(monument[:unit]).split('/')[4]
+
+      mon[:city] = normalize_value(monument[:unitLabel])
+
+      mon[:address] = normalize_value(monument[:address])
+
+      mon[:allphotos] = "https://commons.wikimedia.org/w/index.php?search=#{CGI.escape('"')}#{normalize_value(monument[:wlmid])}#{CGI.escape('"')}"
+
+      if normalize_value(monument[:instanceof]) == "http://www.wikidata.org/entity/Q811534"
+        mon[:tree] = true
+      else
+        mon[:tree] = false
+      end
+
+      if mon[:latitude].blank? || mon[:longitude].blank?
+        mon[:hidden] = true
+      else
+        mon[:hidden] = false
+      end
+
+      if !mon[:year].try(:year).nil? && mon[:year].try(:year) != Date.today.year
+        mon[:noupload] = true
+      else
+        mon[:noupload] = false
+      end
+
+      unless mon[:enddate].nil?
+        if mon[:enddate].to_datetime < Date.today
+          mon[:noupload] = true
+        else 
+          mon[:noupload] = false
+        end
+      end
+
+
+      monuments_to_be_saved.reject! { |i| i[:item] == mon[:item] } # Elimina duplicati (salvando dunque l'ultimo che arriva) derivanti da dati "sporchi"
+      monuments_to_be_saved.push(mon) unless mon[:wlmid].nil?
     end
+
+    monuments_to_be_saved.uniq!
+
+    monuments_to_be_saved.map! { |mon| mon.merge({created_at: DateTime.now, updated_at: DateTime.now})}
+
+    Monument.upsert_all(monuments_to_be_saved, unique_by: :item)
+
+    # Cancella monumenti che non vengono più restituiti dalla query
+    items_to_be_deleted = Monument.pluck(:item).uniq - monuments_to_be_saved.pluck(:item).uniq
+
+    items_to_be_deleted.each { |item| Monument.find_by(item: item).destroy }
   end
 end
