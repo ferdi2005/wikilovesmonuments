@@ -42,6 +42,7 @@ ActiveRecord::Schema[7.0].define(version: 2021_09_03_224317) do
     t.string "allphotos"
     t.string "city_item"
     t.integer "commonsphotos"
+    t.boolean "is_castle", default: false
     t.index ["item"], name: "index_monuments_on_item", unique: true
   end
 

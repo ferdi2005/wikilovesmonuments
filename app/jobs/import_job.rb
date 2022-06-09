@@ -14,10 +14,11 @@ class ImportJob < ApplicationJob
   def perform
     endpoint = 'https://query.wikidata.org/sparql'
     # Query di Lorenzo Losa
-    sparql = 'SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unit ?unitLabel ?address ?instanceof ?year
+    sparql = 'SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unit ?unitLabel ?address ?approvedby ?year
     WHERE {
       ?item p:P2186 ?wlmst .
       ?wlmst ps:P2186 ?wlmid .
+      OPTIONAL { ?wlmst pq:P790 ?approvedby . }
 
       ?item wdt:P17 wd:Q38 . 
       ?item wdt:P131 ?unit .
@@ -25,7 +26,6 @@ class ImportJob < ApplicationJob
       MINUS {?item wdt:P31 wd:Q747074.}
       MINUS {?item wdt:P31 wd:Q954172.}
     
-      OPTIONAL {?item wdt:P31 ?instanceof }
       OPTIONAL {?item wdt:P625 ?coords. }
       OPTIONAL { ?wlmst pqv:P582 [ wikibase:timeValue ?enddate ] .}
       OPTIONAL { ?wlmst pqv:P585 [ wikibase:timeValue ?year ] .}
@@ -113,6 +113,13 @@ class ImportJob < ApplicationJob
       else
         mon[:tree] = false
       end
+
+      if normalize_value(monument[:approvedby]) == "http://www.wikidata.org/entity/Q85864317"
+        mon[:is_castle] = true
+      else
+        mon[:is_castle] = false
+      end
+
 
       if mon[:latitude].blank? || mon[:longitude].blank?
         mon[:hidden] = true
