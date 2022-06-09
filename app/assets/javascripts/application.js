@@ -15,7 +15,7 @@
 //= require turbolinks
 //= require pagy
 //= require all
-//= require jquery
+//= require jquery/dist/jquery.js
 //= require leaflet/dist/leaflet.js
 //= require chartkick
 //= require Chart.bundle
