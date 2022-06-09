@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_03_224317) do
-
+ActiveRecord::Schema[7.0].define(version: 2021_09_03_224317) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -22,8 +21,8 @@ ActiveRecord::Schema.define(version: 2021_09_03_224317) do
     t.decimal "longitude"
     t.string "itemlabel"
     t.string "image"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "itemdescription"
     t.string "wikipedia"
     t.boolean "with_photos"
@@ -33,7 +32,7 @@ ActiveRecord::Schema.define(version: 2021_09_03_224317) do
     t.string "regione"
     t.string "nonwlmuploadurl"
     t.boolean "hidden", default: false
-    t.datetime "enddate"
+    t.datetime "enddate", precision: nil
     t.boolean "duplicate", default: false
     t.string "city"
     t.string "address"
@@ -48,8 +47,8 @@ ActiveRecord::Schema.define(version: 2021_09_03_224317) do
 
   create_table "nophotos", force: :cascade do |t|
     t.integer "count"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.integer "monuments"
     t.integer "with_commons"
     t.integer "with_image"
@@ -61,8 +60,8 @@ ActiveRecord::Schema.define(version: 2021_09_03_224317) do
 
   create_table "towns", force: :cascade do |t|
     t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "item"
     t.string "disambiguation"
     t.string "visible_name"
