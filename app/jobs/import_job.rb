@@ -114,6 +114,13 @@ class ImportJob < ApplicationJob
         mon[:tree] = false
       end
 
+      if normalize_value(monument[:instanceof]) == "http://www.wikidata.org/entity/" # TODO: inserire l'item collegato
+        mon[:is_castle] = true
+      else
+        mon[:is_castle] = false
+      end
+
+
       if mon[:latitude].blank? || mon[:longitude].blank?
         mon[:hidden] = true
       else
