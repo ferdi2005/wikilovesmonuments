@@ -14,7 +14,7 @@ class ImportJob < ApplicationJob
   def perform
     endpoint = 'https://query.wikidata.org/sparql'
     # Query di Lorenzo Losa
-    sparql = 'SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unit ?unitLabel ?address ?approvedby ?year
+    sparql = 'SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unit ?unitLabel ?address ?approvedby ?year ?instanceof
     WHERE {
       ?item p:P2186 ?wlmst .
       ?wlmst ps:P2186 ?wlmid .
@@ -25,7 +25,8 @@ class ImportJob < ApplicationJob
       
       MINUS {?item wdt:P31 wd:Q747074.}
       MINUS {?item wdt:P31 wd:Q954172.}
-    
+      
+      OPTIONAL {?item wdt:P31 ?instanceof }
       OPTIONAL {?item wdt:P625 ?coords. }
       OPTIONAL { ?wlmst pqv:P582 [ wikibase:timeValue ?enddate ] .}
       OPTIONAL { ?wlmst pqv:P585 [ wikibase:timeValue ?year ] .}
