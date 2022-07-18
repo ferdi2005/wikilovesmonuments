@@ -40,6 +40,7 @@ gem 'httparty'
 
 gem 'dotenv-rails'
 gem 'puma'
+gem 'listen'
 # Use ActiveStorage variant
 # gem 'mini_magick', '~> 4.8'
 

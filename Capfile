@@ -4,6 +4,10 @@ require "capistrano/setup"
 # Include default deployment tasks
 require "capistrano/deploy"
 
+# cap install
+# bundle lock --add-platform x86_64-linux
+
+
 # Load the SCM plugin appropriate to your project:
 #
 # require "capistrano/scm/hg"
