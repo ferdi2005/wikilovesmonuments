@@ -6,6 +6,7 @@ set :application, "wikilovesmonuments"
 server 'c.ferdi.cc', port: 22, roles: [:web, :app, :db], primary: true
 set :repo_url, "git@github.com:ferdi2005/wikilovesmonuments.git"
 set :sidekiq_service_unit_name, "#{fetch(:application)}-sidekiq"
+set :branch, "main"
 
 set :user, 'deploy'
 set :puma_threads,    [4, 16]
@@ -52,9 +53,8 @@ namespace :deploy do
     namespace :check do
       before :linked_files, :set_master_key do
         on roles(:app), in: :sequence, wait: 10 do
-          unless test("[ -f #{shared_path}/.env ]")
+            puts "Uploading .env file..."
             upload! '.env', "#{shared_path}/.env"
-          end
         end
       end
     end
