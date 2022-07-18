@@ -28,6 +28,7 @@ install_plugin Capistrano::Puma::Systemd
 # cap production puma:systemd:config puma:systemd:enable
 install_plugin Capistrano::Puma::Nginx
 # cap production puma:nginx_config
+# mkdir apps/mysite/shared/tmp/sockets
 
 require 'capistrano/yarn'
 require 'capistrano/lets-encrypt'
@@ -36,6 +37,15 @@ require 'capistrano/sidekiq'
 install_plugin Capistrano::Sidekiq  # Default sidekiq tasks
 # Then select your service manager
 install_plugin Capistrano::Sidekiq::Systemd
+
+# su postgres
+# cd
+#createdb mysite_production
+# psql
+# create user rails with password 'mypassword';
+# grant all privileges on database mysite_production to rails;
+# exit # exit psql shell
+# exit # back to root user
 
 # cap lets_encrypt:register            # Register a Let's encrypt account
 # cap lets_encrypt:check_certificate   # Check for validity of certificates

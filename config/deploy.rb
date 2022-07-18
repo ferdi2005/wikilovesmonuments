@@ -31,7 +31,7 @@ set :sidekiq_user, fetch(:user)
 set :sidekiq_service_unit_user, :system
 
 append :linked_files, ".env"
-append :linked_dirs, "log", "tmp/pids", "tmp/cache", "public/uploads"
+append :linked_dirs, "log", "tmp/pids", "tmp/sockets", "tmp/cache", "public/uploads"
 
 namespace :rails do
     desc 'Open a rails console `cap [staging] rails:console [server_index default: 0]`'
