@@ -1,6 +1,9 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    acme-client (2.0.11)
+      faraday (>= 1.0, < 3.0.0)
+      faraday-retry (~> 1.0)
     actioncable (7.0.3)
       actionpack (= 7.0.3)
       activesupport (= 7.0.3)
@@ -85,6 +88,9 @@ GEM
       sshkit (>= 1.9.0)
     capistrano-bundler (2.1.0)
       capistrano (~> 3.1)
+    capistrano-lets-encrypt (0.3.0)
+      capistrano (>= 3.0.0)
+      letsencrypt-cli (>= 0.1.4)
     capistrano-rails (1.6.2)
       capistrano (~> 3.1)
       capistrano-bundler (>= 1.1, < 3)
@@ -122,6 +128,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
+    colorize (0.8.1)
     concurrent-ruby (1.1.10)
     connection_pool (2.2.5)
     crass (1.0.6)
@@ -145,6 +152,7 @@ GEM
       faraday-net_http (~> 2.0)
       ruby2_keywords (>= 0.0.4)
     faraday-net_http (2.0.3)
+    faraday-retry (1.0.3)
     ffi (1.15.5)
     fugit (1.5.3)
       et-orbi (~> 1, >= 1.2.7)
@@ -165,6 +173,10 @@ GEM
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
     json (2.6.2)
+    letsencrypt-cli (0.4.1)
+      acme-client (>= 0.2.4)
+      colorize
+      thor
     link_header (0.0.8)
     listen (3.0.8)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -361,6 +373,7 @@ DEPENDENCIES
   byebug
   capistrano
   capistrano-bundler
+  capistrano-lets-encrypt
   capistrano-rails
   capistrano-rvm
   capistrano-sidekiq

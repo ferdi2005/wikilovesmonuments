@@ -23,9 +23,24 @@ require 'capistrano/rails/migrations'
 require "capistrano/rvm"
 require 'capistrano/puma'
 install_plugin Capistrano::Puma
+# cap production puma:config
 install_plugin Capistrano::Puma::Systemd
+# cap production puma:systemd:config puma:systemd:enable
+install_plugin Capistrano::Puma::Nginx
+# cap production puma:nginx_config
 
 require 'capistrano/yarn'
+require 'capistrano/lets-encrypt'
+
+require 'capistrano/sidekiq'
+install_plugin Capistrano::Sidekiq  # Default sidekiq tasks
+# Then select your service manager
+install_plugin Capistrano::Sidekiq::Systemd
+
+# cap lets_encrypt:register            # Register a Let's encrypt account
+# cap lets_encrypt:check_certificate   # Check for validity of certificates
+# cap lets_encrypt:authorize           # Authorize a domain using ACME protocol
+# cap lets_encrypt:cert                # Create certificates and private keys
 
 # Include tasks from other gems included in your Gemfile
 #
