@@ -6,7 +6,6 @@ set :application, "wikilovesmonuments"
 server 'c.ferdi.cc', port: 22, roles: [:web, :app, :db], primary: true
 set :repo_url, "git@github.com:ferdi2005/wikilovesmonuments.git"
 set :sidekiq_service_unit_name, "#{fetch(:application)}-sidekiq"
-set :branch, "main"
 
 set :user, 'deploy'
 set :puma_threads,    [4, 16]
