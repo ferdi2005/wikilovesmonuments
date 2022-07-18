@@ -45,5 +45,7 @@ test:
 production:
   adapter: postgresql
   encoding: unicode
-  database: sample_postgres_production
+  database: wikilovesmonuments_production
+  username: wikilovesmonuments
+  password: <%= ENV["DATABASE_PASSWORD"] %>
   pool: 5
