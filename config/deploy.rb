@@ -5,6 +5,7 @@ set :application, "wikilovesmonuments"
 
 server 'c.ferdi.cc', port: 22, roles: [:web, :app, :db], primary: true
 set :repo_url, "git@github.com:ferdi2005/wikilovesmonuments.git"
+set :sidekiq_service_unit_name, "#{fetch(:application)}-sidekiq"
 
 set :user, 'deploy'
 set :puma_threads,    [4, 16]
@@ -24,10 +25,41 @@ set :ssh_options,     { forward_agent: true, user: fetch(:user), keys: %w(~/.ssh
 set :puma_preload_app, true
 set :puma_worker_timeout, nil
 set :puma_init_active_record, true  # Change to false when not using ActiveRecord
+set :default_env, {"LD_PRELOAD" => "/usr/lib/x86_64-linux-gnu/libjemalloc.so.2"}
+set :sidekiq_user, fetch(:user)
+set :sidekiq_service_unit_user, :system
 
 append :linked_files, ".env"
 append :linked_dirs, "log", "tmp/pids", "tmp/cache", "public/uploads"
 
+namespace :rails do
+    desc 'Open a rails console `cap [staging] rails:console [server_index default: 0]`'
+    task :console do    
+      server = roles(:app)[ARGV[2].to_i]
+  
+      puts "Opening a console on: #{server.hostname}...."
+  
+      cmd = "ssh #{server.user}@#{server.hostname} -t 'cd #{fetch(:deploy_to)}/current && RAILS_ENV=#{fetch(:rails_env)} bundle exec rails console'"
+  
+      puts cmd
+  
+      exec cmd
+    end
+end
+
+namespace :deploy do
+    namespace :check do
+      before :linked_files, :set_master_key do
+        on roles(:app), in: :sequence, wait: 10 do
+          unless test("[ -f #{shared_path}/.env ]")
+            upload! '.env', "#{shared_path}/.env"
+          end
+        end
+      end
+    end
+end
+  
+  
 # Default branch is :master
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
 
