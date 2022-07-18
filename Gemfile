@@ -65,6 +65,7 @@ group :development do
   gem 'rails_real_favicon'
 
   gem 'capistrano',         require: false
+  gem 'capistrano-yarn',     require: false
   gem 'capistrano-rvm',     require: false
   gem 'capistrano-rails',   require: false
   gem 'capistrano-bundler', require: false

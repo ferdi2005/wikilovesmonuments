@@ -4,8 +4,7 @@ lock "~> 3.17.0"
 set :application, "wikilovesmonuments"
 
 server 'c.ferdi.cc', port: 22, roles: [:web, :app, :db], primary: true
-set :application, "mysite"
-set :repo_url, "git@github.com:me/wikilovesmonuments.git"
+set :repo_url, "git@github.com:ferdi2005/wikilovesmonuments.git"
 
 set :user, 'deploy'
 set :puma_threads,    [4, 16]

@@ -44,6 +44,7 @@ test:
 
 production:
   adapter: postgresql
+  host: localhost
   encoding: unicode
   database: wikilovesmonuments_production
   username: wikilovesmonuments
