@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2021_09_03_224317) do
+ActiveRecord::Schema[7.0].define(version: 2022_07_21_212759) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -43,6 +43,10 @@ ActiveRecord::Schema[7.0].define(version: 2021_09_03_224317) do
     t.string "city_item"
     t.integer "commonsphotos"
     t.boolean "is_castle", default: false
+    t.boolean "quality", default: false
+    t.boolean "featured", default: false
+    t.integer "quality_count", default: 0
+    t.integer "featured_count", default: 0
     t.index ["item"], name: "index_monuments_on_item", unique: true
   end
 

@@ -29,6 +29,7 @@ set :puma_init_active_record, true  # Change to false when not using ActiveRecor
 set :default_env, {"LD_PRELOAD" => "/usr/lib/x86_64-linux-gnu/libjemalloc.so.2"}
 set :sidekiq_user, fetch(:user)
 set :sidekiq_service_unit_user, :system
+set :rvm_ruby_version, "3.1.2"
 
 append :linked_files, ".env"
 append :linked_dirs, "log", "tmp/pids", "tmp/sockets", "tmp/cache", "public/uploads"

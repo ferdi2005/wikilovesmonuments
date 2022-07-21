@@ -4,7 +4,8 @@ class LookupJob < ApplicationJob
   queue_as :default
 
   def perform(*_args)
-    Monument.find_each do |monument|
+    puts "Starting to perform LookupJob..."
+    Monument.find_each do |monument| 
       search = '"' + monument.wlmid + '"'
       retimes = 0
       begin
@@ -24,11 +25,51 @@ class LookupJob < ApplicationJob
       totalhits = count.try(:[], 'query').try(:[], 'searchinfo').try(:[], 'totalhits')
       
       next if totalhits.nil?
+      
+      ## Verifica fotografie di qualità
+      quality_search = '"' + monument.wlmid + '" incategory:"Quality images"'
+      begin
+        quality_count = HTTParty.get("https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=#{quality_search}&srwhat=text&srnamespace=6&srlimit=1&format=json",
+                             headers: { 'User-Agent' => 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using HTTParty Ruby Gem' },
+                             uri_adapter: Addressable::URI).to_h
+      rescue => e
+        retimes += 1
+        if retimes < 4
+          puts "Retrying for ID: #{monument.id} - WLMID: #{monument.wlmid} - error: #{e}"
+          retry
+        else
+          puts "Skipping ID: #{monument.id} - WLMID: #{monument.wlmid} - error: #{e}"
+          next
+        end
+      end      
+      quality = quality_count.try(:[], 'query').try(:[], 'searchinfo').try(:[], 'totalhits')
+      
+      ## Verifica fotografie featured
+      featured_search = '"' + monument.wlmid + '" incategory:"Featured pictures on Wikimedia_Commons"'
+      begin
+        featured_count = HTTParty.get("https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=#{featured_search}&srwhat=text&srnamespace=6&srlimit=1&format=json",
+                             headers: { 'User-Agent' => 'WikiLovesMonumentsItaly MonumentsFinder/1.4 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using HTTParty Ruby Gem' },
+                             uri_adapter: Addressable::URI).to_h
+      rescue => e
+        retimes += 1
+        if retimes < 4
+          puts "Retrying for ID: #{monument.id} - WLMID: #{monument.wlmid} - error: #{e}"
+          retry
+        else
+          puts "Skipping ID: #{monument.id} - WLMID: #{monument.wlmid} - error: #{e}"
+          next
+        end
+      end      
+      featured = featured_count.try(:[], 'query').try(:[], 'searchinfo').try(:[], 'totalhits')
+
+      ## Booleano da aggiornare
+      quality > 0 ? quality_bool = true : quality_bool = false
+      featured > 0 ? featured_bool = true : featured_bool = false
 
       if totalhits > 0
-        monument.update!(with_photos: true, photos_count: totalhits)
+        monument.update!(with_photos: true, photos_count: totalhits, quality: quality_bool, featured: featured_bool, quality_count: quality, featured_count: featured)
       elsif !monument.image.nil?
-        monument.update!(with_photos: true, photos_count: totalhits)
+        monument.update!(with_photos: true, photos_count: totalhits, quality: quality_bool, featured: featured_bool, quality_count: quality, featured_count: featured)
       elsif !monument.commons.nil?
         begin
           count = HTTParty.get("https://commons.wikimedia.org/w/api.php", query: { action: :query, prop: :categoryinfo, titles: "Category:" + monument.commons ,format: :json },
