@@ -1,12 +1,23 @@
 <div id="mapid" class="is-centered" style="height: 100vh;width:100vh;"></div>
 <script>
 var mymap = L.map('mapid').setView([42.504154, 12.646361], 6);
+
+var blueIcon = new L.Icon({
+    iconUrl: '<%= image_url 'marker-icon-2x-blue.png' %>',
+    shadowUrl: '<%= image_url 'marker-shadow.png' %>',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
+
+
 L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y}?access_token=<%= ENV['MAPBOX_KEY'] %>', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(mymap);
 
 <% @monuments.each do |monument| %>
-L.marker([<%= monument.latitude %>, <%= monument.longitude %>]).addTo(mymap)
+L.marker([<%= monument.latitude %>, <%= monument.longitude %>], {icon: blueIcon}).addTo(mymap)
     .bindPopup('<%= link_to monument.itemlabel.capitalize, show_path(id: monument.id) %>');
 <% end %>
 </script>

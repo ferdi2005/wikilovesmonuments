@@ -8,7 +8,16 @@
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(mymap);
 
-    L.marker([ <%= @monument.latitude %>,<%= @monument.longitude %>]).addTo(mymap)
+    var blueIcon = new L.Icon({
+        iconUrl: '<%= image_url 'marker-icon-2x-blue.png' %>',
+        shadowUrl: '<%= image_url 'marker-shadow.png' %>',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+    L.marker([ <%= @monument.latitude %>,<%= @monument.longitude %>], {icon: blueIcon}).addTo(mymap)
         .bindPopup('<%= @monument.itemlabel.capitalize %>')
         .openPopup();
 </script>
