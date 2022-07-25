@@ -3,6 +3,34 @@
 <% if @monument.any? %>
 <div id="mapid" class="is-centered" style="height: 300px;width:100%;"></div>
 <script>
+
+if (item.noupload) {
+            var icon = "/images/Info grey.png"
+          } else if (item.with_photos) {
+            if (item.tree) {
+              var icon = "/images/tree blue android.png";
+            } else if (item.is_castle) {
+              var icon = "/images/castle blue android.png";
+            } else {
+              var icon = "/images/Info blue.png";
+            }
+          } else {
+            if (item.tree) {
+              var icon = "/images/tree red android.png";
+            } else if (item.is_castle) {
+              var icon = "/images/castle red android.png";
+            } else {
+              var icon = "/images/Info red.png";
+            }
+          }
+          markers.push({
+            latitude: item.latitude,
+            longitude: item.longitude,
+            title: item.itemlabel,
+            icon: icon,
+            id: item.item
+          });
+
 var mymap = L.map('mapid').setView(<%= @geocenter.to_s %>, 12);
 L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y}?access_token=<%= ENV['MAPBOX_KEY'] %>', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -11,10 +39,10 @@ L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y
 var redIcon = new L.Icon({
   iconUrl: '<%= image_url 'marker-icon-2x-red.png' %>',
   shadowUrl: '<%= image_url 'marker-shadow.png' %>',
-  iconSize: [25, 41],
+  iconSize: [50, 82],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+  shadowSize: [82, 82]
 });
 
 var greenIcon = new L.Icon({
@@ -25,8 +53,135 @@ var greenIcon = new L.Icon({
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
 });
+
+var orangeIcon = new L.Icon({
+  iconUrl: '<%= image_url 'marker-icon-2x-orange.png' %>',
+  shadowUrl: '<%= image_url 'marker-shadow.png' %>',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var goldIcon = new L.Icon({
+  iconUrl: '<%= image_url 'marker-icon-2x-gold.png' %>',
+  shadowUrl: '<%= image_url 'marker-shadow.png' %>',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var blueIcon = new L.Icon({
+  iconUrl: '<%= image_url 'marker-icon-2x-blue.png' %>',
+  shadowUrl: '<%= image_url 'marker-shadow.png' %>',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var greyIcon = new L.Icon({
+  iconUrl: '<%= image_url 'marker-icon-2x-grey.png' %>',
+  shadowUrl: '<%= image_url 'marker-shadow.png' %>',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+// Trees
+var redTree = new L.Icon({
+  iconUrl: '<%= image_url 'tree red.png' %>',
+  shadowUrl: '<%= image_url 'marker-shadow.png' %>',
+  iconSize: [50, 82],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [82, 82]
+});
+
+var goldTree = new L.Icon({
+  iconUrl: '<%= image_url 'tree gold.png' %>',
+  shadowUrl: '<%= image_url 'marker-shadow.png' %>',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var blueTree = new L.Icon({
+  iconUrl: '<%= image_url 'tree blue.png' %>',
+  shadowUrl: '<%= image_url 'marker-shadow.png' %>',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+// Castles
+var redCastle = new L.Icon({
+  iconUrl: '<%= image_url 'castle red.png' %>',
+  shadowUrl: '<%= image_url 'marker-shadow.png' %>',
+  iconSize: [50, 82],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [82, 82]
+});
+
+var goldCastle = new L.Icon({
+  iconUrl: '<%= image_url 'castle gold.png' %>',
+  shadowUrl: '<%= image_url 'marker-shadow.png' %>',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+var blueCastle = new L.Icon({
+  iconUrl: '<%= image_url 'castle blue.png' %>',
+  shadowUrl: '<%= image_url 'marker-shadow.png' %>',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
 <% @monument_nopagy.each do |monument| %>
-  L.marker([<%= monument.latitude %>, <%= monument.longitude %>] , {icon: <%= monument.with_photos? ? 'greenIcon' : 'redIcon' %>}).addTo(mymap)
+  <% if monument.noupload %>
+    <% icon = "greyIcon" %>
+  <% elsif monument.tree %>
+    <% if monument.with_photos %>
+      <% if monument.quality || monument.featured %>
+        <% icon = "goldTree" %>
+      <% else %>
+        <% icon = "blueTree" %>
+      <% end %>
+    <% else %>
+      <% icon = "redTree" %>
+    <% end %>
+  <% elsif monument.is_castle %>
+    <% if monument.with_photos %>
+      <% if monument.quality || monument.featured %>
+        <% icon = "goldCastle" %>
+      <% else %>
+        <% icon = "blueCastle" %>
+      <% end %>
+    <% else %>
+      <% icon = "redCastle" %>
+    <% end %>
+  <% else %>
+    <% if monument.with_photos %>
+      <% if monument.quality || monument.featured %>
+        <% icon = "goldIcon" %>
+      <% else %>
+        <% icon = "blueIcon" %>
+      <% end %>
+    <% else %>
+      <% icon = "redIcon" %>
+    <% end %>
+  <% end %>
+
+  L.marker([<%= monument.latitude %>, <%= monument.longitude %>] , {icon: <%= icon %>}).addTo(mymap)
       .bindPopup('<%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=400" unless monument.image.blank? %><%== '<br/>' unless monument.image.blank? %> <%= link_to monument.itemlabel.capitalize, show_path(id: monument.id) %>');
 <% end %>
 
