@@ -49,4 +49,4 @@ production:
   database: wikilovesmonuments_production
   username: wikilovesmonuments
   password: <%= ENV["DATABASE_PASSWORD"] %>
-  pool: 5
+  pool: 20
