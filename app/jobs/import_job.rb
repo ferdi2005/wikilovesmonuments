@@ -25,6 +25,7 @@ class ImportJob < ApplicationJob
       
       MINUS {?item wdt:P31 wd:Q747074.}
       MINUS {?item wdt:P31 wd:Q954172.}
+      MINUS {?item wdt:P31 wd:Q1549591.}
       
       OPTIONAL {?item wdt:P31 ?instanceof }
       OPTIONAL {?item wdt:P625 ?coords. }
