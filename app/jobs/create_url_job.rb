@@ -15,35 +15,44 @@ class CreateUrlJob < ApplicationJob
     regioni = {
       'Abruzzo' => ['Abruzzo', true],
       'Basilicata' => ['Basilicata', true],
-      'Calabria' => ['Calabria', false],
+      'Calabria' => ['Calabria', true],
       'Campania' => ['Campania', false],
       'Emilia-Romagna' => ['Emilia-Romagna', false],
-      'Friuli-Venezia Giulia' => ['Friuli-Venezia Giulia', false],
-      'Lazio' => ['Lazio', false],
+      'Friuli-Venezia Giulia' => ['Friuli-Venezia Giulia', true],
+      'Lazio' => ['Lazio', true],
       'Liguria' => ['Liguria', true],
-      'Lombardia' => ['Lombardy', false],
+      'Lombardia' => ['Lombardy', true],
       'Marche' => ['Marche', true],
       'Molise' => ['Molise', false],
-      'Piemonte' => ['Piedmont', false],
+      'Piemonte' => ['Piedmont', true],
       'Puglia' => ['Apulia', true],
       'Sardegna' => ['Sardinia', false],
       'Sicilia' => ['Sicily', false],
       'Toscana' => ['Tuscany', false],
       'Trentino-Alto Adige' => ['Trentino-South Tyrol', false],
-      'Umbria' => ['Umbria', true],
+      'Umbria' => ['Umbria', false],
       "Valle d'Aosta" => ['Aosta Valley', false],
       'Veneto' => ['Veneto', true]
     }
 
     regarr = regioni[monument.regione]
+    
+    if monument.is_castle
+      regarr = regioni[monument.regione] + "+-+fortifications"
+    else
+      newstring = '+-+' + regarr[0]
+    end
 
-    newstring = '+-+' + regarr[0]
     if regarr[1] == false && !monument.item.in?(@lakecomo)
       newstring = newstring + '%7C' + basecat + '+-+' + 'without+local+award'
     end
 
     newstring = newstring + '%7C' + basecat + '+-+' + 'Lake+Como' if monument.item.in?(@lakecomo)
     newstring = newstring + '%7C' + basecat + '+-+' + 'Valle+del+Primo+Presepe' if monument.city_item.in?(@valle_del_primo_presepe)
+
+    # Terre dell'Uftia
+    newstring = newstring + '%7C' + basecat + '+-+' + 'Terre+dell%27Ufita' if monument.city_item.in?(@terre_dell_ufita)
+
     monurl.gsub!('+-+unknown+region', newstring)
 
     notwlm = baselink
@@ -94,6 +103,8 @@ class CreateUrlJob < ApplicationJob
 
     # Comuni partecipanti a Valle del primo presepe
     @valle_del_primo_presepe = %w[Q223423 Q223427 Q223434 Q223459 Q223472 Q223476 Q223509 Q224039 Q224043 Q118085 Q224109 Q224144 Q224149 Q224172 Q224211 Q224264 Q224300 Q224333 Q13396 Q224405]
+
+    @terre_dell_ufita = %w[Q55007 Q55008 Q55016 Q55033 Q55036 Q55042 Q55085 Q55121 Q55139]
 
     Monument.find_each do |monument|
       createurl(monument)
