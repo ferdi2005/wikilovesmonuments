@@ -38,7 +38,7 @@ class CreateUrlJob < ApplicationJob
     regarr = regioni[monument.regione]
     
     if monument.is_castle
-      regarr = regioni[monument.regione] + "+-+fortifications"
+      newstring = '+-+' + regarr[0] + "+-+fortifications"
     else
       newstring = '+-+' + regarr[0]
     end
