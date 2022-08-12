@@ -108,7 +108,7 @@ class ImportJob < ApplicationJob
 
       mon[:address] = normalize_value(monument[:address])
 
-      mon[:allphotos] = 'https://commons.wikimedia.org/w/index.php?search="' + self.wlmid + + '"'
+      mon[:allphotos] = 'https://commons.wikimedia.org/w/index.php?search="' + normalize_value(monument[:wlmid]) + + '"'
 
       if normalize_value(monument[:instanceof]) == "http://www.wikidata.org/entity/Q811534"
         mon[:tree] = true
