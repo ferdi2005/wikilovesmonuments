@@ -8,9 +8,6 @@ class Monument < ApplicationRecord
     where('lower(itemlabel) LIKE lower(?) OR lower(itemdescription) LIKE lower(?)', "%#{query.strip}%", "%#{query.strip}%")
   end
 
-  def commons_photos 
-    return 'https://commons.wikimedia.org/w/index.php?search="' + self.wlmid + + '"'
-  end
   def find_next_id
     selected = Monument.where(city: self.city).pluck(:wlmid).select { |id| id.match?(/^\d{2}[A-Z]\d{3}\d{4}$/)}
     unless selected.empty?
