@@ -33,7 +33,7 @@ Rails.application.routes.draw do
 
     get 'numerics-monuments', to: 'numerics#monuments'
 
-    # mount Sidekiq::Web => '/secret-sidekiq'
+    mount Sidekiq::Web => '/secret-sidekiq'
 
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
