@@ -1,5 +1,5 @@
-# require 'sidekiq/web'
-# require 'sidekiq/cron/web'
+require 'sidekiq/web'
+require 'sidekiq/cron/web'
 Rails.application.routes.draw do
   get 'towns/search'
   get 'import/do'
