@@ -43,7 +43,7 @@ class CreateUrlJob < ApplicationJob
       newstring = '+-+' + regarr[0]
     end
 
-   if regarr[1] == false && !monument.item.in?(@lakecomo) && !monument.item.in?(@valle_del_primo_presepe) && !monument.item.in?(@terre_dell_ufita)
+   if regarr[1] == false && !monument.item.in?(@lakecomo) && !monument.city_item.in?(@valle_del_primo_presepe) && !monument.city_item.in?(@terre_dell_ufita)
       newstring = newstring + '%7C' + basecat + '+-+' + 'without+local+award'
     end
 
