@@ -28,7 +28,7 @@ class CreateUrlJob < ApplicationJob
       'Puglia' => ['Apulia', true],
       'Sardegna' => ['Sardinia', false],
       'Sicilia' => ['Sicily', false],
-      'Toscana' => ['Tuscany', false],
+      'Toscana' => ['Tuscany', true],
       'Trentino-Alto Adige' => ['Trentino-South Tyrol', false],
       'Umbria' => ['Umbria', false],
       "Valle d'Aosta" => ['Aosta Valley', false],
