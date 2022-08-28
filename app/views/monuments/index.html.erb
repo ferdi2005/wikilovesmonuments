@@ -1,7 +1,7 @@
 <% provide(:title, 'Monumenti nelle vicinanze') %>
 <h1 class="title is-2 is-danger">Lista monumenti nelle vicinanze</h1>
 <% if @monument.any? %>
-<div id="mapid" class="is-centered" style="height: 300px;width:100%;"></div>
+<div id="mapid" class="is-centered" style="height: 500px;width:100%;"></div>
 <script>
 var mymap = L.map('mapid').setView(<%= @geocenter.to_s %>, 12);
 L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/{z}/{x}/{y}?access_token=<%= ENV['MAPBOX_KEY'] %>', {
@@ -165,7 +165,11 @@ L.marker(<%= @geocenter.to_s %>, {icon: greenIcon}).bindPopup('Tu sei qui').addT
   <thead>
     <th>Immagine</th>
     <th>Nome</th>
-    <th>Link</th>
+    <th>Indirizzo</th>
+    <th>Info</th>
+    <% if Date.today.month == 9 %>
+      <th>Partecipa!</th>
+    <% end %>
   </thead>
   <tbody>
       <% @monument.each do |monument| %>
@@ -183,8 +187,16 @@ L.marker(<%= @geocenter.to_s %>, {icon: greenIcon}).bindPopup('Tu sei qui').addT
         <%= monument.itemlabel %>
         </td>
         <td>
+        <%= return_address(monument) %>
+        </td>
+        <td>
           <i class="fas fa-search"></i> <%= link_to 'Maggiori informazioni', show_path(id: monument.id), class: 'button is-link'%>
         </td>
+        <% if Date.today.month == 9 %>
+        <td>
+          <i class="fas fa-camera"></i> <%= link_to 'Carica una foto', monument.uploadurl, class: 'button is-danger'%>
+        </td>
+        <% end %>
       <% end %>
     </tbody>
 </table>

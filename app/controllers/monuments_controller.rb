@@ -40,7 +40,6 @@ class MonumentsController < ApplicationController
 
   def show
     @monument = Monument.find(params[:id])
-    @result = Geocoder.search([@monument.latitude, @monument.longitude])
     respond_to do |format|
       format.html
       format.json { render json: @monument }

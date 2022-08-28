@@ -20,11 +20,11 @@
                     var lat = position.coords.latitude;
                     var lng = position.coords.longitude;
 
-                    $("#click-submit-position").click(function() {
+                   // $("#click-submit-position").click(function() {
                         $("#latitude").val(lat);
                         $("#longitude").val(lng);
                         $("#form-position").submit();
-                    });
+                    // });
 
                 }, function(error) {
                     clearTimeout(location_timeout);
@@ -38,9 +38,13 @@
             }
 
         }
+
+        $("#click-submit-position").click(function() {
+            geoloc();
+        });
         // Verifica dell'acquisizione del consenso
-        var consenso;
-        if (document.cookie.split(';').includes('consenso=yes') || document.cookie.split(';').includes(' consenso=yes')) {
+        // var consenso;
+        /* if (document.cookie.split(';').includes('consenso=yes') || document.cookie.split(';').includes(' consenso=yes')) {
             consenso = false;
         } else {
             consenso = true;
@@ -71,7 +75,7 @@
         } else {
             // Se il consenso è stato già prestato, geolocalizza.
             geoloc();
-        }
+        } */
     </script>
     <div class="strike">
         <span>O</span>

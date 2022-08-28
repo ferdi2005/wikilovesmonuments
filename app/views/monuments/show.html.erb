@@ -25,25 +25,29 @@
 
 <br />
 <b>Indirizzo:</b>
-<a href="https://www.openstreetmap.org/?mlat=<%= @monument.latitude %>&mlon=<%= @monument.longitude %>"><%= @result.first.address unless @result.nil? || @result.first.nil?%> </a>
+<a href="https://www.openstreetmap.org/?mlat=<%= @monument.latitude %>&mlon=<%= @monument.longitude %>"><%= return_address(@monument)%></a>
 <hr />
 <br />
-<div class="buttons is-vertical">
-    <%= link_to 'Item su Wikidata', "https://wikidata.org/wiki/#{@monument.item}", class: 'button is-danger is-medium' %>
-    <br />
-    <br />
     <% if @monument.noupload %>
     <%= link_to ' Monumento scaduto ', "#", class: 'button is-primary is-medium is-disabled' %>
     <% elsif Date.today.month == 9 %>
-    <%= link_to ' Carica una foto ', @monument.uploadurl, class: 'button is-primary is-medium' %>
+    <%= link_to ' Carica una foto ', @monument.uploadurl, class: 'button is-danger is-medium' %>
     <% else %>
-    <%= link_to ' Carica una foto non partecipante a WLM', @monument.nonwlmuploadurl, class: 'button is-primary is-medium' %>
+    <%= link_to ' Carica una foto non partecipante a WLM', @monument.nonwlmuploadurl, class: 'button is-danger is-medium' %>
     <p>Solo le foto caricate dall'1 al 30 settembre partecipano a Wiki Loves Monuments.</p>
     <% end %>
-    <br />
-    <br />
-    <%= link_to 'Categoria su Commons', "https://commons.wikimedia.org/wiki/Category:#{@monument.commons}", class: 'button is-danger is-medium' unless @monument.commons.nil?%>
-
+    <br/>
+<div class="buttons is-vertical">
+    <%= link_to 'Categoria su Commons', "https://commons.wikimedia.org/wiki/Category:#{@monument.commons}", class: 'button is-primary is-light' unless @monument.commons.nil?%>
+    <br/>
+    <br/>
+    <%= link_to 'Item su Wikidata', "https://wikidata.org/wiki/#{@monument.item}", class: 'button is-primary is-light' %>
+    <br/>
+    <br/>
+    <%= link_to 'Foto caricate', @monument.allphotos, class: 'button is-primary is-light' %>
+    <br/>
+    <br/>
+    <%= link_to 'Voce su Wikipedia', @monument.wikipedia, class: 'button is-primary is-light' unless @monument.wikipedia.nil? %>
 </div>
 <% if @monument.with_photos %>
 <p>Il monumento ha <%= @monument.photos_count unless @monument.photos_count.nil? %> foto.</p>

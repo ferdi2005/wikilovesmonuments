@@ -4,8 +4,9 @@
     <li><%= link_to 'Codice sorgente', 'https://github.com/ferdi2005/wikilovesmonuments' %></li>
     <li>Dati importati da Wikidata - Licenza CC0 </li>
 </ul>
-<li>Query di Lorenzo Losa, è grazie a lui se questo tool e l'applicazione esistono</li>
-<li>Favicon del sito è il <a href="https://commons.wikimedia.org/wiki/File:Wiki_Loves_Monuments_Logo_notext.svg">Logo ufficiale di WLM</a></li>
+<li>Un ringraziamento a Lorenzo Losa per aver scritto la query iniziale</li>
+<li>Favicon del sito è il <a href="https://commons.wikimedia.org/wiki/File:Wiki_Loves_Monuments_Logo_notext.svg">logo ufficiale di WLM</a></li>
+<li>Tool realizzato da <a href="https://it.wikipedia.org/wiki/Utente:Ferdi2005">Ferdinando Traversa</a></li>
 </ul>
 
 <h2 class="title h3">Statistiche</h2>
@@ -16,4 +17,4 @@
 <% end %>
 <%= line_chart Nophoto.where(regione: nil, created_at: Date.parse('30 august')...Date.parse('1 october')).pluck(:created_at, :count) %>
 
-<p> Ci sono <b><%= Monument.where(with_photos: true, photos_count: 0).count %></b> che hanno 0 foto partecipanti al concorso ma, perché hanno un'immagine su Wikidata o una categoria su Commons, sono considerati da questo sistema con immagini.</p>
+<p> Ci sono <b><%= Monument.where(with_photos: true, photos_count: 0).count %></b> monumenti che non hanno mai avuto foto partecipanti al concorso ma, perché hanno un'immagine su Wikidata o una categoria su Commons, sono considerati da questo sistema con immagini.</p>
