@@ -15,9 +15,35 @@ class CheckNoCoordinatesJob < ApplicationJob
         metadata.merge!(request.try(:[], "query").try(:[], "pages")) # Unisce i due hash
       end
 
+      unless monument.commons.blank?
+        request = HTTParty.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :iilimit => 500, generator: :categorymembers, gcmtitle: "Category:#{monument.commons}", gcmnamespace: 6, gcmlimit: 500, format: :json}, uri_adapter: Addressable::URI).to_h
+        
+        commonslist = request.try(:[], "query").try(:[], "pages")
+
+        while !request["continue"].nil?
+          request = HTTParty.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :iilimit => 500, generator: :categorymembers, gcmtitle: monument.commons, gcmcontinue: request["continue"]["gcmcontinue"], gcmnamespace: 6, gcmlimit: 500, format: :json}, uri_adapter: Addressable::URI).to_h["query"]["pages"]
+
+          commonslist.merge!(request.try(:[], "query").try(:[], "pages")) # Unisce i due hash
+        end
+      end
+      
+      metadata.merge!(commonslist)
+
+      unless monument.image.blank?
+        request = HTTParty.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :titles => "File:#{URI.decode_www_form_component(monument.image)}", :format => :json}, uri_adapter: Addressable::URI).to_h
+
+        image_data = request.try(:[], "query").try(:[], "pages")
+      end
+
+      metadata.merge!(image_data)
+
+      metadata = metadata.uniq
+
       next if metadata.blank?
 
       metadata.each do |_, image|
+        next if _ == "-1" || image["ns"] != 6
+
         latitude = image["imageinfo"][0]["metadata"].find { |h| h["name"] == "GPSLatitude" }.try(:[], "value").to_d
         
         longitude = image["imageinfo"][0]["metadata"].find { |h| h["name"] == "GPSLongitude" }.try(:[], "value").to_d
