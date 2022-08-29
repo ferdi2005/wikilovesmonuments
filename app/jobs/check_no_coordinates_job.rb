@@ -12,7 +12,7 @@ class CheckNoCoordinatesJob < ApplicationJob
       while !request["continue"].nil?
         request = HTTParty.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :iilimit => 500, generator: :search, gsrsearch: '"' + monument.wlmid + '"', gcmcontinue: request["continue"]["gcmcontinue"], gsrwhat: :text, gsrnamespace: 6, gsrlimit: 500, :format => :json}, uri_adapter: Addressable::URI).to_h["query"]["pages"]
 
-        metadata.merge!(request.try(:[], "query").try(:[], "pages")) # Unisce i due hash
+        metadata.merge!(request.try(:[], "query").try(:[], "pages").to_h) # Unisce i due hash
       end
 
       unless monument.commons.blank?
@@ -23,19 +23,19 @@ class CheckNoCoordinatesJob < ApplicationJob
         while !request["continue"].nil?
           request = HTTParty.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :iilimit => 500, generator: :categorymembers, gcmtitle: monument.commons, gcmcontinue: request["continue"]["gcmcontinue"], gcmnamespace: 6, gcmlimit: 500, format: :json}, uri_adapter: Addressable::URI).to_h["query"]["pages"]
 
-          commonslist.merge!(request.try(:[], "query").try(:[], "pages")) # Unisce i due hash
+          commonslist.merge!(request.try(:[], "query").try(:[], "pages").to_h) # Unisce i due hash
         end
       end
       
-      metadata.merge!(commonslist)
+      metadata.merge!(commonslist.to_h)
 
       unless monument.image.blank?
         request = HTTParty.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :titles => "File:#{URI.decode_www_form_component(monument.image)}", :format => :json}, uri_adapter: Addressable::URI).to_h
 
         image_data = request.try(:[], "query").try(:[], "pages")
-      end
 
-      metadata.merge!(image_data)
+        metadata.merge!(image_data.to_h)
+      end
 
       metadata = metadata.uniq
 
