@@ -1,4 +1,5 @@
 <% provide(:title, 'Monumenti nelle vicinanze') %>
+<%= link_to "Home", root_path, class: "button is-small is-info" %>
 <h1 class="title is-2 is-danger">Lista monumenti nelle vicinanze</h1>
 <% if @monument.any? %>
 <div id="mapid" class="is-centered" style="height: 500px;width:100%;"></div>
