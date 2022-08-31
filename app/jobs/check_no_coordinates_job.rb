@@ -53,9 +53,16 @@ class CheckNoCoordinatesJob < ApplicationJob
         end
       end
 
+      next if coordinates.blank?
+
+      maxlat = coordinates.max { |c| c[0] }[0]&.truncate(5)
+      maxlon = coordinates.max { |c| c[1] }[1]&.truncate(5)
+      minlat = coordinates.min { |c| c[0] }[0]&.truncate(5)
+      minlon = coordinates.min { |c| c[1] }[1]&.truncate(5)
+
       geocenter = Geocoder::Calculations.geographic_center(coordinates)
       
-      monument.update!(presumed_latitude: geocenter[0].truncate(5), presumed_longitude: geocenter[1].truncate(5)) unless geocenter[0].nan? || geocenter[1].nan?
+      monument.update!(presumed_latitude: geocenter[0].truncate(5), presumed_longitude: geocenter[1].truncate(5), presumed_maxlat: maxlat, presumed_minlat: minlat, presumed_maxlon: maxlon, presumed_minlon: minlon ) unless geocenter[0].nan? || geocenter[1].nan?
     end
   end
 end

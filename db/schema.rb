@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_08_27_213607) do
+ActiveRecord::Schema[7.0].define(version: 2022_08_31_132007) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -49,6 +49,10 @@ ActiveRecord::Schema[7.0].define(version: 2022_08_27_213607) do
     t.integer "featured_count", default: 0
     t.decimal "presumed_latitude"
     t.decimal "presumed_longitude"
+    t.decimal "presumed_maxlat"
+    t.decimal "presumed_minlat"
+    t.decimal "presumed_maxlon"
+    t.decimal "presumed_minlon"
     t.index ["item"], name: "index_monuments_on_item", unique: true
   end
 
