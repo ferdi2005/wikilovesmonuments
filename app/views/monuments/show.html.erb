@@ -118,12 +118,11 @@ var blueCastle = new L.Icon({
   shadowSize: [30, 30]
 });
 
-<% @monument_nopagy.each do |monument| %>
-  <% if monument.noupload %>
+<% if @monument.noupload %>
     <% icon = "greyIcon" %>
-  <% elsif monument.tree %>
-    <% if monument.with_photos %>
-      <% if monument.quality || monument.featured %>
+  <% elsif @monument.tree %>
+    <% if @monument.with_photos %>
+      <% if @monument.quality || @monument.featured %>
         <% icon = "goldTree" %>
       <% else %>
         <% icon = "blueTree" %>
@@ -131,9 +130,9 @@ var blueCastle = new L.Icon({
     <% else %>
       <% icon = "redTree" %>
     <% end %>
-  <% elsif monument.is_castle %>
-    <% if monument.with_photos %>
-      <% if monument.quality || monument.featured %>
+  <% elsif @monument.is_castle %>
+    <% if @monument.with_photos %>
+      <% if @monument.quality || @monument.featured %>
         <% icon = "goldCastle" %>
       <% else %>
         <% icon = "blueCastle" %>
@@ -142,15 +141,14 @@ var blueCastle = new L.Icon({
       <% icon = "redCastle" %>
     <% end %>
   <% else %>
-    <% if monument.with_photos %>
-      <% if monument.quality || monument.featured %>
+    <% if @monument.with_photos %>
+      <% if @monument.quality || @monument.featured %>
         <% icon = "goldIcon" %>
       <% else %>
         <% icon = "blueIcon" %>
       <% end %>
     <% else %>
       <% icon = "redIcon" %>
-    <% end %>
   <% end %>
 
     L.marker([ <%= @monument.latitude %>,<%= @monument.longitude %>], {icon: <%= icon %>}).addTo(mymap)
