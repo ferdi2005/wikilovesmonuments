@@ -92,3 +92,5 @@ gem "chartkick"
 gem "groupdate"
 
 gem "sentry-raven"
+
+gem "skylight"

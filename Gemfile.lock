@@ -308,6 +308,8 @@ GEM
     sidekiq-cron (1.6.0)
       fugit (~> 1)
       sidekiq (>= 4.2.1)
+    skylight (5.3.3)
+      activesupport (>= 5.2.0)
     sparql (3.2.4)
       builder (~> 3.2)
       ebnf (~> 2.2, >= 2.3.1)
@@ -401,6 +403,7 @@ DEPENDENCIES
   sentry-raven
   sidekiq
   sidekiq-cron
+  skylight
   sparql
   spring
   spring-watcher-listen (~> 2.0.0)
