@@ -118,7 +118,7 @@ var blueCastle = new L.Icon({
   shadowSize: [30, 30]
 });
 
-<% if @monument.noupload %>
+  <% if @monument.noupload %>
     <% icon = "greyIcon" %>
   <% elsif @monument.tree %>
     <% if @monument.with_photos %>
@@ -149,6 +149,7 @@ var blueCastle = new L.Icon({
       <% end %>
     <% else %>
       <% icon = "redIcon" %>
+    <% end %>
   <% end %>
 
     L.marker([ <%= @monument.latitude %>,<%= @monument.longitude %>], {icon: <%= icon %>}).addTo(mymap)
