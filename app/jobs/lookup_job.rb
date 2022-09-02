@@ -63,8 +63,8 @@ class LookupJob < ApplicationJob
       featured = featured_count.try(:[], 'query').try(:[], 'searchinfo').try(:[], 'totalhits')
 
       ## Booleano da aggiornare
-      quality > 0 ? quality_bool = true : quality_bool = false
-      featured > 0 ? featured_bool = true : featured_bool = false
+      (quality&.> 0) ? quality_bool = true : quality_bool = false
+      (featured&.> 0) ? featured_bool = true : featured_bool = false
 
       if totalhits > 0
         monument.update!(with_photos: true, photos_count: totalhits, quality: quality_bool, featured: featured_bool, quality_count: quality, featured_count: featured)
