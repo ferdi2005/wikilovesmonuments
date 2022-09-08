@@ -164,7 +164,7 @@ var blueCastle = new L.Icon({
 <hr />
 <br />
     <% if @monument.noupload %>
-    <%= link_to ' Monumento scaduto ', "#", class: 'button is-primary is-medium is-disabled' %>
+    <%= link_to ' Autorizzazione a fotografare scaduta ', "#", class: 'button is-primary is-medium is-disabled' %>
     <% elsif Date.today.month == 9 %>
     <%= link_to ' Carica una foto ', @monument.uploadurl, class: 'button is-danger is-medium' %>
     <% else %>
