@@ -129,12 +129,18 @@ class ImportJob < ApplicationJob
         mon[:hidden] = false
       end
 
-      if !mon[:year].try(:year).nil? && mon[:year].try(:year) != Date.today.year
-        mon[:noupload] = true
-      else
-        mon[:noupload] = false
+      unless mon[:year].nil?
+        begin
+          if DateTime.parse(mon[:year])&.year != Date.today.year
+            mon[:noupload] = true
+          else
+            mon[:noupload] = false
+          end
+        rescue Date::Error => e
+          mon[:noupload] = false
+        end
       end
-
+      
       unless mon[:enddate].nil?
         if mon[:enddate].to_datetime < Date.today
           mon[:noupload] = true
