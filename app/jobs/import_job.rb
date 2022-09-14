@@ -140,7 +140,7 @@ class ImportJob < ApplicationJob
           mon[:noupload] = false
         end
       end
-      
+
       unless mon[:enddate].nil?
         if mon[:enddate].to_datetime < Date.today
           mon[:noupload] = true
@@ -148,6 +148,8 @@ class ImportJob < ApplicationJob
           mon[:noupload] = false
         end
       end
+
+      mon[:noupload] = false if mon[:noupload].nil?
 
 
       monuments_to_be_saved.reject! { |i| i[:item] == mon[:item] } # Elimina duplicati (salvando dunque l'ultimo che arriva) derivanti da dati "sporchi"
