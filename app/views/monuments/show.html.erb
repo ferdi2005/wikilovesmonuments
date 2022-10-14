@@ -1,5 +1,5 @@
-<% provide(:title, @monument.itemlabel.capitalize) %>
-<h1 class="title is-2 is-primary"><%= @monument.itemlabel.capitalize %></h1>
+<% provide(:title, @monument.itemlabel.upcase_first) %>
+<h1 class="title is-2 is-primary"><%= @monument.itemlabel.upcase_first %></h1>
 <!-- map -->
 <div id="mapid" class="is-centered" style="height: 360px;"></div>
 <script>

@@ -1,25 +1,37 @@
-<div id="mapid" class="is-centered" style="height: 100vh;width:100vh;"></div>
-<script>
-var mymap = L.map('mapid').setView([42.504154, 12.646361], 6);
+<%= provide(:title, "Mappa") %>
 
-var blueIcon = new L.Icon({
-    iconUrl: '<%= image_url 'marker-icon-2x-blue.png' %>',
-    shadowUrl: '<%= image_url 'marker-shadow.png' %>',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-});
+<div id="mymap" style="height: 100vh;width:100wh;"></div>
+
+<script type="module">
+    var latlng = L.latLng(42.135, 12.678);
+    var map = L.map('mymap', {center: latlng, zoom: 7});
+
+    var blueIcon = new L.Icon({
+        iconUrl: '<%= image_url 'marker-icon-2x-blue.png' %>',
+        shadowUrl: '<%= image_url 'marker-shadow.png' %>',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
 
 
-L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/512/{z}/{x}/{y}@2x?access_token=<%= ENV['MAPBOX_KEY'] %>', {tileSize: 512, zoomOffset: -1,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(mymap);
+    L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/512/{z}/{x}/{y}@2x?access_token=<%= ENV['MAPBOX_KEY'] %>', {tileSize: 512, zoomOffset: -1,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors  | <span style="font-family:creativecommons">&#127245;</span> <a href="https://wikidata.org/">Wikidata</a>'
+        }).addTo(map);
 
-<% @monuments.each do |monument| %>
-L.marker([<%= monument.latitude %>, <%= monument.longitude %>], {icon: blueIcon}).addTo(mymap)
-    .bindPopup('<%= link_to monument.itemlabel.capitalize, show_path(id: monument.id) %>');
-<% end %>
+
+
+
+    <% @regioni.each do |reg| %>
+        var <%= snake_case(reg) %> = L.markerClusterGroup();
+    <% end %>
+
+    <%= render partial: "monument", collection: @monuments, cached: true %>
+    
+    <% @regioni.each do |reg| %>
+        map.addLayer(<%= snake_case(reg) %>);
+    <% end %>
+    L.control.locate({initialZoomLevel: 13}).addTo(map);
+
 </script>
-
-

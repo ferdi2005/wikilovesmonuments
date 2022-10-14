@@ -26,7 +26,7 @@ L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/512/{z}/{
             L.marker([ <%= monument.latitude %>, <%= monument.longitude %> ], {
                 icon: <%= monument.with_photos ? 'greenIcon' : 'redIcon' %>
             }).addTo(mymap)
-            .bindPopup('<%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=400" unless monument.image.blank? %><%== '<br/>' unless monument.image.blank? %> <%= link_to monument.itemlabel.capitalize, show_path(id: monument.id) %> <br/> Scadenza <%=monument.enddate.strftime("%d-%m-%Y")%> '); 
+            .bindPopup('<%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=400" unless monument.image.blank? %><%== '<br/>' unless monument.image.blank? %> <%= link_to monument.itemlabel.upcase_first, show_path(id: monument.id) %> <br/> Scadenza <%=monument.enddate.strftime("%d-%m-%Y")%> '); 
 				<% end %>
 </script>
 <table class="table">

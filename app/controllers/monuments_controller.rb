@@ -77,8 +77,27 @@ class MonumentsController < ApplicationController
   end
 
   def map
-    flash[:warning] = "L'utilizzo di questa pagina richiede numerose risorse per il server e per il tuo computer, molto probabilmente si bloccherà facilmente"
    @monuments = Monument.where(hidden: false)
+   @regioni = ["Marche",                                     
+    "Lombardia",                                  
+    "Piemonte",                                   
+    "Liguria",                                    
+    "Sicilia",                                    
+    "Lazio",                                      
+    "Campania",                                   
+    "Basilicata",                                 
+    "Abruzzo",                                    
+    "Emilia-Romagna",                             
+    "Puglia",                                     
+    "Umbria",                                     
+    "Toscana",                                    
+    "Valle d'Aosta",                              
+    "Friuli-Venezia Giulia",
+    "Sardegna",
+    "Molise",
+    "Veneto",
+    "Calabria",
+    "Trentino-Alto Adige"]
   end 
 
   def namesearch

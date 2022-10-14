@@ -17,6 +17,8 @@
 //= require all
 //= require jquery/dist/jquery.js
 //= require leaflet/dist/leaflet.js
+//= require leaflet.markercluster/dist/leaflet.markercluster.js
+//= require leaflet.locatecontrol/dist/L.Control.Locate.min.js
 //= require chartkick
 //= require Chart.bundle
 //= require jszip

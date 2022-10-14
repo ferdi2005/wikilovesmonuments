@@ -154,7 +154,7 @@ var blueCastle = new L.Icon({
   <% end %>
 
   L.marker([<%= monument.latitude %>, <%= monument.longitude %>] , {icon: <%= icon %>}).addTo(mymap)
-      .bindPopup('<%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=400" unless monument.image.blank? %><%== '<br/>' unless monument.image.blank? %> <%= link_to monument.itemlabel.capitalize, show_path(id: monument.id) %>');
+      .bindPopup('<%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=400" unless monument.image.blank? %><%== '<br/>' unless monument.image.blank? %> <%= link_to monument.itemlabel.upcase_first, show_path(id: monument.id) %>');
 <% end %>
 
 
@@ -184,7 +184,7 @@ L.marker(<%= @geocenter.to_s %>, {icon: greenIcon}).bindPopup('Tu sei qui').addT
         <% end %>
         </td>
         <td>
-        <%= monument.itemlabel %>
+        <%= monument.itemlabel.upcase_first %>
         </td>
         <td>
         <%= return_address(monument) %>
