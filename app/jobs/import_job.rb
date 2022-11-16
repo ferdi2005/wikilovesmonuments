@@ -166,5 +166,8 @@ class ImportJob < ApplicationJob
     items_to_be_deleted = Monument.pluck(:item).uniq - monuments_to_be_saved.pluck(:item).uniq
 
     items_to_be_deleted.each { |item| Monument.find_by(item: item).destroy }
+    
+    # Aggiorna la cache
+    CacheWarmJob.perform_later
   end
 end
