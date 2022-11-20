@@ -132,6 +132,7 @@ GEM
     concurrent-ruby (1.1.10)
     connection_pool (2.2.5)
     crass (1.0.6)
+    dalli (3.2.3)
     digest (3.1.0)
     dotenv (2.7.6)
     dotenv-rails (2.7.6)
@@ -385,6 +386,7 @@ DEPENDENCIES
   chartkick
   chromedriver-helper
   coffee-rails (~> 4.2)
+  dalli
   dotenv-rails
   geocoder
   groupdate

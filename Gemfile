@@ -38,6 +38,8 @@ gem 'sidekiq-cron'
 
 gem 'httparty'
 
+gem 'dalli'
+
 gem 'dotenv-rails'
 gem 'puma'
 # Use ActiveStorage variant
