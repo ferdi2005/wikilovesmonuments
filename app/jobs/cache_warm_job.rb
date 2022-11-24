@@ -1,8 +1,6 @@
 class CacheWarmJob < ApplicationJob
   queue_as :default
   
-  include ActionDispatch::Integration::RequestHelpers
-
   def perform(*args)
     @regioni = ["Marche",                                     
       "Lombardia",                                  
