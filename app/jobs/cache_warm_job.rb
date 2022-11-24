@@ -4,6 +4,6 @@ class CacheWarmJob < ApplicationJob
   def perform(*args)
     MonumentsController.expire_page("map")
 
-    MonumentsController.render("map")
+    app.get("/map")
   end
 end
