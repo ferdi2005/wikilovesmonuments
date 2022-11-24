@@ -27,6 +27,6 @@ class CacheWarmJob < ApplicationJob
 
     MonumentsController.expire_page("map")
 
-    MonumentsController.cache_page(MonumentsController.render(:map, assigns: {regioni: @regioni, monuments: @monuments} ), "map")
+    MonumentsController.cache_page(MonumentsController.renderer.new(ApplicationController.renderer.defaults).render(:map, assigns: {regioni: @regioni, monuments: @monuments} ), "map")
   end
 end
