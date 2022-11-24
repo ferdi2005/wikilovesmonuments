@@ -1,3 +1,1 @@
-<% cache monument do %>
-    <%= snake_case(monument.regione) %>.addLayer(L.marker(new L.LatLng(<%= monument.latitude %>, <%= monument.longitude %>), { title: "<%= monument.itemlabel %>", icon: blueIcon }).bindPopup('<%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=300" unless monument.image.blank? %><%== '<br/>' unless monument.image.blank? %><%= link_to monument.itemlabel.upcase_first, show_path(id: monument.id) %>'));
-<% end %>
+<%= snake_case(monument.regione) %>.addLayer(L.marker(new L.LatLng(<%= monument.latitude %>, <%= monument.longitude %>), { title: "<%= monument.itemlabel %>", icon: blueIcon }).bindPopup('<%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=300" unless monument.image.blank? %><%== '<br/>' unless monument.image.blank? %><%= link_to monument.itemlabel.upcase_first, show_path(id: monument.id) %>'));
