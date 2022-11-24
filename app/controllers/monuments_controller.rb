@@ -80,27 +80,27 @@ class MonumentsController < ApplicationController
   end
 
   def map
+  @regioni = ["Marche",                                     
+      "Lombardia",                                  
+      "Piemonte",                                   
+      "Liguria",                                    
+      "Sicilia",                                    
+      "Lazio",                                      
+      "Campania",                                   
+      "Basilicata",                                 
+      "Abruzzo",                                    
+      "Emilia-Romagna",                             
+      "Puglia",                                     
+      "Umbria",                                     
+      "Toscana",                                    
+      "Valle d'Aosta",                              
+      "Friuli-Venezia Giulia",
+      "Sardegna",
+      "Molise",
+      "Veneto",
+      "Calabria",
+      "Trentino-Alto Adige"]  
    @monuments = Monument.where(hidden: false)
-   @regioni = ["Marche",                                     
-    "Lombardia",                                  
-    "Piemonte",                                   
-    "Liguria",                                    
-    "Sicilia",                                    
-    "Lazio",                                      
-    "Campania",                                   
-    "Basilicata",                                 
-    "Abruzzo",                                    
-    "Emilia-Romagna",                             
-    "Puglia",                                     
-    "Umbria",                                     
-    "Toscana",                                    
-    "Valle d'Aosta",                              
-    "Friuli-Venezia Giulia",
-    "Sardegna",
-    "Molise",
-    "Veneto",
-    "Calabria",
-    "Trentino-Alto Adige"]
   end 
 
   def namesearch

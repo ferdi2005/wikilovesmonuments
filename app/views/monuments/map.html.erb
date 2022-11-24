@@ -27,7 +27,7 @@
         var <%= snake_case(reg) %> = L.markerClusterGroup();
     <% end %>
 
-    <%= render partial: "monument", collection: @monuments, cached: true %>
+    <%= render partial: "monument", collection: @monuments %>
     
     <% @regioni.each do |reg| %>
         map.addLayer(<%= snake_case(reg) %>);
