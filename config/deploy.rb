@@ -31,6 +31,8 @@ set :sidekiq_user, fetch(:user)
 set :sidekiq_service_unit_user, :system
 set :rvm_ruby_version, "3.1.2"
 
+set :nginx_template, "deploy/nginx.conf.erb"
+
 append :linked_files, ".env"
 append :linked_dirs, "log", "tmp/pids", "tmp/sockets", "tmp/cache", "public/uploads"
 

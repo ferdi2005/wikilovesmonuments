@@ -96,3 +96,5 @@ gem "groupdate"
 gem "sentry-raven"
 
 gem "skylight"
+
+gem 'actionpack-page_caching'

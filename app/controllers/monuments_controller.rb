@@ -3,6 +3,8 @@ class MonumentsController < ApplicationController
   include MonumentsHelper
   include Skylight::Helpers
 
+  caches_page :map
+
   def index
     if params[:latitude] && params[:longitude]
       if !params[:range].blank?
