@@ -35,7 +35,7 @@ set :rvm_ruby_version, "3.1.2"
 set :nginx_template, "deploy/nginx.conf.erb"
 
 append :linked_files, ".env"
-append :linked_dirs, "log", "tmp/pids", "tmp/sockets", "tmp/cache", "public/uploads"
+append :linked_dirs, "log", "tmp/pids", "tmp/sockets", "tmp/cache", "public/uploads", "public/cached_pages"
 
 namespace :rails do
     desc 'Open a rails console `cap [staging] rails:console [server_index default: 0]`'
