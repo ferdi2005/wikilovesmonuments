@@ -2,7 +2,7 @@ class CacheWarmJob < ApplicationJob
   queue_as :default
 
   def perform(*args)
-    expire_page controller: "monuments", action: "map"
+    MonumentsController.expire_page("map")
 
     MonumentsController.render("map")
   end
