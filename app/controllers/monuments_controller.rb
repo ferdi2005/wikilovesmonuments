@@ -1,6 +1,7 @@
 class MonumentsController < ApplicationController
   include Pagy::Backend
   include MonumentsHelper
+  include Skylight::Helpers
 
   def index
     if params[:latitude] && params[:longitude]
