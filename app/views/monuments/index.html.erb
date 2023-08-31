@@ -177,8 +177,6 @@ L.marker(<%= @geocenter.to_s %>, {icon: greenIcon}).bindPopup('Tu sei qui').addT
         <td>
         <% if !monument.image.nil? %>
           <%= image_tag "https://commons.wikimedia.org/w/thumb.php?f=#{monument.image}&w=200" , width: 200  %>
-        <% elsif Date.today.month == 9 %>
-          <%= link_to 'Scattane una tu e partecipa a WLM!', monument.uploadurl %>
         <% else %>
           <%= link_to 'Scattane una tu!', monument.nonwlmuploadurl %>
         <% end %>
