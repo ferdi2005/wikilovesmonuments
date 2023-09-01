@@ -37,7 +37,8 @@ class MonumentsController < ApplicationController
     end
     respond_to do |format|
       format.html
-      format.json { render json: [@monument_nopagy, @geocenter] }
+      # TODO: riattivare l'API terminato il phasing out dell'applicazione
+      # format.json { render json: [@monument_nopagy, @geocenter] }
     end
   end
 
