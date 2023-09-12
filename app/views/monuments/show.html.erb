@@ -4,7 +4,7 @@
 <div id="mapid" class="is-centered" style="height: 360px;"></div>
 <script>
     var mymap = L.map('mapid').setView([<%= @monument.latitude %> , <%= @monument.longitude %>], 18);
-L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/512/{z}/{x}/{y}@2x?access_token=<%= ENV['MAPBOX_KEY'] %>', {tileSize: 512, zoomOffset: -1,
+L.tileLayer('https://api.mapbox.com/styles/v1/ferdi2005/clawzhmr300e614ld6ep6e843/tiles/512/{z}/{x}/{y}@2x?access_token=<%= ENV['MAPBOX_KEY'] %>', {tileSize: 512, zoomOffset: -1,
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(mymap);
 

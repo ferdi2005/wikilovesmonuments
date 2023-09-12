@@ -8,6 +8,7 @@ require "capistrano/deploy"
 # bundle lock --add-platform x86_64-linux
 
 # Installare memcached
+# Inserire utf-8 come enconding in NGINX
 
 # Load the SCM plugin appropriate to your project:
 #
