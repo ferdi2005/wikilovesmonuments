@@ -5,40 +5,54 @@ class MonumentsController < ApplicationController
 
   caches_page :map
 
-  def index
+  def index    
     if params[:latitude] && params[:longitude]
       if !params[:range].blank?
         range = params[:range].to_i
       else
         range = 50
       end
-      @pagy, @monument = pagy(Monument.where(hidden: false).near([BigDecimal(params[:latitude]), BigDecimal(params[:longitude])], range, units: :km))
-      @monument_nopagy = Monument.where(hidden: false).near([BigDecimal(params[:latitude]), BigDecimal(params[:longitude])], range, units: :km)
+      @monument = Monument.where(hidden: false).near([BigDecimal(params[:latitude]), BigDecimal(params[:longitude])], range, units: :km)
+      @monument_nopagy = @monument
       @geocenter = [params[:latitude].to_f, params[:longitude].to_f]
     elsif params[:city]
-      @pagy, @monument = pagy(Monument.where(hidden: false).near("#{params[:city]}, IT"))
-      @monument_nopagy = Monument.where(hidden: false).near("#{params[:city]}, IT")
+      @monument = Monument.where(hidden: false).near("#{params[:city]}, IT")
+      @monument_nopagy = @monument
       result = Geocoder.search("#{params[:city]}, IT")
       @geocenter = result.try(:first).try(:coordinates)
     elsif params[:townid]
       town = Town.find_by(item: params[:townid])
       if town.latitude != nil && town.longitude != nil
-        @pagy, @monument = pagy(Monument.where(hidden: false).near(town))
-        @monument_nopagy = Monument.where(hidden: false).near(town)
+        @monument = Monument.where(hidden: false).near(town)
+        @monument_nopagy = @monument
         @geocenter = [town.latitude, town.longitude]
       else 
-        @pagy, @monument = pagy(Monument.where(hidden: false).near("#{town.search_name}, IT"))
-        @monument_nopagy = Monument.where(hidden: false).near("#{town.search_name}, IT")
+        @monument = Monument.where(hidden: false).near("#{town.search_name}, IT")
+        @monument_nopagy = @monument
         result = Geocoder.search("#{town.search_name}, IT")
         @geocenter = result.try(:first).try(:coordinates)
       end
     else
       @monument = []
     end
+
+      # Maintenance lists
+    if params[:maintenance] && !@monument.empty?
+      case params[:maintenance]
+      when "nowikidata"
+        @monument = @monument.where(image: nil, with_photos: true)
+      when "nocat"
+        @monument = @monument.where(commons: nil, with_photos: true)
+      when "nowikidata,nocat"
+        @monument = @monument.where(commons: nil, image: nil, with_photos: true)
+      end
+    end
+      
+    @pagy, @monument = pagy(@monument) unless @monument.empty?
+    
     respond_to do |format|
       format.html
-      # TODO: riattivare l'API terminato il phasing out dell'applicazione
-      # format.json { render json: [@monument_nopagy, @geocenter] }
+      format.json { render json: [@monument_nopagy, @geocenter] }
     end
   end
 

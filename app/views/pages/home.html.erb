@@ -2,7 +2,7 @@
 <h1 class="is-danger is-2 title is-centered">Wiki Loves Monuments Italia</h1>
 <h2 style="position:center;" class="is-link is-4 title is-centered">Ricerca monumenti</h1>
     <div class="buttons is-centered">
-        <form method="get" action="/monuments" id="form-position">
+        <form method="get" action="/monuments" id="form-position" class="form">
             <input type="hidden" id="latitude" name="latitude" />
             <input type="hidden" id="longitude" name="longitude" />
         </form>
@@ -89,7 +89,7 @@
             };
         }
     </script>
-    <form method="get" action="/monuments">
+    <form method="get" action="/monuments" class="form">
         <div class="field has-addons is-centered">
             <div class="control">
                 <input type="text" class="input" id="searchTextField" placeholder="Città" name="city" />
@@ -100,6 +100,26 @@
         </div>
         <br />
     </form>
+
+<script>
+$(".form").on("submit", function() {
+    var input = $("<input>").attr("type", "hidden").attr("name", "maintenance").val($("select[name='maintenance']").val());
+    $('.form').append($(input));
+});
+</script>
+
+<h3 class="is-title h3">Visualizzazioni di manutenzione</h3>
+<div class="control">
+  <div class="select">
+    <select name="maintenance">
+      <option value="">Nessun filtro di manutenzione</option>
+      <option value="nowikidata">Monumenti senza immagine su Wikidata</option>
+      <option value="nocat">Monumenti senza categoria su Wikimedia Commons</option>
+      <option value="nowikidata,nocat">Monumenti senza categoria su Wikimedia Commons né immagine su Wikidata</option>
+    </select>
+  </div>
+</div>
+    
     <!-- <% maps_api_key = ENV['GOOGLE_MAPS_API_KEY'] %>
 <script src='https://maps.googleapis.com/maps/api/js?key=<%= maps_api_key %>&libraries=places'></script>
 <script>
