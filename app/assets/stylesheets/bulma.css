@@ -14071,7 +14071,7 @@ has-background-white.is-hoverable:active {
   --bulma-background-l-delta: var(--bulma-active-background-l-delta);
 }
 
-.is-palette-white {
+/*.is-palette-white {
   --h: var(--bulma-white-h);
   --s: var(--bulma-white-s);
   --l: var(--bulma-white-l);
@@ -14118,7 +14118,7 @@ has-background-white.is-hoverable:active {
   --color-95: hsl(var(--h), var(--s), var(--95-l));
   --100-l: var(--bulma-white-100-l);
   --color-100: hsl(var(--h), var(--s), var(--100-l));
-}
+}*/
 
 [class*=is-color-black],
 [class*=has-text-black] {
@@ -14698,7 +14698,7 @@ has-background-black.is-hoverable:active {
   --bulma-background-l-delta: var(--bulma-active-background-l-delta);
 }
 
-.is-palette-black {
+/*.is-palette-black {
   --h: var(--bulma-black-h);
   --s: var(--bulma-black-s);
   --l: var(--bulma-black-l);
@@ -14745,7 +14745,7 @@ has-background-black.is-hoverable:active {
   --color-95: hsl(var(--h), var(--s), var(--95-l));
   --100-l: var(--bulma-black-100-l);
   --color-100: hsl(var(--h), var(--s), var(--100-l));
-}
+}*/
 
 [class*=is-color-light],
 [class*=has-text-light] {
@@ -15325,7 +15325,7 @@ has-background-light.is-hoverable:active {
   --bulma-background-l-delta: var(--bulma-active-background-l-delta);
 }
 
-.is-palette-light {
+/*.is-palette-light {
   --h: var(--bulma-light-h);
   --s: var(--bulma-light-s);
   --l: var(--bulma-light-l);
@@ -15372,7 +15372,7 @@ has-background-light.is-hoverable:active {
   --color-95: hsl(var(--h), var(--s), var(--95-l));
   --100-l: var(--bulma-light-100-l);
   --color-100: hsl(var(--h), var(--s), var(--100-l));
-}
+}*/
 
 [class*=is-color-dark],
 [class*=has-text-dark] {
@@ -15952,7 +15952,7 @@ has-background-dark.is-hoverable:active {
   --bulma-background-l-delta: var(--bulma-active-background-l-delta);
 }
 
-.is-palette-dark {
+/*.is-palette-dark {
   --h: var(--bulma-dark-h);
   --s: var(--bulma-dark-s);
   --l: var(--bulma-dark-l);
@@ -15999,7 +15999,7 @@ has-background-dark.is-hoverable:active {
   --color-95: hsl(var(--h), var(--s), var(--95-l));
   --100-l: var(--bulma-dark-100-l);
   --color-100: hsl(var(--h), var(--s), var(--100-l));
-}
+}*/
 
 [class*=is-color-text],
 [class*=has-text-text] {
@@ -16579,7 +16579,7 @@ has-background-text.is-hoverable:active {
   --bulma-background-l-delta: var(--bulma-active-background-l-delta);
 }
 
-.is-palette-text {
+/*.is-palette-text {
   --h: var(--bulma-text-h);
   --s: var(--bulma-text-s);
   --l: var(--bulma-text-l);
@@ -16626,7 +16626,7 @@ has-background-text.is-hoverable:active {
   --color-95: hsl(var(--h), var(--s), var(--95-l));
   --100-l: var(--bulma-text-100-l);
   --color-100: hsl(var(--h), var(--s), var(--100-l));
-}
+}*/
 
 [class*=is-color-primary],
 [class*=has-text-primary] {
@@ -17206,7 +17206,7 @@ has-background-primary.is-hoverable:active {
   --bulma-background-l-delta: var(--bulma-active-background-l-delta);
 }
 
-.is-palette-primary {
+/*.is-palette-primary {
   --h: var(--bulma-primary-h);
   --s: var(--bulma-primary-s);
   --l: var(--bulma-primary-l);
@@ -17253,7 +17253,7 @@ has-background-primary.is-hoverable:active {
   --color-95: hsl(var(--h), var(--s), var(--95-l));
   --100-l: var(--bulma-primary-100-l);
   --color-100: hsl(var(--h), var(--s), var(--100-l));
-}
+}*/
 
 [class*=is-color-link],
 [class*=has-text-link] {
@@ -17833,7 +17833,7 @@ has-background-link.is-hoverable:active {
   --bulma-background-l-delta: var(--bulma-active-background-l-delta);
 }
 
-.is-palette-link {
+/*.is-palette-link {
   --h: var(--bulma-link-h);
   --s: var(--bulma-link-s);
   --l: var(--bulma-link-l);
@@ -17880,7 +17880,7 @@ has-background-link.is-hoverable:active {
   --color-95: hsl(var(--h), var(--s), var(--95-l));
   --100-l: var(--bulma-link-100-l);
   --color-100: hsl(var(--h), var(--s), var(--100-l));
-}
+}*/
 
 [class*=is-color-info],
 [class*=has-text-info] {
@@ -18460,7 +18460,7 @@ has-background-info.is-hoverable:active {
   --bulma-background-l-delta: var(--bulma-active-background-l-delta);
 }
 
-.is-palette-info {
+/*.is-palette-info {
   --h: var(--bulma-info-h);
   --s: var(--bulma-info-s);
   --l: var(--bulma-info-l);
@@ -18507,7 +18507,7 @@ has-background-info.is-hoverable:active {
   --color-95: hsl(var(--h), var(--s), var(--95-l));
   --100-l: var(--bulma-info-100-l);
   --color-100: hsl(var(--h), var(--s), var(--100-l));
-}
+}*/
 
 [class*=is-color-success],
 [class*=has-text-success] {
@@ -19087,7 +19087,7 @@ has-background-success.is-hoverable:active {
   --bulma-background-l-delta: var(--bulma-active-background-l-delta);
 }
 
-.is-palette-success {
+/*.is-palette-success {
   --h: var(--bulma-success-h);
   --s: var(--bulma-success-s);
   --l: var(--bulma-success-l);
@@ -19134,7 +19134,7 @@ has-background-success.is-hoverable:active {
   --color-95: hsl(var(--h), var(--s), var(--95-l));
   --100-l: var(--bulma-success-100-l);
   --color-100: hsl(var(--h), var(--s), var(--100-l));
-}
+}*/
 
 [class*=is-color-warning],
 [class*=has-text-warning] {
@@ -19714,7 +19714,7 @@ has-background-warning.is-hoverable:active {
   --bulma-background-l-delta: var(--bulma-active-background-l-delta);
 }
 
-.is-palette-warning {
+/*.is-palette-warning {
   --h: var(--bulma-warning-h);
   --s: var(--bulma-warning-s);
   --l: var(--bulma-warning-l);
@@ -19761,7 +19761,7 @@ has-background-warning.is-hoverable:active {
   --color-95: hsl(var(--h), var(--s), var(--95-l));
   --100-l: var(--bulma-warning-100-l);
   --color-100: hsl(var(--h), var(--s), var(--100-l));
-}
+}*/
 
 [class*=is-color-danger],
 [class*=has-text-danger] {
@@ -20341,7 +20341,7 @@ has-background-danger.is-hoverable:active {
   --bulma-background-l-delta: var(--bulma-active-background-l-delta);
 }
 
-.is-palette-danger {
+/*.is-palette-danger {
   --h: var(--bulma-danger-h);
   --s: var(--bulma-danger-s);
   --l: var(--bulma-danger-l);
@@ -20388,7 +20388,7 @@ has-background-danger.is-hoverable:active {
   --color-95: hsl(var(--h), var(--s), var(--95-l));
   --100-l: var(--bulma-danger-100-l);
   --color-100: hsl(var(--h), var(--s), var(--100-l));
-}
+}*/
 
 .is-color-black-bis,
 .has-text-black-bis {
