@@ -13,7 +13,7 @@ class ImportTownsJob < ApplicationJob
 
   def perform(*args)
     endpoint = "https://query.wikidata.org/sparql"
-    sparql = 'SELECT ?item ?itemLabel ?townLabel ?coords WHERE {
+    sparql = 'SELECT ?item ?itemLabel ?townLabel ?commons ?coords WHERE {
       { ?item wdt:P31 wd:Q747074. }
       UNION
       { ?item wdt:P31 wd:Q954172. }
@@ -21,10 +21,11 @@ class ImportTownsJob < ApplicationJob
       { ?item wdt:P31 wd:Q1134686. }
 
       ?item wdt:P131 ?town .
+      OPTIONAL {?item wdt:P373 ?commons .}
       OPTIONAL {?item wdt:P625 ?coords. }
       SERVICE wikibase:label { bd:serviceParam wikibase:language "it". }
     }'
-    
+
     retcount = 0
     begin
       client = SPARQL::Client.new(endpoint, method: :get, headers: { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.5 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1' })
@@ -50,7 +51,7 @@ class ImportTownsJob < ApplicationJob
       OPTIONAL {?item wdt:P625 ?coords. }
       SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
     }'
-    
+
     retcount = 0
     begin
       english_towns = client.query(english_sparql)
@@ -66,7 +67,7 @@ class ImportTownsJob < ApplicationJob
 
     Town.delete_all
     ActiveRecord::Base.connection.reset_pk_sequence!(Town.table_name)
-    
+
     towns.each do |town|
       latlongarray = normalize_value(town[:coords]).try(:split, '(').try(:[], 1).try(:split, ')').try(:[], 0).try(:split, ' ')
       unless latlongarray.nil?
@@ -78,7 +79,7 @@ class ImportTownsJob < ApplicationJob
         latitude = nil
         longitude = nil
       end
-      
+
       if town[:townLabel].to_s.strip == ""
         disambiguation = nil
         visible_name = town[:itemLabel].to_s.strip
@@ -91,6 +92,8 @@ class ImportTownsJob < ApplicationJob
 
       item = town[:item].to_s.split('/')[4]
 
+      commons = normalize_value(town[:commons])
+
       english_town = english_towns.find { |t| t[:item].to_s.split('/')[4] == item && t[:itemLabel] != item }
 
       if english_town.nil?
@@ -102,7 +105,7 @@ class ImportTownsJob < ApplicationJob
         english_name = "#{english_town[:itemLabel].to_s.strip} (#{english_disambiguation.to_s.strip})"
       end
 
-      Town.create(item: item, name: town[:itemLabel].to_s.strip, disambiguation: disambiguation, visible_name: visible_name, search_name: search_name, latitude: latitude, longitude: longitude, english_name: english_name)
+      Town.create(item: item, name: town[:itemLabel].to_s.strip, disambiguation: disambiguation, visible_name: visible_name, search_name: search_name, latitude: latitude, longitude: longitude, english_name: english_name, commons: commons)
     end
   end
 end

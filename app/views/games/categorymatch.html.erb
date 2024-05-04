@@ -1,2 +1,65 @@
-<h1>Games#categorymatch</h1>
-<p>Find me in app/views/games/categorymatch.html.erb</p>
+<% provide(:title, "Image matcher") %>
+<h1 class="title is-1">Monumento senza categoria: <%= link_to @monument.item, "https://wikidata.org/wiki/#{@monument.item}" %> <%= @monument.itemlabel %> (<%= @monument.city %>, <%= @monument.regione %>)</h1>
+<h2 class="subtitle"><%= @monument.itemdescription %></h2>
+
+<% unless @categories.empty? %>
+<p>Esistono già le seguenti categorie con titolo simile, per un totale di <%= @totalhits %></p>
+    <ul>
+        <% @categories.each do |category| %>
+            <li><%= link_to category["title"], "https://commons.wikimedia.org/wiki/#{category["title"]}" %></li>
+        <% end %>
+    </ul>
+<% end %>
+<%= form_with scope: :monument, method: :post, id: :categorymatch_form, url: games_categorymatch_path do |f| %>
+    <%= f.hidden_field :id, value: @monument.id %>
+    <div class="field">
+        <%= f.label :title, "Titolo della categoria", class: "label" %>
+        <%= f.text_field :title, class: "input", value: @title %>
+    </div>
+
+     <div class="field">
+        <label class="label">Categoria in cui verrà inserita la categoria <%= link_to "(verificare la presenza di una categoria specifica)", "https://commons.wikimedia.org/wiki/#{@father}"%></label>
+        <%= f.text_field :father, class: "input", value: @father %>
+    </div>
+    
+    <level class="level"><label class="label">Seleziona le immagini da inserire nella categoria del monumento</label><button class="is-button is-small is-primary" id="select-all">Seleziona tutto</button></level>
+
+<div class="grid is-col-min-8"> 
+    <% @images.each do |image|%>
+        <div height="20%" class="cell">
+            <%= f.check_box image["title"], style: "vertical-align: top;", id: "#{image["pageid"]}-button", class: "checkbox-image"%>
+            <img id="<%= image["pageid"] %>" src="https://commons.wikimedia.org/w/thumb.php?f=<%= CGI.escape(image["title"].gsub("File:", "")) %>&w=500" />
+            <script>
+                $("#<%= image["pageid"] %>").click(function(){
+                    $("#<%= image["pageid"] %>-button").prop("checked", !$("#<%= image["pageid"] %>-button").prop("checked"));
+                });
+            </script>
+        </div>
+    <% end %>
+</div>
+<div class="buttons">
+    <%= f.submit "Crea categoria", class: "button is-primary" %>
+    <%= link_to "Salta", "#", class: "button is-info" %>
+</div>
+<% end %>
+<script>
+    monuments = JSON.parse("<%== @categories.to_json %>");
+
+    function check_mon(element){
+        element.title == $("#monument_title").value();
+    }
+
+    $("#categorymatch_form").on("submit", function(e){
+    if (monuments.some(check_mon)){
+        e.preventDefault();
+        alert("La categoria ha lo stesso nome di una di quelle già esistenti.");
+    }
+    });
+</script>
+
+<script>
+    $("#select-all").click(function(){
+        $(".checkbox-image").prop("checked", !$(".checkbox-image").prop("checked"));
+    });
+</script>
+<p>Ne mancano ancora <%= @count %> (<%= ((@count.to_f / Monument.count.to_f) * 100).truncate(2)%>%)</p>

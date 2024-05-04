@@ -7,11 +7,11 @@
 <div class="grid is-col-min-8">    
     <% @images.each do |image|%>
         <div height="20%" class="cell">
-            <%= f.radio_button :image, image["title"], style: "vertical-align: top;", id: "#{image["title"].parameterize}-button"%>
-            <img id="<%= image["title"].parameterize %>" src="https://commons.wikimedia.org/w/thumb.php?f=<%= CGI.escape(image["title"].gsub("File:", "")) %>&w=500" />
+            <%= f.radio_button :image, image["title"], style: "vertical-align: top;", id: "#{image["pageid"]}-button"%>
+            <img id="<%= image["pageid"] %>" src="https://commons.wikimedia.org/w/thumb.php?f=<%= CGI.escape(image["title"].gsub("File:", "")) %>&w=500" />
             <script>
-                $("#<%= image["title"].parameterize %>").click(function(){
-                    $("#<%= image["title"].parameterize %>-button").prop("checked", true);
+                $("#<%= image["pageid"] %>").click(function(){
+                    $("#<%= image["pageid"] %>-button").prop("checked", true);
                 });
             </script>
         </div>

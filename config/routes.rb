@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   get 'games/categorymatch'
   get 'games/articlematch'
   post 'games/imagematch', to: 'games#imagematch_save'
+  post 'games/categorymatch', to: 'games#categorymatch_save'
 
   get "start_login", to: 'authentication#start'
   get 'success', to: "authentication#success"
