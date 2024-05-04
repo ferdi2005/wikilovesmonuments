@@ -5,7 +5,7 @@ class MonumentsController < ApplicationController
 
   caches_page :map
 
-  def index    
+  def index
     if params[:latitude] && params[:longitude]
       if !params[:range].blank?
         range = params[:range].to_i
@@ -26,7 +26,7 @@ class MonumentsController < ApplicationController
         @monument = Monument.where(hidden: false).near(town)
         @monument_nopagy = @monument
         @geocenter = [town.latitude, town.longitude]
-      else 
+      else
         @monument = Monument.where(hidden: false).near("#{town.search_name}, IT")
         @monument_nopagy = @monument
         result = Geocoder.search("#{town.search_name}, IT")
@@ -40,16 +40,16 @@ class MonumentsController < ApplicationController
     if params[:maintenance] && !@monument.empty?
       case params[:maintenance]
       when "nowikidata"
-        @monument = @monument.where(image: nil, with_photos: true)
+        @monument = @monument.where(image: nil, photos_count: 1..)
       when "nocat"
-        @monument = @monument.where(commons: nil, with_photos: true)
+        @monument = @monument.where(commons: nil, photos_count: 1..)
       when "nowikidata,nocat"
-        @monument = @monument.where(commons: nil, image: nil, with_photos: true)
+        @monument = @monument.where(commons: nil, image: nil, photos_count: 1..)
       end
     end
-      
+
     @pagy, @monument = pagy(@monument) unless @monument.empty?
-    
+
     respond_to do |format|
       format.html
       format.json { render json: [@monument_nopagy, @geocenter] }
@@ -81,7 +81,7 @@ class MonumentsController < ApplicationController
     end
   end
 
-  
+
   def address
     @monument = Monument.find(params[:id])
     result = Geocoder.search([@monument.latitude, @monument.longitude]).try(:first).try(:address)
@@ -95,35 +95,35 @@ class MonumentsController < ApplicationController
   end
 
   def map
-  @regioni = ["Marche",                                     
-      "Lombardia",                                  
-      "Piemonte",                                   
-      "Liguria",                                    
-      "Sicilia",                                    
-      "Lazio",                                      
-      "Campania",                                   
-      "Basilicata",                                 
-      "Abruzzo",                                    
-      "Emilia-Romagna",                             
-      "Puglia",                                     
-      "Umbria",                                     
-      "Toscana",                                    
-      "Valle d'Aosta",                              
+  @regioni = ["Marche",
+      "Lombardia",
+      "Piemonte",
+      "Liguria",
+      "Sicilia",
+      "Lazio",
+      "Campania",
+      "Basilicata",
+      "Abruzzo",
+      "Emilia-Romagna",
+      "Puglia",
+      "Umbria",
+      "Toscana",
+      "Valle d'Aosta",
       "Friuli-Venezia Giulia",
       "Sardegna",
       "Molise",
       "Veneto",
       "Calabria",
-      "Trentino-Alto Adige"]  
+      "Trentino-Alto Adige"]
    @monuments = Monument.where(hidden: false)
-  end 
+  end
 
   def namesearch
     @monuments = Monument.search(params[:search].strip)
     respond_to do |format|
       if params[:lat].blank? || params[:lon].blank?
         format.json { render json: @monuments }
-      else 
+      else
         format.json { render json: @monuments.as_json.map {|mon| mon.merge!({"distance": Monument.find(mon["id"]).distance_to([params[:lat], params[:lon]])})} }
       end
     end
