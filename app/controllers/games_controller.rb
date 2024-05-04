@@ -24,7 +24,7 @@ class GamesController < ApplicationController
       #client = MediawikiApi::Client.new "https://www.wikidata.org/w/api.php"
       #client.oauth_access_token(session[:access_token])
 
-      @token = OAuth::AccessToken.new($oauth_consumer)
+      @token = OAuth::AccessToken.new($wikidata_oauth_consumer)
       @token.secret = session[:secret]
       @token.token = session[:token]
 
