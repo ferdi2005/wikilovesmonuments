@@ -22,7 +22,7 @@
         <%= f.text_field :father, class: "input", value: @father %>
     </div>
     
-    <level class="level"><label class="label">Seleziona le immagini da inserire nella categoria del monumento</label><button class="is-button is-small is-primary" id="select-all">Seleziona tutto</button></level>
+    <level class="level"><label class="label">Seleziona le immagini da inserire nella categoria del monumento</label><div class="button is-small is-primary" id="select-all">Seleziona/Deseleziona tutto</div></level>
 
 <div class="grid is-col-min-8"> 
     <% @images.each do |image|%>
@@ -43,13 +43,13 @@
 </div>
 <% end %>
 <script>
-    monuments = JSON.parse("<%== @categories.to_json %>");
+    monuments = <%== @categories.to_json %>;
 
     function check_mon(element){
-        element.title == $("#monument_title").value();
+        return element.title == $("#monument_title").val();
     }
 
-    $("#categorymatch_form").on("submit", function(e){
+    $("#categorymatch_form").submit(function(e){
     if (monuments.some(check_mon)){
         e.preventDefault();
         alert("La categoria ha lo stesso nome di una di quelle già esistenti.");

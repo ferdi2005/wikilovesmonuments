@@ -187,7 +187,6 @@ class GamesController < ApplicationController
           }
 
           @photo_response = JSON.parse(@commons.post("/w/api.php", photo_body).body)
-          logger.info @photo_response
         end
 
         @wikidata = OAuth::AccessToken.new($wikidata_oauth_consumer)
@@ -243,7 +242,6 @@ class GamesController < ApplicationController
           errors.push("Impossibile aggiornare l'item wikidata per #{monument.item}con la categoria #{params[:monument][:title]}")
         else
           @wikidata_response = JSON.parse(@wikidata.post("/w/api.php", wikidata_body).body)
-          logger.info @wikidata_response
 
           if @wikidata_response["success"]
             monument.update(commons: params[:monument][:title].gsub("Category:", ""))
