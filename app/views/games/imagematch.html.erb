@@ -23,4 +23,4 @@
 </div>
 <% end %>
 
-<p>Ne mancano ancora <%= @count %> (<%= ((@count.to_f / Monument.count.to_f) * 100).truncate(2)%>)</p>
+<p>Ne mancano ancora <%= @count %> (<%= ((@count.to_f / Monument.count.to_f) * 100).truncate(2)%>%)</p>
