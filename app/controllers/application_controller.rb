@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
     before_action :set_raven_context
+    include AuthenticationHelper
 end
 private
 def set_raven_context

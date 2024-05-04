@@ -1,6 +1,16 @@
 require 'sidekiq/web'
 require 'sidekiq/cron/web'
 Rails.application.routes.draw do
+  get 'games/imagematch'
+  get 'games/categorymatch'
+  get 'games/articlematch'
+  post 'games/imagematch', to: 'games#imagematch_save'
+
+  get "start_login", to: 'authentication#start'
+  get 'success', to: "authentication#success"
+  get 'auth/failure', to: "authentication#failure"
+  get "auth/mediawiki/callback", to: "authentication#process_data"
+
   get 'towns/search'
   get 'import/do'
   root 'pages#home'
@@ -8,7 +18,7 @@ Rails.application.routes.draw do
   get 'import', to: 'import#do'
   post 'import', to: 'import#import'
   get 'map', to: 'monuments#map'
-  
+
   get 'monuments', to: 'monuments#index'
   get 'address', to: 'monuments#address'
   get 'show', to: 'monuments#show'
@@ -26,7 +36,7 @@ Rails.application.routes.draw do
 
     get 'nophoto', to: 'numerics#nophoto'
     get 'nophotograph', to: 'numerics#nophotograph'
-  
+
     # concorsi-locali stat
     get 'allregionscount', to: 'numerics#allregionscount'
     get 'allregionsdifference', to: 'numerics#allregionsdifference'

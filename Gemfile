@@ -98,3 +98,9 @@ gem "sentry-raven"
 gem "skylight"
 
 gem 'actionpack-page_caching'
+
+gem 'mediawiki_api', github: "ferdi2005/mediawiki-ruby-api"
+
+gem "oauth", "~> 0.5.6"
+
+gem "multipart-post", "~> 2.1"
