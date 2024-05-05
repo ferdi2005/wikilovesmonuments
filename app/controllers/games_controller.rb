@@ -147,8 +147,7 @@ class GamesController < ApplicationController
           format: "json",
         }
 
-
-        #@commons_response = JSON.parse(@commons.post("/w/api.php", commons_body).body)
+        @commons_response = JSON.parse(@commons.post("/w/api.php", commons_body).body)
 
         if @commons_response["edit"]["result"]
           messages.push("Categoria #{params[:monument][:title]} creata.")
