@@ -156,4 +156,10 @@ class MonumentsController < ApplicationController
   def doppioni
     @monuments = Monument.where(duplicate: true)
   end
+
+  def nophoto_endpoint
+    respond_to do |format|
+      format.json { render :json => Monument.where(photos_count: 0).pluck(:item, :wlmid)}
+    end
+  end
 end

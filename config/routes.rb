@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   post 'games/imagematch', to: 'games#imagematch_save'
   post 'games/categorymatch', to: 'games#categorymatch_save'
 
+  get 'monuments/nophoto_endpoint'
+
   get "start_login", to: 'authentication#start'
   get 'success', to: "authentication#success"
   get 'auth/failure', to: "authentication#failure"
