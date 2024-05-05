@@ -82,7 +82,7 @@ class GamesController < ApplicationController
     search = '"' + @monument.wlmid + '"'
     commons = MediawikiApi::Client.new "https://commons.wikimedia.org/w/api.php"
     @images = commons.query(:list => :search, :srsearch => search, :srwhat => :text, :srnamespace => 6, :srlimit => :max).data["search"]
-    categories_query = commons.query(:list => :search, :srsearch => "intitle:#{@monument.itemlabel}", :srwhat => :text, :srnamespace => 14, :srlimit => :max).data
+    categories_query = commons.query(:list => :search, :srsearch => @monument.itemlabel, :srwhat => :text, :srnamespace => 14, :srlimit => :max).data
     @categories = categories_query["search"]
     @totalhits = categories_query["searchinfo"]["totalhits"]
     @father = "Category:#{Town.find_by(item: @monument.city_item).commons}"
