@@ -59,7 +59,7 @@ class GamesController < ApplicationController
         flash[:success] = "Immagine aggiunta con successo"
       else
         flash[:error] = "Errore nel salvataggio dell'immagine #{@response.to_s.truncate(400)}"
-        Sentry.capture_exception(@response.to_s)
+        Raven.capture_exception(@response.to_s)
       end
       redirect_to games_imagematch_path
     else
@@ -260,7 +260,7 @@ class GamesController < ApplicationController
       end
 
     rescue => e
-      Sentry.capture_exception(e)
+      Raven.capture_exception(e)
       flash[:error] = e.truncate(400)
       redirect_to games_categorymatch_path
     end
