@@ -18,9 +18,18 @@
     <% end %>
 </div>
 <div class="buttons">
-    <%= f.submit "Aggiungi immagine", class: "button is-primary" %>
+    <%= f.submit "Aggiungi immagine", class: "button is-primary", id: "submit" %>
     <%= link_to "Salta", "#", class: "button is-info" %>
 </div>
 <% end %>
+
+<script>
+    $("#submit").click(function(e){
+        if ($("input[type='radio']:checked").length == 0){
+            e.preventDefault();
+            alert("Seleziona un'immagine prima di proseguire");
+        }
+    });
+</script>
 
 <p>Ne mancano ancora <%= @count %> (<%= ((@count.to_f / Monument.count.to_f) * 100).truncate(2)%>%)</p>

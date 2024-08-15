@@ -18,6 +18,11 @@ class GamesController < ApplicationController
       redirect_to start_login_path and return
     end
 
+    if params[:monument][:image].blank?
+      flash[:error] = "Seleziona un'immagine prima di proseguire"
+      redirect_to games_imagematch_path and return
+    end
+
     commons = MediawikiApi::Client.new "https://commons.wikimedia.org/w/api.php"
     if (monument = Monument.find(params[:monument][:id]) and monument.image.nil?)
 
