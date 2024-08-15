@@ -12,6 +12,7 @@
 
 ActiveRecord::Schema[7.0].define(version: 2024_05_04_134529) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_trgm"
   enable_extension "plpgsql"
 
   create_table "monuments", force: :cascade do |t|
@@ -54,8 +55,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_04_134529) do
     t.decimal "presumed_maxlon"
     t.decimal "presumed_minlon"
     t.index ["item"], name: "index_monuments_on_item", unique: true
-    t.index ["itemdescription"], name: "index_monuments_on_itemdescription"
-    t.index ["itemlabel"], name: "index_monuments_on_itemlabel"
+    t.index ["itemdescription"], name: "index_monuments_on_itemdescription", opclass: :gin_trgm_ops, using: :gin
+    t.index ["itemlabel"], name: "index_monuments_on_itemlabel", opclass: :gin_trgm_ops, using: :gin
   end
 
   create_table "nophotos", force: :cascade do |t|

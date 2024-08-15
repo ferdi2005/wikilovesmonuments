@@ -22,6 +22,8 @@ class AuthenticationController < ApplicationController
       hash = { oauth_token: session["oauth_session"], oauth_token_secret: session["oauth_secret"]}
       request_token = OAuth::RequestToken.from_hash($oauth_consumer, hash)
       access_token = request_token.get_access_token(oauth_verifier: params[:oauth_verifier])
+      session.delete("oauth_session")
+      session.delete("oauth_secret")
       session[:token] = access_token.token
       session[:secret] = access_token.secret
 
