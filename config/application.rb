@@ -25,8 +25,6 @@ module Wikilovesmonuments
       config.sanitize_fields = Rails.application.config.filter_parameters.map(&:to_s)
     end
     
-    config.session_store :active_record_store, :key => '_wlm_session'
-    
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading

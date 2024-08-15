@@ -58,7 +58,8 @@ class GamesController < ApplicationController
         monument.update(image: params[:monument][:image].gsub("File:", ""))
         flash[:success] = "Immagine aggiunta con successo"
       else
-        flash[:error] = "Errore nel salvataggio dell'immagine #{@response}"
+        flash[:error] = "Errore nel salvataggio dell'immagine #{@response.truncate(400)}"
+        Sentry.capture_exception(@response)
       end
       redirect_to games_imagematch_path
     else
@@ -259,7 +260,8 @@ class GamesController < ApplicationController
       end
 
     rescue => e
-      flash[:error] = e
+      Sentry.capture_exception(e)
+      flash[:error] = e.truncate(400)
       redirect_to games_categorymatch_path
     end
   end
