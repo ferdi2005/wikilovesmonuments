@@ -21,9 +21,11 @@ module Wikilovesmonuments
     config.filter_parameters << :longitude
     
     Raven.configure do |config|
-      config.dsn = 'https://f2dadc33d45c40b49b46a264cfaa07f1:0738ea171dd54f37a6035b96cc6bc80e@o82964.ingest.sentry.io/5391912'
+      config.dsn = ENV["DSN"]
       config.sanitize_fields = Rails.application.config.filter_parameters.map(&:to_s)
     end
+    
+    config.session_store :active_record_store, :key => '_wlm_session'
     
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
