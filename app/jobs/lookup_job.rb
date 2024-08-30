@@ -8,7 +8,7 @@ class LookupJob < ApplicationJob
 
       thread_pool = Concurrent::FixedThreadPool.new(10)
 
-      Monument.find_each(start: 1200, finish: 1300) do |monument|
+      Monument.find_each do |monument|
         thread_pool.post do
           search = '"' + monument.wlmid + '"'
           retimes = 0
