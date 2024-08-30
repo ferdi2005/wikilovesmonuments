@@ -12,16 +12,55 @@ class ImportJob < ApplicationJob
   end
 
   def perform
-    endpoint = 'https://query.wikidata.org/sparql'
+    # Hash che associa i QID delle regioni italiane ai nomi delle regioni
+      regioni = {
+        "Q1284" => "Abruzzo",
+        "Q1452" => "Basilicata",
+        "Q1458" => "Calabria",
+        "Q1438" => "Campania",
+        "Q1263" => "Emilia-Romagna",
+        "Q1250" => "Friuli-Venezia Giulia",
+        "Q1282" => "Lazio",
+        "Q1256" => "Liguria",
+        "Q1210" => "Lombardia",
+        "Q1279" => "Marche",
+        "Q1443" => "Molise",
+        "Q1216" => "Piemonte",
+        "Q1447" => "Puglia",
+        "Q1462" => "Sardegna",
+        "Q1460" => "Sicilia",
+        "Q1273" => "Toscana",
+        "Q1237" => "Trentino-Alto Adige",
+        "Q1280" => "Umbria",
+        "Q1222" => "Valle d'Aosta",
+        "Q1243" => "Veneto"
+      }
+
+    endpoint = 'https://qlever.cs.uni-freiburg.de/api/wikidata'
     # Query di Lorenzo Losa
-    sparql = 'SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regioneLabel ?enddate ?unit ?unitLabel ?address ?approvedby ?year ?instanceof
+    sparql = <<QUERY
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX schema: <http://schema.org/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX pqv: <http://www.wikidata.org/prop/qualifier/value/>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regione ?enddate ?unit ?unitLabel ?address ?approvedby ?year ?instanceof
     WHERE {
       ?item p:P2186 ?wlmst .
       ?wlmst ps:P2186 ?wlmid .
+      
       OPTIONAL { ?wlmst pq:P790 ?approvedby . }
 
       ?item wdt:P17 wd:Q38 . 
       ?item wdt:P131 ?unit .
+       
       
       MINUS {?item wdt:P31 wd:Q747074.}
       MINUS {?item wdt:P31 wd:Q954172.}
@@ -40,23 +79,15 @@ class ImportJob < ApplicationJob
       ?item wdt:P131* ?regione.
       ?regione wdt:P31 ?typeRegion.
 
-      # esclude i monumenti che hanno una data di inizio successiva al termine del concorso
-      MINUS {
-        ?wlmst pqv:P580 [ wikibase:timeValue ?start ; wikibase:timePrecision ?sprec ] .
-        FILTER (
-          # precisione 9 è anno
-          ( ?sprec >  9 && ?start >= "' + Date.today.year.to_s + '-10-01T00:00:00+00:00"^^xsd:dateTime ) ||
-          ( ?sprec < 10 && ?start >= "' + (Date.today.year + 1).to_s + '-01-01T00:00:00+00:00"^^xsd:dateTime )
-        )
+           ?unit rdfs:label ?unitLabel FILTER (LANG(?unitLabel) = "it")
+		   ?item rdfs:label ?itemLabel FILTER (LANG(?itemLabel) = "it")
+		  OPTIONAL { ?item schema:description ?itemDescription FILTER (LANG(?itemDescription) = "it") }
       }
-      
-      SERVICE wikibase:label { bd:serviceParam wikibase:language "it" }
-      }'
+QUERY
 
     retcount = 0
     begin
-      client = SPARQL::Client.new(endpoint, method: :get, headers: { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.5 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1' })
-      monuments = client.query(sparql)
+      monuments = HTTParty.post("https://qlever.cs.uni-freiburg.de/api/wikidata", body: { query: sparql })
     rescue => e
       retcount += 1
       if retcount < 5
@@ -66,6 +97,8 @@ class ImportJob < ApplicationJob
         return
       end
     end
+
+    g6
 
     monuments_to_be_saved = []
     monuments.uniq.each do |monument|
@@ -96,7 +129,7 @@ class ImportJob < ApplicationJob
 
       mon[:wikipedia] = normalize_value(monument[:sitelink])
 
-      mon[:regione] = normalize_value(monument[:regioneLabel])
+      mon[:regione] = regioni[normalize_value(monument[:regione])]
 
       mon[:enddate] = normalize_value(monument[:enddate])
 
