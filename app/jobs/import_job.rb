@@ -55,17 +55,17 @@ SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelin
     WHERE {
       ?item p:P2186 ?wlmst .
       ?wlmst ps:P2186 ?wlmid .
-      
+
       OPTIONAL { ?wlmst pq:P790 ?approvedby . }
 
-      ?item wdt:P17 wd:Q38 . 
+      ?item wdt:P17 wd:Q38 .
       ?item wdt:P131 ?unit .
-       
-      
+
+
       MINUS {?item wdt:P31 wd:Q747074.}
       MINUS {?item wdt:P31 wd:Q954172.}
       MINUS {?item wdt:P31 wd:Q1549591.}
-      
+
       OPTIONAL {?item wdt:P31 ?instanceof }
       OPTIONAL {?item wdt:P625 ?coords. }
       OPTIONAL { ?wlmst pqv:P582 [ wikibase:timeValue ?enddate ] .}
@@ -87,7 +87,8 @@ QUERY
 
     retcount = 0
     begin
-      monuments = HTTParty.post("https://qlever.cs.uni-freiburg.de/api/wikidata", body: { query: sparql })
+      monuments_request = HTTParty.post("https://qlever.cs.uni-freiburg.de/api/wikidata", body: { query: sparql })
+      monuments = monuments_request["results"]["bindings"]
     rescue => e
       retcount += 1
       if retcount < 5
@@ -104,11 +105,11 @@ QUERY
     monuments.uniq.each do |monument|
       mon = {}
 
-      mon[:item] = normalize_value(monument[:item]).split('/')[4]
+      mon[:item] = normalize_value(monument["item"]["value"]).split('/')[4]
 
-      mon[:wlmid] = normalize_value(monument[:wlmid])
+      mon[:wlmid] = normalize_value(monument["wlmid"]["value"])
 
-      latlongarray = normalize_value(monument[:coords]).try(:split, '(').try(:[], 1).try(:split, ')').try(:[], 0).try(:split, ' ')
+      latlongarray = normalize_value(monument["coords"]["value"]).try(:split, '(').try(:[], 1).try(:split, ')').try(:[], 0).try(:split, ' ')
       unless latlongarray.nil?
         lat = latlongarray[1]
         long = latlongarray[0]
@@ -119,37 +120,37 @@ QUERY
         mon[:longitude] = nil
       end
 
-      mon[:itemlabel] = normalize_value(monument[:itemLabel])
+      mon[:itemlabel] = normalize_value(monument["itemLabel"]["value"])
 
-      mon[:image] = normalize_value(monument[:image]).try(:split, 'Special:FilePath/').try(:[], 1)
+      mon[:image] = normalize_value(monument["image"]["value"]).try(:split, 'Special:FilePath/').try(:[], 1)
 
-      mon[:commons] = normalize_value(monument[:commons])
+      mon[:commons] = normalize_value(monument["commons"]["value"])
 
-      mon[:itemdescription] = normalize_value(monument[:itemDescription])
+      mon[:itemdescription] = normalize_value(monument["itemDescription"]["value"])
 
-      mon[:wikipedia] = normalize_value(monument[:sitelink])
+      mon[:wikipedia] = normalize_value(monument["sitelink"]["value"])
 
-      mon[:regione] = regioni[normalize_value(monument[:regione])]
+      mon[:regione] = regioni[normalize_value(monument["regione"]["value"]).split('/')[4]]
 
-      mon[:enddate] = normalize_value(monument[:enddate])
+      mon[:enddate] = normalize_value(monument["enddate"]["value"])
 
-      mon[:year] = normalize_value(monument[:year])
+      mon[:year] = normalize_value(monument["year"]["value"])
 
-      mon[:city_item] = normalize_value(monument[:unit]).split('/')[4]
+      mon[:city_item] = normalize_value(monument["unit"]["value"]).split('/')[4]
 
-      mon[:city] = normalize_value(monument[:unitLabel])
+      mon[:city] = normalize_value(monument["unitLabel"]["value"])
 
-      mon[:address] = normalize_value(monument[:address])
+      mon[:address] = normalize_value(monument["address"]["value"])
 
-      mon[:allphotos] = 'https://commons.wikimedia.org/w/index.php?search="' + normalize_value(monument[:wlmid]) + + '"'
+      mon[:allphotos] = 'https://commons.wikimedia.org/w/index.php?search="' + normalize_value(monument["wlmid"]["value"]) + + '"'
 
-      if normalize_value(monument[:instanceof]) == "http://www.wikidata.org/entity/Q811534"
+      if normalize_value(monument["instanceof"]["value"]) == "http://www.wikidata.org/entity/Q811534"
         mon[:tree] = true
       else
         mon[:tree] = false
       end
 
-      if normalize_value(monument[:approvedby]) == "http://www.wikidata.org/entity/Q85864317"
+      if normalize_value(monument["approvedby"]["value"]) == "http://www.wikidata.org/entity/Q85864317"
         mon[:is_castle] = true
       else
         mon[:is_castle] = false
@@ -177,7 +178,7 @@ QUERY
       unless mon[:enddate].nil?
         if mon[:enddate].to_datetime < Date.today
           mon[:noupload] = true
-        else 
+        else
           mon[:noupload] = false
         end
       end
@@ -199,7 +200,7 @@ QUERY
     items_to_be_deleted = Monument.pluck(:item).uniq - monuments_to_be_saved.pluck(:item).uniq
 
     items_to_be_deleted.each { |item| Monument.find_by(item: item).destroy }
-    
+
     # Aggiorna la cache
     CacheWarmJob.perform_later
   end
