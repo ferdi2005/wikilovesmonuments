@@ -104,3 +104,4 @@ gem 'mediawiki_api', github: "ferdi2005/mediawiki-ruby-api"
 gem "oauth", "~> 0.5.6"
 
 gem "multipart-post", "~> 2.1"
+gem "concurrent-ruby", "~> 1.1"

@@ -89,8 +89,11 @@ class NumericsController < ApplicationController
     end
 
     def allregionsdifference
-        date = Date.today
-        nophoto = Nophoto.where(created_at: date.midnight...date.end_of_day)
+        if Nophoto.where(created_at: Date.today.midnight...Date.today.end_of_day).empty?
+            nophoto = Nophoto.where(created_at: Date.yesterday.midnight...Date.yesterday.end_of_day)
+        else
+            nophoto = Nophoto.where(created_at: Date.today.midnight...Date.today.end_of_day)
+        end
         respond_to do |format|
             format.json {render json: nophoto }
         end

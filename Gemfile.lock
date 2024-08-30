@@ -412,6 +412,7 @@ DEPENDENCIES
   chartkick
   chromedriver-helper
   coffee-rails (~> 4.2)
+  concurrent-ruby (~> 1.1)
   dalli
   dotenv-rails
   geocoder

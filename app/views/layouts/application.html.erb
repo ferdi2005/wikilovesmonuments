@@ -30,7 +30,7 @@
 </body>
 <footer class="footer">
     <p>
-    Ultimo aggiornamento dei dati: <%= Monument.first.updated_at %>
+    Ultimo aggiornamento dei dati: <%= Sidekiq::Cron::Job.find('import_job').last_enqueue_time unless Sidekiq::Cron::Job.find('import_job').nil? %>
     </p>
     <%= link_to 'About e statistiche', about_path %>
    <!-- -

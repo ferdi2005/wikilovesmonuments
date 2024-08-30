@@ -10,6 +10,6 @@ import_towns_job:
 lookup_job:
   cron: "0 */3 * * *"
   class: "LookupJob"
-create_url_job:
-  cron: "0 */4 * * *"
-  class: "CreateUrlJob"
+#create_url_job:
+#  cron: "0 */4 * * *"
+#  class: "CreateUrlJob"
