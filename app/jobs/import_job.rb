@@ -99,8 +99,6 @@ QUERY
       end
     end
 
-    g6
-
     monuments_to_be_saved = []
     monuments.uniq.each do |monument|
       mon = {}
