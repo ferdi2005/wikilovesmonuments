@@ -103,11 +103,11 @@ QUERY
     monuments.uniq.each do |monument|
       mon = {}
 
-      mon[:item] = normalize_value(monument["item"]["value"]).split('/')[4]
+      mon[:item] = normalize_value(monument["item"].try(:[], "value")).split('/')[4]
 
-      mon[:wlmid] = normalize_value(monument["wlmid"]["value"])
+      mon[:wlmid] = normalize_value(monument["wlmid"].try(:[], "value"))
 
-      latlongarray = normalize_value(monument["coords"]["value"]).try(:split, '(').try(:[], 1).try(:split, ')').try(:[], 0).try(:split, ' ')
+      latlongarray = normalize_value(monument["coords"].try(:[], "value")).try(:split, '(').try(:[], 1).try(:split, ')').try(:[], 0).try(:split, ' ')
       unless latlongarray.nil?
         lat = latlongarray[1]
         long = latlongarray[0]
@@ -118,37 +118,37 @@ QUERY
         mon[:longitude] = nil
       end
 
-      mon[:itemlabel] = normalize_value(monument["itemLabel"]["value"])
+      mon[:itemlabel] = normalize_value(monument["itemLabel"].try(:[], "value"))
 
-      mon[:image] = normalize_value(monument["image"]["value"]).try(:split, 'Special:FilePath/').try(:[], 1)
+      mon[:image] = normalize_value(monument["image"].try(:[], "value")).try(:split, 'Special:FilePath/').try(:[], 1)
 
-      mon[:commons] = normalize_value(monument["commons"]["value"])
+      mon[:commons] = normalize_value(monument["commons"].try(:[], "value"))
 
-      mon[:itemdescription] = normalize_value(monument["itemDescription"]["value"])
+      mon[:itemdescription] = normalize_value(monument["itemDescription"].try(:[], "value"))
 
-      mon[:wikipedia] = normalize_value(monument["sitelink"]["value"])
+      mon[:wikipedia] = normalize_value(monument["sitelink"].try(:[], "value"))
 
-      mon[:regione] = regioni[normalize_value(monument["regione"]["value"]).split('/')[4]]
+      mon[:regione] = regioni[normalize_value(monument["regione"].try(:[], "value")).split('/')[4]]
 
-      mon[:enddate] = normalize_value(monument["enddate"]["value"])
+      mon[:enddate] = normalize_value(monument["enddate"].try(:[], "value"))
 
-      mon[:year] = normalize_value(monument["year"]["value"])
+      mon[:year] = normalize_value(monument["year"].try(:[], "value"))
 
-      mon[:city_item] = normalize_value(monument["unit"]["value"]).split('/')[4]
+      mon[:city_item] = normalize_value(monument["unit"].try(:[], "value")).split('/')[4]
 
-      mon[:city] = normalize_value(monument["unitLabel"]["value"])
+      mon[:city] = normalize_value(monument["unitLabel"].try(:[], "value"))
 
-      mon[:address] = normalize_value(monument["address"]["value"])
+      mon[:address] = normalize_value(monument["address"].try(:[], "value"))
 
-      mon[:allphotos] = 'https://commons.wikimedia.org/w/index.php?search="' + normalize_value(monument["wlmid"]["value"]) + + '"'
+      mon[:allphotos] = 'https://commons.wikimedia.org/w/index.php?search="' + normalize_value(monument["wlmid"].try(:[], "value")) + + '"'
 
-      if normalize_value(monument["instanceof"]["value"]) == "http://www.wikidata.org/entity/Q811534"
+      if normalize_value(monument["instanceof"].try(:[], "value")) == "http://www.wikidata.org/entity/Q811534"
         mon[:tree] = true
       else
         mon[:tree] = false
       end
 
-      if normalize_value(monument["approvedby"]["value"]) == "http://www.wikidata.org/entity/Q85864317"
+      if normalize_value(monument["approvedby"].try(:[], "value")) == "http://www.wikidata.org/entity/Q85864317"
         mon[:is_castle] = true
       else
         mon[:is_castle] = false
