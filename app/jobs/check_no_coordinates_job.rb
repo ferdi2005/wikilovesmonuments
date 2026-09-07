@@ -5,23 +5,23 @@ class CheckNoCoordinatesJob < ApplicationJob
     Monument.where("latitude IS NULL AND photos_count > 0").find_each do |monument|
       coordinates = []
 
-      request = HTTParty.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :iilimit => 500, generator: :search, gsrsearch: '"' + monument.wlmid + '"', gsrwhat: :text, gsrnamespace: 6, gsrlimit: 500, :format => :json}, uri_adapter: Addressable::URI).to_h
+      request = WikimediaApi.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :iilimit => 500, generator: :search, gsrsearch: '"' + monument.wlmid + '"', gsrwhat: :text, gsrnamespace: 6, gsrlimit: 500, :format => :json})
       
       metadata = request.try(:[], "query").try(:[], "pages")
 
       while !request["continue"].nil?
-        request = HTTParty.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :iilimit => 500, generator: :search, gsrsearch: '"' + monument.wlmid + '"', gcmcontinue: request["continue"]["gcmcontinue"], gsrwhat: :text, gsrnamespace: 6, gsrlimit: 500, :format => :json}, uri_adapter: Addressable::URI).to_h["query"]["pages"]
+        request = WikimediaApi.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :iilimit => 500, generator: :search, gsrsearch: '"' + monument.wlmid + '"', gcmcontinue: request["continue"]["gcmcontinue"], gsrwhat: :text, gsrnamespace: 6, gsrlimit: 500, :format => :json})["query"]["pages"]
 
         metadata.merge!(request.try(:[], "query").try(:[], "pages").to_h) # Unisce i due hash
       end
 
       unless monument.commons.blank?
-        request = HTTParty.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :iilimit => 500, generator: :categorymembers, gcmtitle: "Category:#{monument.commons}", gcmnamespace: 6, gcmlimit: 500, format: :json}, uri_adapter: Addressable::URI).to_h
+        request = WikimediaApi.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :iilimit => 500, generator: :categorymembers, gcmtitle: "Category:#{monument.commons}", gcmnamespace: 6, gcmlimit: 500, format: :json})
         
         commonslist = request.try(:[], "query").try(:[], "pages")
 
         while !request["continue"].nil?
-          request = HTTParty.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :iilimit => 500, generator: :categorymembers, gcmtitle: monument.commons, gcmcontinue: request["continue"]["gcmcontinue"], gcmnamespace: 6, gcmlimit: 500, format: :json}, uri_adapter: Addressable::URI).to_h["query"]["pages"]
+          request = WikimediaApi.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :iilimit => 500, generator: :categorymembers, gcmtitle: monument.commons, gcmcontinue: request["continue"]["gcmcontinue"], gcmnamespace: 6, gcmlimit: 500, format: :json})["query"]["pages"]
 
           commonslist.merge!(request.try(:[], "query").try(:[], "pages").to_h) # Unisce i due hash
         end
@@ -30,7 +30,7 @@ class CheckNoCoordinatesJob < ApplicationJob
       metadata.merge!(commonslist.to_h)
 
       unless monument.image.blank?
-        request = HTTParty.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :titles => "File:#{URI.decode_www_form_component(monument.image)}", :format => :json}, uri_adapter: Addressable::URI).to_h
+        request = WikimediaApi.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :titles => "File:#{URI.decode_www_form_component(monument.image)}", :format => :json})
 
         image_data = request.try(:[], "query").try(:[], "pages")
 

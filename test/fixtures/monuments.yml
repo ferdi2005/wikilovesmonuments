@@ -9,8 +9,8 @@ one:
   image: MyString
 
 two:
-  item: MyString
-  wlmid: MyString
+  item: MyString2
+  wlmid: MyString2
   latitude: 9.99
   longitude: 9.99
   itemlabel: MyString
