@@ -36,10 +36,6 @@ Rails.application.routes.draw do
 
   get 'api', to: "pages#api"
 
-  if ENV['WEBSIDEKIQ'] == "TRUE"
-    mount Sidekiq::Web => '/sidekiq'
-  end
-
   # numerics stats
 
     get 'nophoto', to: 'numerics#nophoto'
