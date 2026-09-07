@@ -8,9 +8,11 @@ class WikimediaApi
   DEFAULT_USER_AGENT = 'WikiLovesMonumentsItaly MonumentsFinder/1.5 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using HTTParty Ruby Gem'
   DEFAULT_MAXLAG = 5
   MAX_RETRIES = 5
+  MIN_REQUEST_INTERVAL = 0.35 # Garantisce di non superare il limite di 200 richieste/minuto di Wikimedia
 
   @mutex = Mutex.new
   @pause_until = Time.at(0)
+  @last_request_at = nil
 
   class << self
     attr_reader :mutex
@@ -35,8 +37,24 @@ class WikimediaApi
       sleep(delay) if delay > 0
     end
 
+    def enforce_rate_limit
+      delay = 0
+      @mutex.synchronize do
+        now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        if @last_request_at
+          elapsed = now - @last_request_at
+          delay = MIN_REQUEST_INTERVAL - elapsed if elapsed < MIN_REQUEST_INTERVAL
+        end
+        @last_request_at = now + (delay > 0 ? delay : 0)
+      end
+      sleep(delay) if delay > 0
+    end
+
     def reset_pause!
-      @mutex.synchronize { @pause_until = Time.at(0) }
+      @mutex.synchronize do
+        @pause_until = Time.at(0)
+        @last_request_at = nil
+      end
     end
 
     def get(url, query: {}, headers: {}, max_retries: MAX_RETRIES, maxlag: DEFAULT_MAXLAG)
@@ -56,6 +74,8 @@ class WikimediaApi
 
       loop do
         wait_if_paused
+        enforce_rate_limit
+        wait_if_paused
 
         begin
           response = HTTParty.send(
@@ -70,10 +90,15 @@ class WikimediaApi
           if retries <= max_retries
             backoff = calculate_backoff(nil, retries)
             set_pause(backoff)
-            Rails.logger.warn("WikimediaApi network error: #{e.message}. Retrying in #{backoff}s (attempt #{retries}/#{max_retries})")
+            msg = "[WikimediaApi] Errore di rete: #{e.message}. Attesa di #{backoff}s prima del tentativo #{retries}/#{max_retries}..."
+            puts msg
+            Rails.logger.warn(msg)
+            sleep(backoff)
             next
           else
-            Rails.logger.error("WikimediaApi network error: #{e.message}. Retries exhausted (#{max_retries})")
+            msg = "[WikimediaApi] Errore di rete: #{e.message}. Tentativi esauriti (#{max_retries})"
+            puts msg
+            Rails.logger.error(msg)
             raise e
           end
         end
@@ -85,10 +110,15 @@ class WikimediaApi
             retry_after_header = response.headers['retry-after']
             backoff = calculate_backoff(retry_after_header, retries)
             set_pause(backoff)
-            Rails.logger.warn("WikimediaApi received HTTP #{response.code}. Retrying in #{backoff}s (attempt #{retries}/#{max_retries})")
+            msg = "[WikimediaApi] HTTP #{response.code} ricevuto (Retry-After: #{retry_after_header.inspect}). Attesa di #{backoff}s prima del tentativo #{retries}/#{max_retries}..."
+            puts msg
+            Rails.logger.warn(msg)
+            sleep(backoff)
             next
           else
-            Rails.logger.error("WikimediaApi HTTP #{response.code}. Retries exhausted (#{max_retries})")
+            msg = "[WikimediaApi] HTTP #{response.code}. Tentativi esauriti (#{max_retries})"
+            puts msg
+            Rails.logger.error(msg)
             return to_hash(response)
           end
         end
@@ -106,10 +136,15 @@ class WikimediaApi
               min_delay = lag_seconds.to_f > 0 ? lag_seconds.to_f : 5.0
               backoff = calculate_backoff(retry_after_header, retries, min_delay: min_delay)
               set_pause(backoff)
-              Rails.logger.warn("WikimediaApi received #{error_code} error. Retrying in #{backoff}s (attempt #{retries}/#{max_retries})")
+              msg = "[WikimediaApi] MediaWiki ha restituito #{error_code}. Attesa di #{backoff}s prima del tentativo #{retries}/#{max_retries}..."
+              puts msg
+              Rails.logger.warn(msg)
+              sleep(backoff)
               next
             else
-              Rails.logger.error("WikimediaApi #{error_code} error. Retries exhausted (#{max_retries})")
+              msg = "[WikimediaApi] Errore #{error_code} MediaWiki. Tentativi esauriti (#{max_retries})"
+              puts msg
+              Rails.logger.error(msg)
               return parsed
             end
           end
@@ -122,7 +157,10 @@ class WikimediaApi
     def calculate_backoff(retry_after_header, attempt, min_delay: 2.0)
       if retry_after_header.present?
         parsed_delay = parse_retry_after(retry_after_header)
-        return [parsed_delay, min_delay].max if parsed_delay
+        if parsed_delay
+          # Aggiunta di un buffer di 1.5 secondi per garantire il superamento della finestra sul server
+          return [parsed_delay + 1.5, min_delay].max.round(1)
+        end
       end
 
       delay = (2**attempt) + rand(0.5..1.5)
@@ -130,10 +168,10 @@ class WikimediaApi
     end
 
     def parse_retry_after(header_value)
-      val = header_value.to_s.strip
+      val = Array(header_value).flatten.compact.first.to_s.strip
       return nil if val.empty?
 
-      # Formato numerico in secondi (es. "5" o "120")
+      # Formato numerico in secondi (es. "11" o "11.5")
       if val =~ /\A\d+(\.\d+)?\z/
         return val.to_f
       end

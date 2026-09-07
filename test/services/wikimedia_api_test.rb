@@ -12,12 +12,14 @@ class WikimediaApiTest < ActiveSupport::TestCase
     WikimediaApi.reset_pause!
   end
 
-  test "parse_retry_after con secondi numerici interi e decimali" do
+  test "parse_retry_after con secondi numerici interi e decimali anche in array" do
     assert_equal 5.0, WikimediaApi.parse_retry_after("5")
+    assert_equal 11.0, WikimediaApi.parse_retry_after(["11"])
     assert_equal 120.0, WikimediaApi.parse_retry_after("120")
     assert_equal 12.5, WikimediaApi.parse_retry_after("12.5")
     assert_nil WikimediaApi.parse_retry_after("")
     assert_nil WikimediaApi.parse_retry_after(nil)
+    assert_nil WikimediaApi.parse_retry_after([])
   end
 
   test "parse_retry_after con data HTTP futura" do
@@ -28,13 +30,13 @@ class WikimediaApiTest < ActiveSupport::TestCase
     assert delay >= 55 && delay <= 62
   end
 
-  test "calculate_backoff utilizza retry_after se presente" do
-    delay = WikimediaApi.calculate_backoff("15", 1)
-    assert_equal 15.0, delay
+  test "calculate_backoff utilizza retry_after aggiungendo margine di sicurezza" do
+    delay = WikimediaApi.calculate_backoff(["11"], 1)
+    assert_equal 12.5, delay
   end
 
   test "calculate_backoff applica min_delay" do
-    delay = WikimediaApi.calculate_backoff("1", 1, min_delay: 5.0)
+    delay = WikimediaApi.calculate_backoff("0.1", 1, min_delay: 5.0)
     assert_equal 5.0, delay
   end
 
@@ -53,7 +55,7 @@ class WikimediaApiTest < ActiveSupport::TestCase
     attempts = 0
     fake_response_429 = Struct.new(:code, :headers, :parsed_response, :body).new(
       429,
-      { 'retry-after' => '1' },
+      { 'retry-after' => ['0.1'] },
       nil,
       'Too Many Requests'
     )
