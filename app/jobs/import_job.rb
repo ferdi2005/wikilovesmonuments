@@ -78,8 +78,15 @@ SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelin
       ?item wdt:P131* ?regione.
       ?regione wdt:P31 ?typeRegion.
 
-           ?unit rdfs:label ?unitLabel FILTER (LANG(?unitLabel) = 'it')
-      ?item rdfs:label ?itemLabel FILTER (LANG(?itemLabel) = 'it')
+      OPTIONAL { ?unit rdfs:label ?unitLabelIt FILTER (LANG(?unitLabelIt) = 'it') }
+      OPTIONAL { ?unit rdfs:label ?unitLabelMul FILTER (LANG(?unitLabelMul) = 'mul') }
+      BIND(COALESCE(?unitLabelIt, ?unitLabelMul) AS ?unitLabel)
+
+      OPTIONAL { ?item rdfs:label ?itemLabelIt FILTER (LANG(?itemLabelIt) = 'it') }
+      OPTIONAL { ?item rdfs:label ?itemLabelMul FILTER (LANG(?itemLabelMul) = 'mul') }
+      BIND(COALESCE(?itemLabelIt, ?itemLabelMul) AS ?itemLabel)
+      FILTER (BOUND(?itemLabel))
+
       OPTIONAL { ?item schema:description ?itemDescription FILTER (LANG(?itemDescription) = 'it') }
       }"
     retcount = 0
