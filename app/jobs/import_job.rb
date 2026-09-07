@@ -212,7 +212,11 @@ SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelin
     records_to_upsert = monuments_to_be_saved.values
 
     records_to_upsert.each_slice(5000) do |slice|
-      Monument.upsert_all(slice, unique_by: :item)
+      if Monument.connection.supports_insert_conflict_target?
+        Monument.upsert_all(slice, unique_by: :item)
+      else
+        Monument.upsert_all(slice)
+      end
     end
 
     # Cancella monumenti che non vengono più restituiti dalla query

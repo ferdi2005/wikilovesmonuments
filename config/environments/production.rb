@@ -26,9 +26,11 @@ Rails.application.configure do
   # or in config/master.key. This key is used to decrypt credentials (and other encrypted files).
   # config.require_master_key = true
 
+  toolforge_mode = ENV["TOOLFORGE"].to_s.downcase == "true"
+
   # Disable serving static files from the `/public` folder by default since
-  # Apache or NGINX already handles this.
-  config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present?
+  # Apache or NGINX already handles this (enabled on Toolforge containers).
+  config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present? || toolforge_mode
 
   # Compress CSS using a preprocessor.
   # config.assets.css_compressor = :sass
@@ -52,7 +54,7 @@ Rails.application.configure do
   # config.action_cable.allowed_request_origins = [ "http://example.com", /http:\/\/example.*/ ]
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # config.force_ssl = true
+  config.force_ssl = ENV['FORCE_SSL'].present? ? (ENV['FORCE_SSL'] == 'true') : toolforge_mode
 
   # Include generic and useful information about system operation, but avoid logging too much
   # information to avoid inadvertent exposure of personally identifiable information (PII).
@@ -62,7 +64,19 @@ Rails.application.configure do
   config.log_tags = [ :request_id ]
 
   # Use a different cache store in production.
-  config.cache_store = :mem_cache_store
+  if toolforge_mode
+    redis_cache_url = if ENV["REDIS_PASSWORD"].present?
+                        "redis://:#{ENV['REDIS_PASSWORD']}@redis:6379/0"
+                      else
+                        "redis://redis.svc.tools.eqiad1.wikimedia.cloud:6379/0"
+                      end
+    namespace = ENV["REDIS_NAMESPACE"].presence || "#{ENV['TOOL_TOOLSDB_USER'] || ENV['USER'] || 'wikilovesmonuments'}_cache"
+    config.cache_store = :redis_cache_store, { url: ENV["REDIS_URL"].presence || redis_cache_url, namespace: namespace }
+  elsif ENV["MEMCACHE_SERVERS"].present?
+    config.cache_store = :mem_cache_store
+  else
+    config.cache_store = :memory_store
+  end
   
   # Use a real queuing backend for Active Job (and separate queues per environment).
   # config.active_job.queue_adapter     = :resque
@@ -94,7 +108,7 @@ Rails.application.configure do
   # require "syslog/logger"
   # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new "app-name")
 
-  if ENV["RAILS_LOG_TO_STDOUT"].present?
+  if ENV["RAILS_LOG_TO_STDOUT"].present? || toolforge_mode
     logger           = ActiveSupport::Logger.new(STDOUT)
     logger.formatter = config.log_formatter
     config.logger    = ActiveSupport::TaggedLogging.new(logger)
@@ -103,7 +117,13 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  Rails.application.routes.default_url_options = { host: "cerca.wikilovesmonuments.it" }
+  default_host = if toolforge_mode
+                   tool_name = ENV['TOOL_TOOLSDB_USER'] || ENV['USER'] || 'wikilovesmonuments'
+                   ENV["CANONICAL_HOST"] || "#{tool_name}.toolforge.org"
+                 else
+                   "cerca.wikilovesmonuments.it"
+                 end
+  Rails.application.routes.default_url_options = { host: default_host }
   config.action_mailer.default_url_options = Rails.application.routes.default_url_options
 
 end

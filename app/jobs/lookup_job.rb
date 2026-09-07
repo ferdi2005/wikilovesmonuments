@@ -6,7 +6,9 @@ class LookupJob < ApplicationJob
   def perform(*_args)
     puts "Starting to perform LookupJob..."
 
-    thread_pool = Concurrent::FixedThreadPool.new(3)
+    default_concurrency = (ENV["TOOLFORGE"].to_s.downcase == "true") ? 10 : 3
+    concurrency = ENV.fetch("WIKIMEDIA_CONCURRENCY") { default_concurrency }.to_i
+    thread_pool = Concurrent::FixedThreadPool.new(concurrency)
 
     Monument.find_each do |monument|
       thread_pool.post do

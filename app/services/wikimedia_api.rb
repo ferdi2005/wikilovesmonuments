@@ -8,7 +8,8 @@ class WikimediaApi
   DEFAULT_USER_AGENT = 'WikiLovesMonumentsItaly MonumentsFinder/1.5 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using HTTParty Ruby Gem'
   DEFAULT_MAXLAG = 5
   MAX_RETRIES = 5
-  MIN_REQUEST_INTERVAL = 0.35 # Garantisce di non superare il limite di 200 richieste/minuto di Wikimedia
+  # Su Wikimedia Toolforge non si applica il limite per client esterni di 200 richieste/minuto
+  MIN_REQUEST_INTERVAL = (ENV["TOOLFORGE"].to_s.downcase == "true") ? 0.0 : 0.35
 
   @mutex = Mutex.new
   @pause_until = Time.at(0)
@@ -38,6 +39,8 @@ class WikimediaApi
     end
 
     def enforce_rate_limit
+      return if MIN_REQUEST_INTERVAL <= 0.0
+
       delay = 0
       @mutex.synchronize do
         now = Process.clock_gettime(Process::CLOCK_MONOTONIC)

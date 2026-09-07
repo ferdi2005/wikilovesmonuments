@@ -5,8 +5,10 @@ ruby '3.1.2'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 7.0'
-# Use pgsql as the database for Active Record
+# Use pgsql or mysql2 as the database for Active Record
 gem 'pg'
+gem 'mysql2', '~> 0.5.6'
+gem 'redis-namespace', '~> 1.11'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets

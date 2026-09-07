@@ -39,3 +39,4 @@
 !/csv/.keep
 
 .env
+*.json.gz

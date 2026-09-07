@@ -42,7 +42,20 @@ test:
   database: sample_postgres_test
   pool: 5
 
+<% toolforge_mode = (ENV["TOOLFORGE"].to_s.downcase == "true") %>
+
 production:
+<% if ENV['DATABASE_URL'] && !ENV['DATABASE_URL'].empty? %>
+  url: <%= ENV['DATABASE_URL'] %>
+<% elsif toolforge_mode %>
+  adapter: mysql2
+  encoding: utf8mb4
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: <%= ENV.fetch("TOOL_TOOLSDB_HOST") { "tools.db.svc.wikimedia.cloud" } %>
+  username: <%= ENV["TOOL_TOOLSDB_USER"] || ENV["DBUSERNAME"] || ENV["USER"] %>
+  password: <%= ENV["TOOL_TOOLSDB_PASSWORD"] || ENV["DATABASE_PASSWORD"] %>
+  database: <%= ENV["TOOL_TOOLSDB_DATABASE"] || ENV["DBNAME"] || "#{(ENV['TOOL_TOOLSDB_USER'] || ENV['USER'])}__monuments" %>
+<% else %>
   adapter: postgresql
   host: localhost
   encoding: unicode
@@ -50,3 +63,4 @@ production:
   username: wikilovesmonuments
   password: <%= ENV["DATABASE_PASSWORD"] %>
   pool: 20
+<% end %>

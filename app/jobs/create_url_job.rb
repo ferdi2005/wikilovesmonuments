@@ -3,11 +3,19 @@ class CreateUrlJob < ApplicationJob
 
   def createurl(monument)
     basecat = "Images+from+Wiki+Loves+Monuments+#{Date.today.year}+in+Italy"
-    mon = HTTParty.get("https://it.wikipedia.org/w/api.php?action=parse&text={{%23invoke:WLM|upload_url|#{monument.item}}}&contentmodel=wikitext&format=json",
-                       headers: { 'User-Agent' => 'WikiLovesMonumentsItaly MonumentsFinder/1.5 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using HTTParty Ruby Gem' },
-                       uri_adapter: Addressable::URI).to_h
+    mon = WikimediaApi.get(
+      "https://it.wikipedia.org/w/api.php",
+      query: {
+        action: :parse,
+        text: "{{#invoke:WLM|upload_url|#{monument.item}}}",
+        contentmodel: :wikitext,
+        format: :json
+      }
+    )
+    return if mon.nil? || mon["parse"].nil? || mon.dig("parse", "externallinks").blank?
+
     baselink = mon["parse"]["externallinks"].first + ' '
-    monurl = mon["parse"]["externallinks"].first
+    monurl = mon["parse"]["externallinks"].first.dup
     monurl.gsub!('(', '%28') # fix parentesi (
     monurl.gsub!(')', '%29') # fix parentesi )
 
