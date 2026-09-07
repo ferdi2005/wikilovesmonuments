@@ -36,10 +36,9 @@ class ImportJob < ApplicationJob
         "Q1243" => "Veneto"
       }
 
-    endpoint = 'https://qlever.cs.uni-freiburg.de/api/wikidata'
+    endpoint = 'https://qlever.dev/api/wikidata'
     # Query di Lorenzo Losa
-    sparql = <<QUERY
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    sparql = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX schema: <http://schema.org/>
@@ -79,16 +78,17 @@ SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelin
       ?item wdt:P131* ?regione.
       ?regione wdt:P31 ?typeRegion.
 
-           ?unit rdfs:label ?unitLabel FILTER (LANG(?unitLabel) = "it")
-		   ?item rdfs:label ?itemLabel FILTER (LANG(?itemLabel) = "it")
-		  OPTIONAL { ?item schema:description ?itemDescription FILTER (LANG(?itemDescription) = "it") }
-      }
-QUERY
-
+           ?unit rdfs:label ?unitLabel FILTER (LANG(?unitLabel) = 'it')
+      ?item rdfs:label ?itemLabel FILTER (LANG(?itemLabel) = 'it')
+      OPTIONAL { ?item schema:description ?itemDescription FILTER (LANG(?itemDescription) = 'it') }
+      }"
     retcount = 0
     begin
-      monuments_request = HTTParty.post("https://qlever.cs.uni-freiburg.de/api/wikidata", body: { query: sparql })
-      monuments = monuments_request["results"]["bindings"]
+      monuments_request = HTTParty.post(endpoint, body: { query: sparql }, headers: { 'Accept' => 'application/sparql-results+json' }, format: :json)
+      raise "Risposta non valida da SPARQL (status #{monuments_request.code})" unless monuments_request.success?
+
+      monuments = monuments_request.parsed_response&.dig("results", "bindings")
+      raise "Risultati SPARQL vuoti o non validi" if monuments.nil?
     rescue => e
       retcount += 1
       if retcount < 5
@@ -99,7 +99,8 @@ QUERY
       end
     end
 
-    monuments_to_be_saved = []
+    monuments_to_be_saved = {}
+    now = DateTime.now
     monuments.uniq.each do |monument|
       mon = {}
 
@@ -183,21 +184,34 @@ QUERY
 
       mon[:noupload] = false if mon[:noupload].nil?
 
+      mon[:created_at] = now
+      mon[:updated_at] = now
 
-      monuments_to_be_saved.reject! { |i| i[:item] == mon[:item] } # Elimina duplicati (salvando dunque l'ultimo che arriva) derivanti da dati "sporchi"
-      monuments_to_be_saved.push(mon) unless mon[:wlmid].nil?
+      if existing = monuments_to_be_saved[mon[:item]]
+        mon[:tree] ||= existing[:tree]
+        mon[:is_castle] ||= existing[:is_castle]
+        if mon[:latitude].blank? && existing[:latitude].present?
+          mon[:latitude] = existing[:latitude]
+          mon[:longitude] = existing[:longitude]
+          mon[:hidden] = false
+        end
+        mon[:image] ||= existing[:image]
+        mon[:commons] ||= existing[:commons]
+      end
+
+      monuments_to_be_saved[mon[:item]] = mon unless mon[:wlmid].nil?
     end
 
-    monuments_to_be_saved.uniq!
+    records_to_upsert = monuments_to_be_saved.values
 
-    monuments_to_be_saved.map! { |mon| mon.merge({created_at: DateTime.now, updated_at: DateTime.now})}
-
-    Monument.upsert_all(monuments_to_be_saved, unique_by: :item)
+    records_to_upsert.each_slice(5000) do |slice|
+      Monument.upsert_all(slice, unique_by: :item)
+    end
 
     # Cancella monumenti che non vengono più restituiti dalla query
-    items_to_be_deleted = Monument.pluck(:item).uniq - monuments_to_be_saved.pluck(:item).uniq
+    items_to_be_deleted = Monument.pluck(:item).uniq - monuments_to_be_saved.keys
 
-    items_to_be_deleted.each { |item| Monument.find_by(item: item).destroy }
+    Monument.where(item: items_to_be_deleted).in_batches.destroy_all
 
     # Aggiorna la cache
     CacheWarmJob.perform_later

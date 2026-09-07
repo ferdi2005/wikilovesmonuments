@@ -7,9 +7,6 @@ require "capistrano/deploy"
 # cap install
 # bundle lock --add-platform x86_64-linux
 
-# Installare memcached
-# Inserire utf-8 come enconding in NGINX
-
 # Load the SCM plugin appropriate to your project:
 #
 # require "capistrano/scm/hg"
@@ -37,12 +34,13 @@ install_plugin Capistrano::Puma::Nginx
 # mkdir apps/mysite/shared/tmp/sockets
 
 require 'capistrano/yarn'
-require 'capistrano/lets-encrypt'
 
 require 'capistrano/sidekiq'
 install_plugin Capistrano::Sidekiq  # Default sidekiq tasks
 # Then select your service manager
 install_plugin Capistrano::Sidekiq::Systemd
+
+# cap production sidekiq:install
 
 # su postgres
 # cd
