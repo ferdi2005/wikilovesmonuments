@@ -21,7 +21,7 @@ module Wikilovesmonuments
     config.filter_parameters << :longitude
     
     Raven.configure do |config|
-      config.dsn = ENV["DSN"]
+      config.dsn = "https://#{ENV["DSN_USER"]}:#{ENV["DSN_PASSWORD"]}.ingest.sentry.io/5391912"
       config.sanitize_fields = Rails.application.config.filter_parameters.map(&:to_s)
     end
     
