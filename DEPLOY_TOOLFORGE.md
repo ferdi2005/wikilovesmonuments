@@ -9,7 +9,7 @@ Questa guida documenta la procedura di distribuzione dell'applicazione `wikilove
 - Un account con accesso a Toolforge e iscritto al progetto Wikimedia Cloud Services.
 - Toolforge CLI (`toolforge`) disponibile all'interno dei server bastion (`login.toolforge.org`).
 - Repository Git accessibile (es. `https://github.com/ferdi2005/wikilovesmonuments`).
-- Nei comandi che seguono, sostituisci `<nome_tool>` con il nome effettivo del tool account (ad esempio `cerca-wlm` o `wikilovesmonuments`).
+- Nei comandi che seguono, sostituisci `wlm-italy` con il nome effettivo del tool account (ad esempio `cerca-wlm` o `wikilovesmonuments`).
 
 ---
 
@@ -19,7 +19,7 @@ Accedi via SSH al bastion di Toolforge e passa all'utente del tool:
 
 ```bash
 ssh login.toolforge.org
-become <nome_tool>
+become wlm-italy
 ```
 
 ---
@@ -149,7 +149,7 @@ Esegui il job di migrazione:
 
 ```bash
 toolforge jobs run migrate-job \
-  --image tool-<nome_tool>/tool-<nome_tool>:latest \
+  --image tool-wlm-italy/tool-wlm-italy:latest \
   --command "migrate" \
   --mount all \
   --wait
@@ -177,7 +177,7 @@ toolforge webservice status
 ```
 
 L'applicazione sara raggiungibile all'URL:
-`https://<nome_tool>.toolforge.org/`
+`https://wlm-italy.toolforge.org/`
 
 ---
 
@@ -187,11 +187,11 @@ Avvia il worker per l'esecuzione dei job pianificati in `config/schedule.yml` (`
 
 ```bash
 toolforge jobs run worker-job \
-  --image tool-<nome_tool>/tool-<nome_tool>:latest \
+  --image tool-wlm-italy/tool-wlm-italy:latest \
   --command "worker" \
   --continuous \
   --cpu 1 \
-  --mem 1Gi \
+  --mem 2Gi \
   --emails none \
   --mount all
 ```
@@ -213,20 +213,20 @@ Questo passaggio trasferisce le tabelle `towns`, `nophotos` (serie storiche non 
 ### Procedura automatizzata:
 Dal computer locale, esegui lo script:
 ```bash
-./bin/transfer_to_toolforge.sh <nome_tool>
+./bin/transfer_to_toolforge.sh wlm-italy
 ```
 Lo script:
 1. Si collega via SSH a `deploy@c.ferdi.cc` ed esegue `rake db:export_data`.
 2. Scarica il dump compresso in locale.
-3. Lo carica sul bastion di Toolforge nel percorso `/data/project/<nome_tool>/`.
+3. Lo carica sul bastion di Toolforge nel percorso `/data/project/wlm-italy/`.
 
 ### Esecuzione dell'importazione su Toolforge:
-Dal bastion (`become <nome_tool>`):
+Dal bastion (`become wlm-italy`):
 ```bash
 # Esegui il job di importazione
 toolforge jobs run import-data-job \
-  --image tool-<nome_tool>/tool-<nome_tool>:latest \
-  --command "bundle exec rake 'db:import_data[/data/project/<nome_tool>/wlm_data_NOMEFILE.json.gz]'" \
+  --image tool-wlm-italy/tool-wlm-italy:latest \
+  --command "bundle exec rake 'db:import_data[/data/project/wlm-italy/wlm_data_NOMEFILE.json.gz]'" \
   --mount all \
   --wait
 
@@ -235,7 +235,7 @@ toolforge jobs logs import-data-job
 
 # Al termine, elimina il job e il dump per liberare spazio
 toolforge jobs delete import-data-job
-rm -f /data/project/<nome_tool>/wlm_data_*.json.gz
+rm -f /data/project/wlm-italy/wlm_data_*.json.gz
 ```
 
 ---
@@ -276,7 +276,7 @@ rm -f /data/project/<nome_tool>/wlm_data_*.json.gz
   toolforge build start https://github.com/ferdi2005/wikilovesmonuments
 
   # 2. Esegui eventuali migrazioni
-  toolforge jobs run migrate-job --image tool-<nome_tool>/tool-<nome_tool>:latest --command "migrate" --wait
+  toolforge jobs run migrate-job --image tool-wlm-italy/tool-wlm-italy:latest --command "migrate" --wait
   toolforge jobs delete migrate-job
 
   # 3. Riavvia webservice e worker

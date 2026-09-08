@@ -12,7 +12,7 @@ if ENV["TOOLFORGE"].to_s.downcase == "true"
     end
   end
 
-  module GroupdateRelationBuilderPatch
+  module GroupdateMySQLAdapterPatch
     def group_clause
       offset = Time.current.in_time_zone(@time_zone).strftime("%:z")
       tz_mock = Struct.new(:tzinfo).new(Struct.new(:name).new(offset))
@@ -25,5 +25,10 @@ if ENV["TOOLFORGE"].to_s.downcase == "true"
   end
 
   Groupdate::Magic::Relation.prepend(GroupdateMysqlTimezonePatch)
-  Groupdate::RelationBuilder.prepend(GroupdateRelationBuilderPatch)
+  if defined?(Groupdate::Adapters::MySQLAdapter)
+    Groupdate::Adapters::MySQLAdapter.prepend(GroupdateMySQLAdapterPatch)
+  end
+  if defined?(Groupdate::RelationBuilder)
+    Groupdate::RelationBuilder.prepend(GroupdateMySQLAdapterPatch)
+  end
 end
