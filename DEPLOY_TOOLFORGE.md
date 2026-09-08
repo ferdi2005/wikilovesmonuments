@@ -114,7 +114,8 @@ toolforge envvars create CONSUMER_SECRET "IL_TUO_CONSUMER_SECRET"
 toolforge envvars create WIKIMEDIA_CONCURRENCY 10
 
 # Opzionale: monitoraggio errori Sentry
-# toolforge envvars create DSN "https://..."
+toolforge envvars create DSN_USER "user"
+toolforge envvars create DSN_PASSWORD "password"
 ```
 
 Verifica le variabili impostate:
