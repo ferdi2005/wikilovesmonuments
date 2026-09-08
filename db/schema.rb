@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_05_04_134529) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_08_122444) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -21,26 +21,26 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_04_134529) do
     t.decimal "latitude"
     t.decimal "longitude"
     t.string "itemlabel"
-    t.string "image"
+    t.text "image"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.string "itemdescription"
-    t.string "wikipedia"
+    t.text "wikipedia"
     t.boolean "with_photos"
     t.integer "photos_count"
-    t.string "commons"
-    t.string "uploadurl"
+    t.text "commons"
+    t.text "uploadurl"
     t.string "regione"
-    t.string "nonwlmuploadurl"
+    t.text "nonwlmuploadurl"
     t.boolean "hidden", default: false
     t.datetime "enddate", precision: nil
     t.boolean "duplicate", default: false
     t.string "city"
-    t.string "address"
+    t.text "address"
     t.boolean "tree", default: false
     t.boolean "noupload", default: false
     t.date "year"
-    t.string "allphotos"
+    t.text "allphotos"
     t.string "city_item"
     t.integer "commonsphotos"
     t.boolean "is_castle", default: false
