@@ -118,9 +118,16 @@
 
 
 
+<% if toolforge? %>
+    L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png?lang=it', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="https://foundation.wikimedia.org/wiki/Maps_Terms_of_Use">Wikimedia maps</a>  | <span style="font-family:creativecommons">&#127245;</span> <a href="https://wikidata.org/">Wikidata</a>'
+        }).addTo(map);
+<% else %>
     L.tileLayer('https://api.mapbox.com/styles/v1/ferdi2005/clawzhmr300e614ld6ep6e843/tiles/512/{z}/{x}/{y}@2x?access_token=<%= ENV['MAPBOX_KEY'] %>', {tileSize: 512, zoomOffset: -1,
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors  | <span style="font-family:creativecommons">&#127245;</span> <a href="https://wikidata.org/">Wikidata</a>'
         }).addTo(map);
+<% end %>
 
 
 

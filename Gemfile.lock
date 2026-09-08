@@ -224,6 +224,8 @@ GEM
     msgpack (1.5.3)
     multi_xml (0.6.0)
     multipart-post (2.4.0)
+    mysql2 (0.5.7)
+      bigdecimal
     net-http-persistent (4.0.2)
       connection_pool (~> 2.2)
     net-imap (0.2.3)
@@ -310,6 +312,8 @@ GEM
       rdf (~> 3.3)
       rexml (~> 3.2)
     redis (4.7.1)
+    redis-namespace (1.11.0)
+      redis (>= 4)
     regexp_parser (2.5.0)
     rexml (3.3.6)
       strscan
@@ -433,6 +437,7 @@ DEPENDENCIES
   listen (>= 3.0.5, < 3.2)
   mediawiki_api!
   multipart-post (~> 2.1)
+  mysql2 (~> 0.5.6)
   oauth (~> 0.5.6)
   pagy
   pg
@@ -441,6 +446,7 @@ DEPENDENCIES
   rails (~> 7.0)
   rails_real_favicon
   redis (~> 4.0)
+  redis-namespace (~> 1.11)
   sass-rails (~> 5.0)
   selenium-webdriver
   sentry-raven
