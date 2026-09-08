@@ -2,20 +2,26 @@ class CreateUrlJob < ApplicationJob
   queue_as :default
 
   def createurl(monument)
+    @lakecomo ||= []
+    @valle_del_primo_presepe ||= []
+    @terre_dell_ufita ||= []
+
     basecat = "Images+from+Wiki+Loves+Monuments+#{Date.today.year}+in+Italy"
     mon = WikimediaApi.get(
       "https://it.wikipedia.org/w/api.php",
       query: {
-        action: :parse,
+        action: :expandtemplates,
         text: "{{#invoke:WLM|upload_url|#{monument.item}}}",
-        contentmodel: :wikitext,
+        prop: :wikitext,
         format: :json
       }
     )
-    return if mon.nil? || mon["parse"].nil? || mon.dig("parse", "externallinks").blank?
+    raw_url = mon&.dig("expandtemplates", "wikitext")
+    raw_url ||= mon&.dig("parse", "externallinks")&.first
+    return if raw_url.blank? || !raw_url.start_with?("http")
 
-    baselink = mon["parse"]["externallinks"].first + ' '
-    monurl = mon["parse"]["externallinks"].first.dup
+    baselink = "#{raw_url} "
+    monurl = raw_url.dup
     monurl.gsub!('(', '%28') # fix parentesi (
     monurl.gsub!(')', '%29') # fix parentesi )
 
@@ -44,6 +50,7 @@ class CreateUrlJob < ApplicationJob
     }
 
     regarr = regioni[monument.regione]
+    return if regarr.nil?
     
     if monument.is_castle
       newstring = '+-+' + regarr[0] + "+-+fortifications"
@@ -63,7 +70,7 @@ class CreateUrlJob < ApplicationJob
 
     monurl.gsub!('+-+unknown+region', newstring)
 
-    notwlm = baselink
+    notwlm = baselink.dup
     notwlm.gsub!('(', '%28') # fix parentesi (
     notwlm.gsub!(')', '%29') # fix parentesi )
     notwlm.gsub!(' ', '')
