@@ -1,111 +1,119 @@
+# frozen_string_literal: true
+
 class ImportTownsJob < ApplicationJob
   queue_as :default
 
   def normalize_value(value)
-    if value.to_s == ""
-      return nil
-    elsif value.start_with?("_:")
-      return nil
-    else
-      return value.to_s
-    end
+    return nil if value.to_s.empty? || value.start_with?("_:")
+
+    value.to_s
   end
 
-  def perform(*args)
-    endpoint = "https://query.wikidata.org/sparql"
-    sparql = 'SELECT ?item ?itemLabel ?townLabel ?commons ?coords WHERE {
-      { ?item wdt:P31 wd:Q747074. }
-      UNION
-      { ?item wdt:P31 wd:Q954172. }
-      UNION
-      { ?item wdt:P31 wd:Q1134686. }
+  def perform(*_args)
+    sparql = <<~SPARQL
+      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+      PREFIX wd: <http://www.wikidata.org/entity/>
+      PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 
-      ?item wdt:P131 ?town .
-      OPTIONAL {?item wdt:P373 ?commons .}
-      OPTIONAL {?item wdt:P625 ?coords. }
-      SERVICE wikibase:label { bd:serviceParam wikibase:language "it". }
-    }'
+      SELECT ?item ?itemLabelIt ?itemLabelMul ?townLabelIt ?itemLabelEn ?townLabelEn ?commons ?coords WHERE {
+        VALUES ?type { wd:Q747074 wd:Q954172 wd:Q1134686 }
+        ?item wdt:P31 ?type .
+        ?item wdt:P131 ?town .
+        OPTIONAL { ?item wdt:P373 ?commons . }
+        OPTIONAL { ?item wdt:P625 ?coords . }
+        OPTIONAL { ?item rdfs:label ?itemLabelIt FILTER(LANG(?itemLabelIt) = "it") }
+        OPTIONAL { ?item rdfs:label ?itemLabelMul FILTER(LANG(?itemLabelMul) = "mul") }
+        OPTIONAL { ?town rdfs:label ?townLabelIt FILTER(LANG(?townLabelIt) = "it") }
+        OPTIONAL { ?item rdfs:label ?itemLabelEn FILTER(LANG(?itemLabelEn) = "en") }
+        OPTIONAL { ?town rdfs:label ?townLabelEn FILTER(LANG(?townLabelEn) = "en") }
+      }
+    SPARQL
 
-    retcount = 0
     begin
-      client = SPARQL::Client.new(endpoint, method: :get, headers: { 'User-Agent': 'WikiLovesMonumentsItaly MonumentsFinder/1.5 (https://github.com/ferdi2005/wikilovesmonuments; ferdi.traversa@gmail.com) using Sparql gem ruby/2.2.1' })
-      towns = client.query(sparql)
-    rescue => e
-      retcount += 1
-      if retcount < 5
-        retry
-      else
-        Raven.capture_message('Impossibile eseguire il job di importazione dei comuni per errore nella connessione a SPARQL', level: 'fatal')
-        return
-      end
+      towns = WikidataSparqlClient.query(sparql)
+    rescue StandardError => e
+      Raven.capture_message("Impossibile eseguire il job di importazione dei comuni per errore nella connessione a SPARQL: #{e}", level: "fatal")
+      return
     end
 
-    english_sparql = 'SELECT ?item ?itemLabel ?townLabel ?coords WHERE {
-      { ?item wdt:P31 wd:Q747074. }
-      UNION
-      { ?item wdt:P31 wd:Q954172. }
-      UNION
-      { ?item wdt:P31 wd:Q1134686. }
-
-      ?item wdt:P131 ?town .
-      OPTIONAL {?item wdt:P625 ?coords. }
-      SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-    }'
-
-    retcount = 0
-    begin
-      english_towns = client.query(english_sparql)
-    rescue => e
-      retcount += 1
-      if retcount < 5
-        retry
-      else
-        Raven.capture_message('Impossibile eseguire il job di importazione dei nomi inglesi per errore nella connessione a SPARQL', level: 'fatal')
-        return
-      end
-    end
-
-    Town.delete_all
-    ActiveRecord::Base.connection.reset_pk_sequence!(Town.table_name)
+    now = Time.current
+    records_by_key = {}
 
     towns.each do |town|
-      latlongarray = normalize_value(town[:coords]).try(:split, '(').try(:[], 1).try(:split, ')').try(:[], 0).try(:split, ' ')
-      unless latlongarray.nil?
-        lat = latlongarray[1]
-        long = latlongarray[0]
-        latitude = BigDecimal(lat)
-        longitude = BigDecimal(long)
+      item = normalize_value(town.dig("item", "value"))&.split("/")&.dig(4)
+      next if item.blank?
+
+      name_it = normalize_value(town.dig("itemLabelIt", "value")) || normalize_value(town.dig("itemLabelMul", "value"))
+      next if name_it.blank?
+
+      name_it = name_it.strip
+      town_label_it = normalize_value(town.dig("townLabelIt", "value")).to_s.strip
+
+      latlongarray = normalize_value(town.dig("coords", "value"))&.split("(")&.dig(1)&.split(")")&.dig(0)&.split(" ")
+      if latlongarray.present? && latlongarray.length >= 2
+        latitude = BigDecimal(latlongarray[1])
+        longitude = BigDecimal(latlongarray[0])
       else
         latitude = nil
         longitude = nil
       end
 
-      if town[:townLabel].to_s.strip == ""
+      if town_label_it.empty?
         disambiguation = nil
-        visible_name = town[:itemLabel].to_s.strip
-        search_name = town[:itemLabel].to_s.strip
+        visible_name = name_it
+        search_name = name_it
       else
-        disambiguation = town[:townLabel].to_s.match(/(città metropolitana di)?(provincia di)?(provincia autonoma di)?(.+)/i)[4].strip
-        visible_name = "#{town[:itemLabel].to_s.strip} (#{disambiguation.to_s.strip})"
-        search_name = "#{town[:itemLabel].to_s.strip}, #{disambiguation.to_s.strip}"
+        match = town_label_it.match(/(città metropolitana di)?(provincia di)?(provincia autonoma di)?(.+)/i)
+        disambiguation = match ? match[4].strip : town_label_it
+        visible_name = "#{name_it} (#{disambiguation})"
+        search_name = "#{name_it}, #{disambiguation}"
       end
 
-      item = town[:item].to_s.split('/')[4]
+      commons = normalize_value(town.dig("commons", "value"))
 
-      commons = normalize_value(town[:commons])
+      name_en = normalize_value(town.dig("itemLabelEn", "value"))&.strip
+      town_label_en = normalize_value(town.dig("townLabelEn", "value"))&.strip
+      english_name = if name_en.blank?
+                       visible_name
+                     elsif town_label_en.blank?
+                       name_en
+                     else
+                       "#{name_en} (#{town_label_en})"
+                     end
 
-      english_town = english_towns.find { |t| t[:item].to_s.split('/')[4] == item && t[:itemLabel] != item }
-
-      if english_town.nil?
-        english_name = visible_name
-      elsif english_town[:townLabel].to_s.strip.blank?
-        english_name = english_town[:itemLabel].to_s.strip
-      else
-        english_disambiguation = english_town[:townLabel].to_s.strip
-        english_name = "#{english_town[:itemLabel].to_s.strip} (#{english_disambiguation.to_s.strip})"
+      dedup_key = [name_it, disambiguation]
+      existing = records_by_key[dedup_key]
+      if existing
+        existing[:commons] ||= commons
+        existing[:latitude] ||= latitude
+        existing[:longitude] ||= longitude
+        next
       end
 
-      Town.create(item: item, name: town[:itemLabel].to_s.strip, disambiguation: disambiguation, visible_name: visible_name, search_name: search_name, latitude: latitude, longitude: longitude, english_name: english_name, commons: commons)
+      records_by_key[dedup_key] = {
+        item: item,
+        name: name_it,
+        disambiguation: disambiguation,
+        visible_name: visible_name,
+        search_name: search_name,
+        latitude: latitude,
+        longitude: longitude,
+        english_name: english_name,
+        commons: commons,
+        created_at: now,
+        updated_at: now
+      }
+    end
+
+    records = records_by_key.values
+    return if records.empty?
+
+    Town.transaction do
+      Town.delete_all
+      ActiveRecord::Base.connection.reset_pk_sequence!(Town.table_name)
+      records.each_slice(2000) do |slice|
+        Town.insert_all(slice)
+      end
     end
   end
 end

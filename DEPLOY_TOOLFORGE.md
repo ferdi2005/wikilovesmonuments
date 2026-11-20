@@ -57,6 +57,13 @@ Su Toolforge ogni tool dispone di accesso a un'istanza MariaDB gestita (ToolsDB)
    EXIT;
    ```
 
+### Accesso alle database replica di Commons (`commonswiki_p`)
+Quando `TOOLFORGE=true`, i job `LookupJob` e `CheckNoCoordinatesJob` interrogano direttamente in sola lettura le due repliche MariaDB su cui è distribuito `commonswiki_p` utilizzando le stesse credenziali presenti in `~/replica.my.cnf` (`TOOL_TOOLSDB_USER` e `TOOL_TOOLSDB_PASSWORD`, oppure `TOOL_REPLICA_USER` e `TOOL_REPLICA_PASSWORD`):
+- **Cluster core (`s4`)**: `commonswiki.analytics.db.svc.wikimedia.cloud` per le tabelle `category`, `file`, `filerevision`, `image` e `page`.
+- **Cluster links (`x4`)**: `links.commonswiki.analytics.db.svc.wikimedia.cloud` per le tabelle `categorylinks`, `linktarget` e `page`.
+
+Per eseguire test in locale tramite tunnel SSH verso le repliche di Toolforge, imposta `USE_TOOLFORGE_REPLICAS=true` insieme a `TOOL_COMMONS_REPLICA_HOST`, `TOOL_COMMONS_REPLICA_PORT`, `TOOL_COMMONS_LINKS_REPLICA_HOST` e `TOOL_COMMONS_LINKS_REPLICA_PORT`.
+
 ---
 
 ## 4. Configurazione di Redis
@@ -110,8 +117,11 @@ toolforge envvars create MAPBOX_SECRET "IL_TUO_MAPBOX_SECRET"
 toolforge envvars create CONSUMER_KEY "IL_TUO_CONSUMER_KEY"
 toolforge envvars create CONSUMER_SECRET "IL_TUO_CONSUMER_SECRET"
 
-# Opzionale: concorrenza chiamate Commons in LookupJob (predefinito: 10)
+# Opzionale: concorrenza chiamate Commons in LookupJob quando si usa il fallback API (predefinito: 10)
 toolforge envvars create WIKIMEDIA_CONCURRENCY 10
+
+# Opzionale: endpoint SPARQL personalizzato compatibile con QLever o WDQS (predefinito: https://qlever.dev/api/wikidata con fallback a https://query.wikidata.org/sparql)
+toolforge envvars create WIKIDATA_SPARQL_ENDPOINT "https://qlever.dev/api/wikidata"
 
 # Opzionale: monitoraggio errori Sentry
 toolforge envvars create DSN_USER "user"
@@ -183,7 +193,10 @@ L'applicazione sara raggiungibile all'URL:
 
 ## 9. Avvio del worker Sidekiq in background
 
-Avvia il worker per l'esecuzione dei job pianificati in `config/schedule.yml` (`ImportJob`, `LookupJob`, `CheckDuplicatesJob`, `ImportTownsJob`):
+Avvia il worker per l'esecuzione dei job pianificati in `config/schedule.yml`:
+- `ImportJob`: importazione giornaliera dei monumenti da Wikidata (SPARQL compatibile con QLever e WDQS), calcolo in memoria dei duplicati e generazione locale degli URL di caricamento;
+- `LookupJob`: aggiornamento giornaliero dei conteggi fotografici e delle categorie dalla replica `commonswiki_p`, calcolo delle coordinate presunte dai metadati EXIF per i monumenti senza coordinate (`CheckNoCoordinatesJob`), salvataggio statistiche giornaliere `Nophoto` e aggiornamento della cache mappa;
+- `ImportTownsJob`: importazione mensile dei comuni da Wikidata tramite query unificata IT e EN.
 
 ```bash
 toolforge jobs run worker-job \

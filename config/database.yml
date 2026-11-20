@@ -64,3 +64,19 @@ production:
   password: <%= ENV["DATABASE_PASSWORD"] %>
   pool: 20
 <% end %>
+
+commons_replica: &replica_default
+  adapter: mysql2
+  encoding: utf8mb4
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: <%= ENV.fetch("TOOL_COMMONS_REPLICA_HOST") { "commonswiki.analytics.db.svc.wikimedia.cloud" } %>
+  port: <%= ENV.fetch("TOOL_COMMONS_REPLICA_PORT") { 3306 } %>
+  username: <%= ENV["TOOL_REPLICA_USER"] || ENV["TOOL_TOOLSDB_USER"] || ENV["DBUSERNAME"] || ENV["USER"] %>
+  password: <%= ENV["TOOL_REPLICA_PASSWORD"] || ENV["TOOL_TOOLSDB_PASSWORD"] || ENV["DATABASE_PASSWORD"] %>
+  database: <%= ENV.fetch("TOOL_COMMONS_REPLICA_DB") { "commonswiki_p" } %>
+
+commons_links_replica:
+  <<: *replica_default
+  host: <%= ENV.fetch("TOOL_COMMONS_LINKS_REPLICA_HOST") { "links.commonswiki.analytics.db.svc.wikimedia.cloud" } %>
+  port: <%= ENV.fetch("TOOL_COMMONS_LINKS_REPLICA_PORT") { 3306 } %>
+  database: <%= ENV.fetch("TOOL_COMMONS_LINKS_REPLICA_DB") { "commonswiki_p" } %>

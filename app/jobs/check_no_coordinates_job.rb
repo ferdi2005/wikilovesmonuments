@@ -1,68 +1,49 @@
+# frozen_string_literal: true
+
 class CheckNoCoordinatesJob < ApplicationJob
   queue_as :default
 
+  def self.update_monument_coordinates!(monument, coordinates)
+    return if coordinates.blank?
+
+    lats = coordinates.map(&:first)
+    lons = coordinates.map(&:last)
+    maxlat = lats.max&.truncate(5)
+    minlat = lats.min&.truncate(5)
+    maxlon = lons.max&.truncate(5)
+    minlon = lons.min&.truncate(5)
+
+    geocenter = Geocoder::Calculations.geographic_center(coordinates)
+    return if geocenter[0].nan? || geocenter[1].nan?
+
+    monument.update!(
+      presumed_latitude: geocenter[0].truncate(5),
+      presumed_longitude: geocenter[1].truncate(5),
+      presumed_maxlat: maxlat,
+      presumed_minlat: minlat,
+      presumed_maxlon: maxlon,
+      presumed_minlon: minlon
+    )
+  end
+
   def perform(*args)
-    Monument.where("latitude IS NULL AND photos_count > 0").find_each do |monument|
-      coordinates = []
+    if WikimediaReplicaClient.enabled?
+      perform_with_replicas
+    else
+      Api::CheckNoCoordinatesJob.new.perform(*args)
+    end
+  end
 
-      request = WikimediaApi.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :iilimit => 500, generator: :search, gsrsearch: '"' + monument.wlmid + '"', gsrwhat: :text, gsrnamespace: 6, gsrlimit: 500, :format => :json})
-      
-      metadata = request.try(:[], "query").try(:[], "pages")
+  private
 
-      while !request["continue"].nil?
-        request = WikimediaApi.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :iilimit => 500, generator: :search, gsrsearch: '"' + monument.wlmid + '"', gcmcontinue: request["continue"]["gcmcontinue"], gsrwhat: :text, gsrnamespace: 6, gsrlimit: 500, :format => :json})["query"]["pages"]
+  def perform_with_replicas
+    monuments = Monument.where("latitude IS NULL AND (photos_count > 0 OR with_photos = ?)", true).to_a
+    return if monuments.empty?
 
-        metadata.merge!(request.try(:[], "query").try(:[], "pages").to_h) # Unisce i due hash
-      end
-
-      unless monument.commons.blank?
-        request = WikimediaApi.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :iilimit => 500, generator: :categorymembers, gcmtitle: "Category:#{monument.commons}", gcmnamespace: 6, gcmlimit: 500, format: :json})
-        
-        commonslist = request.try(:[], "query").try(:[], "pages")
-
-        while !request["continue"].nil?
-          request = WikimediaApi.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :iilimit => 500, generator: :categorymembers, gcmtitle: monument.commons, gcmcontinue: request["continue"]["gcmcontinue"], gcmnamespace: 6, gcmlimit: 500, format: :json})["query"]["pages"]
-
-          commonslist.merge!(request.try(:[], "query").try(:[], "pages").to_h) # Unisce i due hash
-        end
-      end
-      
-      metadata.merge!(commonslist.to_h)
-
-      unless monument.image.blank?
-        request = WikimediaApi.get("https://commons.wikimedia.org/w/api.php", query: { :action => :query, :prop => :imageinfo, :iiprop => "metadata", :titles => "File:#{URI.decode_www_form_component(monument.image)}", :format => :json})
-
-        image_data = request.try(:[], "query").try(:[], "pages")
-
-        metadata.merge!(image_data.to_h)
-      end
-
-      metadata = metadata.uniq
-
-      next if metadata.blank?
-
-      metadata.each do |_, image|
-        next if _ == "-1" || image["ns"] != 6
-
-        latitude = image["imageinfo"][0]["metadata"].find { |h| h["name"] == "GPSLatitude" }.try(:[], "value").to_d
-        
-        longitude = image["imageinfo"][0]["metadata"].find { |h| h["name"] == "GPSLongitude" }.try(:[], "value").to_d
-
-        if latitude != 0 && longitude != 0
-          coordinates.push([latitude, longitude])
-        end
-      end
-
-      next if coordinates.blank?
-
-      maxlat = coordinates.max { |c| c[0] }[0]&.truncate(5)
-      maxlon = coordinates.max { |c| c[1] }[1]&.truncate(5)
-      minlat = coordinates.min { |c| c[0] }[0]&.truncate(5)
-      minlon = coordinates.min { |c| c[1] }[1]&.truncate(5)
-
-      geocenter = Geocoder::Calculations.geographic_center(coordinates)
-      
-      monument.update!(presumed_latitude: geocenter[0].truncate(5), presumed_longitude: geocenter[1].truncate(5), presumed_maxlat: maxlat, presumed_minlat: minlat, presumed_maxlon: maxlon, presumed_minlon: minlon ) unless geocenter[0].nan? || geocenter[1].nan?
+    coords_by_item = WikimediaReplicaClient.fetch_gps_coordinates_for_monuments(monuments)
+    monuments.each do |monument|
+      coords = coords_by_item[monument.item]
+      self.class.update_monument_coordinates!(monument, coords) if coords.present?
     end
   end
 end

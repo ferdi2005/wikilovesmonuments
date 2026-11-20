@@ -1,15 +1,9 @@
 import_job:
   cron: "0 0 * * *"
   class: "ImportJob"
-check_duplicates:
-  cron: "0 10 * * *"
-  class: "CheckDuplicatesJob"
+lookup_job:
+  cron: "30 0 * * *"
+  class: "LookupJob"
 import_towns_job:
   cron: "0 3 1 * *"
   class: "ImportTownsJob"
-lookup_job:
-  cron: "0 0 * * *"
-  class: "LookupJob"
-#create_url_job:
-#  cron: "0 */4 * * *"
-#  class: "CreateUrlJob"
