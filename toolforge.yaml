@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://gitlab.wikimedia.org/repos/cloud/toolforge/components-api/-/raw/main/openapi/tool-config-schema.json
+config_version: v1beta1
+source_url: https://raw.githubusercontent.com/ferdi2005/wikilovesmonuments/master/toolforge.yaml
+components:
+  web:
+    component_type: webservice
+    build:
+      repository: https://github.com/ferdi2005/wikilovesmonuments
+      ref: master
+    run:
+      cpu: "2"
+      memory: 2Gi
+      mount: all
+      port: 8000
+  worker-job:
+    component_type: continuous
+    build:
+      reuse_from: web
+    run:
+      command: worker
+      cpu: "1"
+      memory: 2Gi
+      mount: all
+      emails: none

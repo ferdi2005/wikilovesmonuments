@@ -296,3 +296,25 @@ rm -f /data/project/wlm-italy/wlm_data_*.json.gz
   toolforge webservice restart
   toolforge jobs restart worker-job
   ```
+
+- **Deploy automatico dopo `git push` con GitHub Actions (`toolforge components`):**
+  Il repository include `toolforge.yaml` e il workflow `.github/workflows/deploy-toolforge.yml`, che avvia build e aggiornamento dei componenti `web` e `worker-job` tramite l'API `toolforge components`.
+
+  Configurazione iniziale su Toolforge (`become wlm-italy`):
+  ```bash
+  # 1. Registra la configurazione dei componenti dal repository
+  curl -fsSL https://raw.githubusercontent.com/ferdi2005/wikilovesmonuments/master/toolforge.yaml | toolforge components config create
+
+  # 2. Genera il token di deploy per GitHub Actions
+  toolforge components deploy-token create
+
+  # 3. Ferma webservice e job avviati manualmente prima del primo deployment gestito da components
+  toolforge webservice stop
+  toolforge jobs delete worker-job
+
+  # 4. Avvia il primo deployment
+  toolforge components deployment create
+  ```
+
+  Su GitHub, in `Settings -> Secrets and variables -> Actions -> New repository secret`, aggiungi il secret `TOOLS_DEPLOY_TOKEN` con il token generato al punto 2. Ad ogni push su `master` il workflow avvia automaticamente il deployment e ne attende il completamento.
+  Dopo il passaggio a `toolforge components`, anche il webservice viene gestito come job Kubernetes chiamato `web`: usa `toolforge jobs list`, `toolforge jobs logs -f web` e `toolforge jobs logs -f worker-job` per stato e log. Eventuali nuove migrazioni database vanno eseguite manualmente tramite `migrate-job`.

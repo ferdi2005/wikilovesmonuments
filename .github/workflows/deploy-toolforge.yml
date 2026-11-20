@@ -1,0 +1,73 @@
+name: Deploy su Toolforge
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-toolforge
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Trigger build e deploy su Toolforge
+    runs-on: ubuntu-latest
+    env:
+      TOOL_NAME: wlm-italy
+      TOOLS_DEPLOY_TOKEN: ${{ secrets.TOOLS_DEPLOY_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Avvia deployment tramite Toolforge Components API
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${TOOLS_DEPLOY_TOKEN:-}" ]]; then
+            echo "::error::Secret TOOLS_DEPLOY_TOKEN non configurato nelle impostazioni del repository GitHub (Settings -> Secrets and variables -> Actions)."
+            exit 1
+          fi
+
+          description="$(git show --no-patch --pretty='format:%h: %s' "${GITHUB_SHA}")"
+          echo "Avvio deploy per: ${description}"
+
+          response="$(jq --null-input --arg description "${description}" '{$description}' | \
+            curl --fail-with-body -sS -X POST --json @- \
+            "https://api.svc.toolforge.org/components/v1/tool/${TOOL_NAME}/deployment?token=${TOOLS_DEPLOY_TOKEN}")"
+
+          echo "${response}" | jq .
+          deployment_id="$(echo "${response}" | jq -r '.data.deploy_id')"
+
+          if [[ -z "${deployment_id}" || "${deployment_id}" == "null" ]]; then
+            echo "::error::Impossibile ottenere deploy_id dalla risposta di Toolforge."
+            exit 1
+          fi
+
+          echo "Deployment avviato con ID: ${deployment_id}"
+          sleep 5
+
+          while true; do
+            current_deployment="$(curl --fail-with-body -sS -X GET \
+              "https://api.svc.toolforge.org/components/v1/tool/${TOOL_NAME}/deployment/${deployment_id}?token=${TOOLS_DEPLOY_TOKEN}")"
+            current_status="$(echo "${current_deployment}" | jq -r '.data.status')"
+            echo "Stato deployment ${deployment_id}: ${current_status}"
+
+            if [[ "${current_status}" =~ ^(running|pending)$ ]]; then
+              sleep 10
+              continue
+            fi
+
+            echo "${current_deployment}" | jq .
+
+            if [[ "${current_status}" == "successful" ]]; then
+              echo "Deployment completato con successo."
+              exit 0
+            fi
+
+            echo "::error::Deployment terminato con stato: ${current_status}"
+            exit 1
+          done
