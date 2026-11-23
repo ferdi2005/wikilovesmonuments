@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_09_08_122444) do
+ActiveRecord::Schema[7.0].define(version: 2026_11_20_132501) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -54,6 +54,10 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_08_122444) do
     t.decimal "presumed_minlat"
     t.decimal "presumed_maxlon"
     t.decimal "presumed_minlon"
+    t.string "instanceof_qid"
+    t.string "monument_type"
+    t.integer "inception_year"
+    t.string "mic_catalog_id"
     t.index ["item"], name: "index_monuments_on_item", unique: true
     t.index ["itemdescription"], name: "index_monuments_on_itemdescription", opclass: :gin_trgm_ops, using: :gin
     t.index ["itemlabel"], name: "index_monuments_on_itemlabel", opclass: :gin_trgm_ops, using: :gin
@@ -84,7 +88,9 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_08_122444) do
     t.decimal "longitude"
     t.string "english_name"
     t.string "commons"
+    t.integer "population"
     t.index ["english_name"], name: "index_towns_on_english_name"
+    t.index ["item"], name: "index_towns_on_item"
     t.index ["name", "disambiguation"], name: "index_towns_on_name_and_disambiguation", unique: true
     t.index ["name"], name: "index_towns_on_name"
   end

@@ -162,4 +162,51 @@ class MonumentsController < ApplicationController
       format.json { render :json => Monument.where(photos_count: 0).pluck(:item, :wlmid)}
     end
   end
+
+  def analytics_endpoint
+    populations_by_item = Town.where.not(item: [nil, ""]).pluck(:item, :population).to_h
+
+    rows = Monument.where.not(wlmid: [nil, ""]).pluck(
+      :item,
+      :wlmid,
+      :itemlabel,
+      :regione,
+      :city,
+      :city_item,
+      :monument_type,
+      :instanceof_qid,
+      :inception_year,
+      :mic_catalog_id,
+      :wikipedia,
+      :commons,
+      :image,
+      :photos_count,
+      :commonsphotos,
+      :hidden
+    ).map do |item, wlmid, label, regione, city, city_item, monument_type, instanceof_qid, inception_year, mic_catalog_id, wikipedia, commons, image, photos_count, commonsphotos, hidden|
+      {
+        item: item,
+        wlmid: wlmid,
+        label: label,
+        regione: regione,
+        city: city,
+        city_item: city_item,
+        municipality_population: city_item ? populations_by_item[city_item] : nil,
+        monument_type: monument_type,
+        instanceof_qid: instanceof_qid,
+        inception_year: inception_year,
+        mic_catalog_id: mic_catalog_id,
+        has_wikipedia: wikipedia.present?,
+        has_commons_category: commons.present?,
+        has_p18: image.present?,
+        photos_count: photos_count.to_i,
+        commonsphotos: commonsphotos.to_i,
+        hidden: hidden == true
+      }
+    end
+
+    respond_to do |format|
+      format.json { render json: rows }
+    end
+  end
 end

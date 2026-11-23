@@ -15,12 +15,13 @@ class ImportTownsJob < ApplicationJob
       PREFIX wd: <http://www.wikidata.org/entity/>
       PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 
-      SELECT ?item ?itemLabelIt ?itemLabelMul ?townLabelIt ?itemLabelEn ?townLabelEn ?commons ?coords WHERE {
+      SELECT ?item ?itemLabelIt ?itemLabelMul ?townLabelIt ?itemLabelEn ?townLabelEn ?commons ?coords ?population WHERE {
         VALUES ?type { wd:Q747074 wd:Q954172 wd:Q1134686 }
         ?item wdt:P31 ?type .
         ?item wdt:P131 ?town .
         OPTIONAL { ?item wdt:P373 ?commons . }
         OPTIONAL { ?item wdt:P625 ?coords . }
+        OPTIONAL { ?item wdt:P1082 ?population . }
         OPTIONAL { ?item rdfs:label ?itemLabelIt FILTER(LANG(?itemLabelIt) = "it") }
         OPTIONAL { ?item rdfs:label ?itemLabelMul FILTER(LANG(?itemLabelMul) = "mul") }
         OPTIONAL { ?town rdfs:label ?townLabelIt FILTER(LANG(?townLabelIt) = "it") }
@@ -70,6 +71,8 @@ class ImportTownsJob < ApplicationJob
       end
 
       commons = normalize_value(town.dig("commons", "value"))
+      raw_pop = normalize_value(town.dig("population", "value"))
+      population = raw_pop&.match?(/\A\d+(\.\d+)?\z/) ? raw_pop.to_i : nil
 
       name_en = normalize_value(town.dig("itemLabelEn", "value"))&.strip
       town_label_en = normalize_value(town.dig("townLabelEn", "value"))&.strip
@@ -87,6 +90,7 @@ class ImportTownsJob < ApplicationJob
         existing[:commons] ||= commons
         existing[:latitude] ||= latitude
         existing[:longitude] ||= longitude
+        existing[:population] = [existing[:population], population].compact.max
         next
       end
 
@@ -100,6 +104,7 @@ class ImportTownsJob < ApplicationJob
         longitude: longitude,
         english_name: english_name,
         commons: commons,
+        population: population,
         created_at: now,
         updated_at: now
       }

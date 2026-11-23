@@ -28,6 +28,39 @@ class ImportJob < ApplicationJob
     "Q1243" => "Veneto"
   }.freeze
 
+  MONUMENT_TYPE_BY_P31 = {
+    "Q16970" => "chiesa",
+    "Q2977" => "chiesa",
+    "Q108325" => "chiesa",
+    "Q160742" => "chiesa",
+    "Q44613" => "chiesa",
+    "Q317557" => "chiesa",
+    "Q1128397" => "chiesa",
+    "Q163687" => "chiesa",
+    "Q39614" => "cimitero",
+    "Q1241568" => "cimitero",
+    "Q33506" => "museo",
+    "Q207694" => "museo",
+    "Q23413" => "castello",
+    "Q57821" => "castello",
+    "Q751876" => "castello",
+    "Q16560" => "palazzo",
+    "Q3950" => "palazzo",
+    "Q12518" => "torre",
+    "Q200334" => "torre",
+    "Q12280" => "ponte",
+    "Q483453" => "fontana",
+    "Q24354" => "teatro",
+    "Q153562" => "teatro",
+    "Q22698" => "parco",
+    "Q1107656" => "parco",
+    "Q7075" => "biblioteca",
+    "Q839954" => "sito_archeologico",
+    "Q4989906" => "monumento_commemorativo",
+    "Q5003624" => "monumento_commemorativo",
+    "Q811534" => "albero"
+  }.freeze
+
   def normalize_value(value)
     return nil if value.to_s.empty? || value.start_with?("_:")
 
@@ -47,7 +80,7 @@ class ImportJob < ApplicationJob
       PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
       PREFIX pqv: <http://www.wikidata.org/prop/qualifier/value/>
 
-      SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regione ?enddate ?unit ?unitLabel ?unitCommons ?address ?approvedby ?religiousSponsor ?year ?instanceof
+      SELECT DISTINCT ?item ?itemLabel ?itemDescription ?coords ?wlmid ?image ?sitelink ?commons ?regione ?enddate ?unit ?unitLabel ?unitCommons ?address ?approvedby ?religiousSponsor ?year ?instanceof ?inception ?micId ?micSiteId
       WHERE {
         ?item p:P2186 ?wlmst .
         ?wlmst ps:P2186 ?wlmid .
@@ -63,6 +96,9 @@ class ImportJob < ApplicationJob
         MINUS { ?item wdt:P31 wd:Q1549591 . }
 
         OPTIONAL { ?item wdt:P31 ?instanceof . }
+        OPTIONAL { ?item wdt:P571 ?inception . }
+        OPTIONAL { ?item wdt:P9051 ?micId . }
+        OPTIONAL { ?item wdt:P9050 ?micSiteId . }
         OPTIONAL { ?item wdt:P625 ?coords . }
         OPTIONAL { ?wlmst pqv:P582 [ wikibase:timeValue ?enddate ] . }
         OPTIONAL { ?wlmst pqv:P585 [ wikibase:timeValue ?year ] . }
@@ -135,7 +171,13 @@ class ImportJob < ApplicationJob
       mon[:address] = normalize_value(monument.dig("address", "value"))
       mon[:allphotos] = %(https://commons.wikimedia.org/w/index.php?search="#{wlmid}")
 
-      mon[:tree] = normalize_value(monument.dig("instanceof", "value")) == "http://www.wikidata.org/entity/Q811534"
+      instanceof_qid = normalize_value(monument.dig("instanceof", "value"))&.split("/")&.dig(4)
+      mon[:instanceof_qid] = instanceof_qid
+      mon[:monument_type] = MONUMENT_TYPE_BY_P31[instanceof_qid]
+      mon[:inception_year] = parse_inception_year(normalize_value(monument.dig("inception", "value")))
+      mon[:mic_catalog_id] = normalize_value(monument.dig("micId", "value")) || normalize_value(monument.dig("micSiteId", "value"))
+
+      mon[:tree] = instanceof_qid == "Q811534"
       mon[:is_castle] = normalize_value(monument.dig("approvedby", "value")) == "http://www.wikidata.org/entity/Q85864317"
       mon[:_religious] = normalize_value(monument.dig("religiousSponsor", "value")).present?
       mon[:_unit_commons] = normalize_value(monument.dig("unitCommons", "value"))
@@ -170,6 +212,10 @@ class ImportJob < ApplicationJob
         end
         mon[:image] ||= existing[:image]
         mon[:commons] ||= existing[:commons]
+        mon[:instanceof_qid] ||= existing[:instanceof_qid]
+        mon[:monument_type] ||= existing[:monument_type]
+        mon[:inception_year] ||= existing[:inception_year]
+        mon[:mic_catalog_id] ||= existing[:mic_catalog_id]
       end
 
       monuments_to_be_saved[mon[:item]] = mon
@@ -210,6 +256,15 @@ class ImportJob < ApplicationJob
   end
 
   private
+
+  def parse_inception_year(raw)
+    return nil if raw.blank?
+
+    match = raw.to_s.match(/\A([+-]?\d{1,4})/)
+    return nil unless match
+
+    match[1].to_i
+  end
 
   def fetch_lakecomo_items
     sparql = <<~SPARQL
