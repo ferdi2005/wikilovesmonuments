@@ -115,7 +115,9 @@ class ImportTownsJob < ApplicationJob
 
     Town.transaction do
       Town.delete_all
-      ActiveRecord::Base.connection.reset_pk_sequence!(Town.table_name)
+      if ActiveRecord::Base.connection.respond_to?(:reset_pk_sequence!)
+        ActiveRecord::Base.connection.reset_pk_sequence!(Town.table_name)
+      end
       records.each_slice(2000) do |slice|
         Town.insert_all(slice)
       end
